@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% import '@SpipuUi/macro/buttons.html.twig' as buttons %}
+
+{% set menuCurrentItem="spipu-process-admin-log" %}
+
+{% block header_title %}{{ parent() }} - {{ block('main_title') }}{% endblock %}
+
+{% block main_title %}{{ 'spipu.process.page.admin.log.list'|trans() }}{% endblock %}
+
+{% block main_actions %}
+{% endblock %}
+
+{% block body %}{{ renderManager(manager) }}{% endblock %}

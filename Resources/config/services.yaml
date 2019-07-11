@@ -1,0 +1,22 @@
+services:
+    # Generic Declaration
+    Spipu\ProcessBundle\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Tests,SpipuProcessBundle.php}'
+        autowire: true
+        autoconfigure: true
+
+    # Steps
+    Spipu\ProcessBundle\Step\:
+        resource: '../../Step/*'
+        public: true
+        tags: ['spipu.process.step']
+
+    # Role Definition
+    Spipu\ProcessBundle\Service\RoleDefinition:
+        tags: ['spipu.user.role']
+
+    Spipu\ProcessBundle\Form\Options\Status:
+        arguments:
+            - '@Spipu\ProcessBundle\Service\Status'
+        public: true

@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+{% import '@SpipuUi/macro/buttons.html.twig' as buttons %}
+{% import '@SpipuUi/macro/size.html.twig' as convertSize %}
+
+{% set menuCurrentItem="spipu-process-admin-log" %}
+
+{%  block main_class %}container-fluid{% endblock %}
+
+{% block header_title %}{{ parent() }} - {{ block('main_title') }}{% endblock %}
+
+{% block main_title %}{{ 'spipu.process.page.admin.log.show'|trans({'%id': resource.id}) }}{% endblock %}
+
+{% block main_actions %}
+    {{ buttons.back(path('spipu_process_admin_log_list')) }}
+    {%  if resource.task %}
+        {{ buttons.show(path('spipu_process_admin_task_show', {'id': resource.task.id }), 'spipu.process.action.show_task') }}
+    {%  endif %}
+    {% if is_granted('ROLE_ADMIN_MANAGE_PROCESS_DELETE') %}
+        {{ buttons.delete(path('spipu_process_admin_log_delete', {'id': resource.id}), 'process_log_' ~ resource.id) }}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12 col-md-6 m-auto">
+            <div class="card mb-3">
+                <div class="card-header font-weight-bold">{{ 'spipu.process.label.log.single'|trans }}</div>
+                <table class="table table-striped table-hover table-sm mb-0">
+                    <tr>
+                        <th class="w-25">{{ 'spipu.process.field.log.id'|trans   }}</th>
+                        <td>{{ resource.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.log.code'|trans }}</th>
+                        <td>{{ resource.code }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.log.task'|trans }}</th>
+                        <td>
+                            {% if resource.task %}
+                                <a href="{{ path('spipu_process_admin_task_show', {'id':resource.task.id}) }}">#{{ resource.task.id }}</a>
+                            {%  else %}
+                                ---
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.log.status'|trans }}</th>
+                        {% include '@SpipuProcess/grid/field/status.html.twig' with {'data': resource.status, 'column': null} %}
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.log.progress'|trans }}</th>
+                        {% include '@SpipuProcess/grid/field/progress.html.twig' with {'data': resource.progress, 'column': null} %}
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.log.created_at'|trans }}</th>
+                        <td>{{ resource.createdAt|date('Y-m-d H:i:s')  }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.log.updated_at'|trans }}</th>
+                        <td>{{ resource.updatedAt|date('Y-m-d H:i:s')  }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-md-12 overflow-auto">
+            <div class="card mb-3">
+                <table class="table table-hover table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{ 'spipu.process.field.message.date'|trans }}</th>
+                            <th>{{ 'spipu.process.field.message.level'|trans }}</th>
+                            <th>{{ 'spipu.process.field.message.memory'|trans }}</th>
+                            <th>{{ 'spipu.process.field.message.memory_peak'|trans }}</th>
+                            <th>{{ 'spipu.process.field.message.duration'|trans }}</th>
+                            <th>{{ 'spipu.process.field.message.message'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%  for message in messages %}
+                            <tr class="{{ message.class }}">
+                                <td>{{ message.date|date('Y-m-d H:i:s') }}</td>
+                                <td>{{ message.level }}</td>
+                                <td>{{ convertSize.bytesToSize(message.memory) }}</td>
+                                <td>{{ convertSize.bytesToSize(message.memory_peak) }}</td>
+                                <td>{{ message.duration }}</td>
+                                <td><pre>{{ message.message|raw }}</pre></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if resource.status == 'running' %}
+    <div id="process-log-card-refresh" class="reload" style="position: fixed; bottom: 2em; right: 2em;">
+        <div class="card mb-3" style="max-width: 18rem;">
+            <div class="card-header">
+                <i class="fas fa-sync-alt"></i>
+                {{ 'spipu.process.refresh.content'|trans }}<span id="process-log-time">10s</span>
+            </div>
+            <div class="card-body text-center" >
+                {{ buttons.defaultButton('', 'spipu.process.refresh.stop',  'danger mr-2',  'stop-circle', 'process-log-stop') }}
+                {{ buttons.defaultButton('', 'spipu.process.refresh.start', 'success mr-2', 'play-circle', 'process-log-start') }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {% if resource.status == 'running' %}
+    <script type="application/javascript">
+
+        window.onload = function () {
+            'use strict';
+
+            let card = $('#process-log-card-refresh');
+
+            $('#process-log-stop').show().click(function () {
+                card.removeClass('reload');
+                $('#process-log-stop').hide();
+                $('#process-log-start').show();
+            });
+
+            $('#process-log-start').hide().click(function () {
+                card.addClass('reload');
+                $('#process-log-stop').show();
+                $('#process-log-start').hide();
+            });
+
+            // Refresh Remaining time to reload
+            (function refreshTime(remaining) {
+                if (card.hasClass('reload')) {
+                    if (remaining === 0) {
+                        location.reload(true);
+                    }
+
+                    $('#process-log-time').html(remaining + 's');
+
+                    if ($('#process-log-card-refresh').hasClass('reload')) {
+                        remaining = remaining - 1;
+                    }
+                }
+                setTimeout(function(){ refreshTime(remaining); }, 1000);
+            })(10);
+        };
+
+        // Scroll to bottom page
+        window.scrollTo(0,document.body.scrollHeight);
+    </script>
+    {% endif %}
+{% endblock %}

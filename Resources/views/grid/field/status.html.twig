@@ -1,0 +1,11 @@
+{% set class='' %}
+{% if data == 'created'  %}{% set class='secondary' %}{% endif %}
+{% if data == 'running'  %}{% set class='primary' %}{% endif %}
+{% if data == 'finished' %}{% set class='success' %}{% endif %}
+{% if data == 'failed'   %}{% set class='danger' %}{% endif %}
+{% set divCss='badge badge-pill badge-' ~ class ~ ' w-100 text-center' %}
+<td class="text-center">
+    <div class="{{ divCss }}">
+        {{ data|label_from_option_name('Spipu\\ProcessBundle\\Form\\Options\\Status')|trans }}
+    </div>
+</td>

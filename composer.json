@@ -1,0 +1,23 @@
+{
+    "name": "spipu/process-bundle",
+    "type": "symfony-bundle",
+    "description": "Spipu Process Bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "laurent Minguet",
+            "email": "contact@minguet.fr"
+        }
+    ],
+    "version": "1.0",
+    "require": {
+        "spipu/ui-bundle": "*",
+        "spipu/configuration-bundle": "*",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spipu\\ProcessBundle\\": "src/"
+        }
+    }
+}

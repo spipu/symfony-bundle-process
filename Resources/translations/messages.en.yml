@@ -1,0 +1,90 @@
+spipu:
+    process:
+        label:
+            task:
+                single:  "Task"
+                plurial: "Tasks"
+            log:
+                single:  "Log"
+                plurial: "Logs"
+
+        page:
+            admin:
+                task:
+                    list:     "Process Tasks"
+                    show:     "Show Process Task #%id"
+                log:
+                    list:     "Process Logs"
+                    show:     "Show Process Log #%id"
+
+        fieldset:
+            task:   "Task"
+            try:    "Try"
+            inputs: "Inputs"
+            logs:   "Logs"
+
+        field:
+            task:
+                id:                       "Id"
+                code:                     "Code"
+                status:                   "Status"
+                progress:                 "Progress"
+                try_last_at:              "Last Try"
+                try_number:               "Try Nb"
+                try_last_message:         "Last Message"
+                can_be_run_automatically: "Auto Rerun"
+                created_at:               "Created"
+                updated_at:               "Updated"
+
+            log:
+                id:                       "Id"
+                code:                     "Process"
+                task:                     "Task"
+                status:                   "Status"
+                progress:                 "Progress"
+                created_at:               "Created"
+                updated_at:               "Updated"
+
+            message:
+                date:                     "Date"
+                level:                    "Date"
+                memory:                   "Mem"
+                memory_peak:              "Peak"
+                duration:                 "Duration"
+                message:                  "Message"
+
+            input:
+                empty:                    "No Input"
+
+        status:
+            created:  "Created"
+            running:  "Running"
+            finished: "Finished"
+            failed:   "Failed"
+
+        action:
+            show_task: "Show the task"
+            rerun:     "ReRun the task"
+            kill:      "Kill the task"
+
+        refresh:
+            title:   "Refresh"
+            content: "Updated in "
+            stop:    "Stop refresh"
+            start:   "Start refresh"
+
+        error:
+            rerun:    "This task can not be rerun in this status"
+            kill:     "This task can not be killed in this status"
+            disable:  "This action has been disabled in the app configuration"
+
+        success:
+            rerun:    "The task has been rerun"
+            kill:     "The task has been killed"
+
+        role:
+            admin:          "Manage Processs"
+            admin_show:     "Manage Processs - Show Tasks and Logs"
+            admin_delete:   "Manage Processs - Delete Tasks and Logs"
+            admin_rerun:    "Manage Processs - Rerun Task"
+            admin_kill:     "Manage Processs - Kill Task"

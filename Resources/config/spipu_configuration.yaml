@@ -1,0 +1,58 @@
+spipu_configuration:
+    process.archive.keep_number:
+        type:     integer
+        required: true
+        default:  "5"
+        unit:     "file(s)"
+
+    process.cleanup.finished_logs:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "1"
+
+    process.cleanup.finished_logs_after:
+        type:     integer
+        required: true
+        default:  "7"
+        unit:     "day(s)"
+
+    process.cleanup.finished_tasks:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "1"
+
+    process.cleanup.finished_tasks_after:
+        type:     integer
+        required: true
+        default:  "7"
+        unit:     "day(s)"
+
+    process.task.can_kill:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "0"
+
+    process.task.automatic_rerun:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "1"
+
+    process.failed.send_email:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "1"
+
+    process.failed.email:
+        type:     email
+        required: true
+        default:  "debug@my-website.fr"
+
+    process.failed.max_retry:
+        type:     integer
+        required: true
+        default:  "5"
