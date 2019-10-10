@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Service;
 
+use DateInterval;
+use DateTime;
 use Spipu\ProcessBundle\Repository\LogRepository;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -175,14 +177,14 @@ class CronManager
      */
     private function prepareLimitDate(int $nbdays): \DateTimeInterface
     {
-        $date = new \DateTime();
+        $date = new DateTime();
 
         $interval = 'PT1H';
         if ($nbdays > 0) {
             $interval = 'P'.$nbdays.'DT1H';
         }
 
-        $date->sub(new \DateInterval($interval));
+        $date->sub(new DateInterval($interval));
 
         return $date;
     }

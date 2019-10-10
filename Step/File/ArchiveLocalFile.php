@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
+use DateTime;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
@@ -44,7 +45,7 @@ class ArchiveLocalFile implements StepInterface
             mkdir($folder, 0777, true);
         }
 
-        $time = (new \DateTime())->format('YmdHisv');
+        $time = (new DateTime())->format('YmdHisv');
         $archiveFilename = $folder.basename($filename).'.'.$time;
 
         $this->logger->debug(sprintf('File archived [%s]', basename($archiveFilename)));

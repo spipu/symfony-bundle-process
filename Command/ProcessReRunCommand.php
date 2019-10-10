@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Command;
 
+use Exception;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\Status as ProcessStatus;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
@@ -94,7 +95,7 @@ class ProcessReRunCommand extends Command
      * @param OutputInterface $output
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
@@ -104,10 +105,10 @@ class ProcessReRunCommand extends Command
 
         $task = $this->processTaskRepository->find($taskId);
         if (!$task) {
-            throw new \Exception('The asked task does not exist');
+            throw new Exception('The asked task does not exist');
         }
         if (!$this->processStatus->canRerun($task->getStatus())) {
-            throw new \Exception(
+            throw new Exception(
                 sprintf(
                     'The asked task [%s] with the status [%s] can not be rerun',
                     $taskId,

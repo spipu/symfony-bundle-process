@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Service;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Spipu\ProcessBundle\Entity\Task as ProcessTask;
@@ -292,7 +293,7 @@ class Logger implements LoggerProcessInterface
     public function log($level, $message, array $context = array())
     {
         $this->messages[] = [
-            'date'        => (new \DateTime())->getTimestamp(),
+            'date'        => (new DateTime())->getTimestamp(),
             'memory'      => memory_get_usage(),
             'memory_peak' => memory_get_peak_usage(),
             'level'       => (string) $level,
