@@ -303,7 +303,7 @@ class Manager
         $this->prepareInputs($process);
         $this->executeUpdateTask($process, Status::CREATED);
 
-        $this->asynchronousCommand->execute('app:process:rerun', [$process->getTask()->getId()]);
+        $this->asynchronousCommand->execute('spipu:process:rerun', [$process->getTask()->getId()]);
 
         return $process->getTask()->getId();
     }

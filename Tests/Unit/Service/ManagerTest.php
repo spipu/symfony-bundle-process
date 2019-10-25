@@ -40,7 +40,7 @@ class ManagerTest extends TestCase
             $asynchronousCommand
                 ->expects($testCase->once())
                 ->method('execute')
-                ->with('app:process:rerun', [1])
+                ->with('spipu:process:rerun', [1])
                 ->willReturn(true);
         }
 
