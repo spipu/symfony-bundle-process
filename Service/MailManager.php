@@ -54,7 +54,7 @@ class MailManager
         $message = "
     Hi,
     
-    This an automatic important technical message.
+    This is an automatic important technical message.
     
     An <b>error</b> occurs during the execution of the following process: <b>{$processLog->getCode()}</b>.
     You can click on the following link for more details:
