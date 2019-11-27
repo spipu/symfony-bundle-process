@@ -6,7 +6,7 @@ namespace Spipu\ProcessBundle\Repository;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * @method Task|null find($id, $lockMode = null, $lockVersion = null)
@@ -23,11 +23,11 @@ class TaskRepository extends ServiceEntityRepository
 
     /**
      * ProcessTaskRepository constructor.
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      * @param Status $status
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         Status $status
     ) {
         parent::__construct($registry, Task::class);
