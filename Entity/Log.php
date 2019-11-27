@@ -5,6 +5,7 @@ namespace Spipu\ProcessBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Spipu\UiBundle\Entity\EntityInterface;
+use Spipu\UiBundle\Entity\TimestampableInterface;
 use Spipu\UiBundle\Entity\TimestampableTrait;
 
 /**
@@ -12,7 +13,7 @@ use Spipu\UiBundle\Entity\TimestampableTrait;
  * @ORM\Entity(repositoryClass="Spipu\ProcessBundle\Repository\LogRepository")
  * @ORM\HasLifecycleCallbacks()
  */
-class Log implements EntityInterface
+class Log implements EntityInterface, TimestampableInterface
 {
     use TimestampableTrait;
 

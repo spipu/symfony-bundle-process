@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Spipu\UiBundle\Entity\EntityInterface;
+use Spipu\UiBundle\Entity\TimestampableInterface;
 use Spipu\UiBundle\Entity\TimestampableTrait;
 
 /**
@@ -15,7 +16,7 @@ use Spipu\UiBundle\Entity\TimestampableTrait;
  * @ORM\Entity(repositoryClass="Spipu\ProcessBundle\Repository\TaskRepository")
  * @ORM\HasLifecycleCallbacks()
  */
-class Task implements EntityInterface
+class Task implements EntityInterface, TimestampableInterface
 {
     use TimestampableTrait;
 
