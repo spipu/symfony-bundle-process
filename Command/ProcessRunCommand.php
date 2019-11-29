@@ -94,10 +94,10 @@ class ProcessRunCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return void
+     * @return int
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Init the new process.
         $processCode = $input->getArgument(static::ARGUMENT_PROCESS);
@@ -114,6 +114,8 @@ class ProcessRunCommand extends Command
         // Display the result.
         $output->writeln(' => Result:');
         $output->writeln($result);
+
+        return 0;
     }
 
     /**

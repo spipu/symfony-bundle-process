@@ -94,10 +94,10 @@ class ProcessReRunCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return void
+     * @return int
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $taskId = (int) $input->getArgument(static::ARGUMENT_TASK);
 
@@ -125,5 +125,7 @@ class ProcessReRunCommand extends Command
 
         $output->writeln(' => Result:');
         $output->writeln($result);
+
+        return 0;
     }
 }
