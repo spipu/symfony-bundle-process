@@ -9,8 +9,17 @@ services:
     # Steps
     Spipu\ProcessBundle\Step\:
         resource: '../../Step/*'
-        public: true
         tags: ['spipu.process.step']
+        public: true
+        autowire: true
+
+    Spipu\ProcessBundle\Step\File\RowReader\Action\:
+        resource: '../../Step/File/RowReader/Action/*'
+        tags: ['spipu.process.row-reader.action']
+
+    Spipu\ProcessBundle\Step\File\RowReader\ActionList:
+        arguments:
+            - !tagged 'spipu.process.row-reader.action'
 
     # Role Definition
     Spipu\ProcessBundle\Service\RoleDefinition:
