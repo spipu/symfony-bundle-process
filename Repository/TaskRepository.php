@@ -6,7 +6,7 @@ namespace Spipu\ProcessBundle\Repository;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Task|null find($id, $lockMode = null, $lockVersion = null)

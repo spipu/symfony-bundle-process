@@ -6,7 +6,7 @@ namespace Spipu\ProcessBundle\Repository;
 use Spipu\ProcessBundle\Entity\Log;
 use Spipu\ProcessBundle\Service\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Log|null find($id, $lockMode = null, $lockVersion = null)
