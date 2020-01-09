@@ -14,6 +14,7 @@ use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\UiBundle\Service\Ui\Definition\EntityDefinitionInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\Json;
 
 /**
  * Process Input Form
@@ -210,6 +211,7 @@ class ProcessForm implements EntityDefinitionInterface
             [
                 'label'    => $code,
                 'required' => true,
+                'constraints' => [new Json()],
                 'help'     => 'spipu.process.help.json'
             ]
         );

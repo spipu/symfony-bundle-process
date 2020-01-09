@@ -210,7 +210,7 @@ class CallRest implements StepInterface
             curl_setopt($curl, $key, $value);
         }
 
-        if (array_key_exists('ssl_verify', $options) && !$options['ssl_verify']) {
+        if (array_key_exists('ssl_verify', $options) && $options['ssl_verify'] === 'false') {
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
         }

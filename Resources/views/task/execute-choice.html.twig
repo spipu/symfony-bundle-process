@@ -31,7 +31,7 @@
                         <td class="text-left">{{ process.name }}</td>
                         <td class="text-center">{% if process.need_inputs%}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td>
                         <td class="text-right">
-                            {{ buttons.defaultLink(path('spipu_process_admin_task_execute', {'taskCode': process.code}), 'spipu.process.action.execute', 'success  btn-sm', 'play-circle') }}
+                            {{ buttons.defaultLink(path('spipu_process_admin_task_execute', {'processCode': process.code}), 'spipu.process.action.execute', 'success  btn-sm', 'play-circle') }}
                         </td>
                     </tr>
 {% endfor %}
