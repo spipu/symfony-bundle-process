@@ -99,6 +99,9 @@ spipu:
             kill:     "This task can not be killed in this status"
             disable:  "This action has been disabled in the app configuration"
 
+        help:
+            json:     "Must be a valid Json format"
+
         success:
             rerun:    "The task has been rerun"
             kill:     "The task has been killed"
