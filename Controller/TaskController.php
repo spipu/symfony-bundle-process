@@ -281,6 +281,10 @@ class TaskController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $processForm->setProcessCode($processCode);
+        if ($this->getUser()) {
+            $processForm->setCurrentUserName((string) $this->getUser()->getUsername());
+        }
+
         $processDefinition = $processForm->getProcessDefinition();
 
         $formManager = $formFactory->create($processForm);

@@ -43,6 +43,11 @@ class ProcessForm implements EntityDefinitionInterface
     private $processCode;
 
     /**
+     * @var string|null
+     */
+    private $currentUserName = null;
+
+    /**
      * ConfigurationForm constructor.
      * @param ConfigReader $configReader
      * @param YesNo $yesNoOptions
@@ -62,6 +67,17 @@ class ProcessForm implements EntityDefinitionInterface
     public function setProcessCode(string $processCode): self
     {
         $this->processCode = $processCode;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $currentUserName
+     * @return self
+     */
+    public function setCurrentUserName(?string $currentUserName): self
+    {
+        $this->currentUserName = $currentUserName;
 
         return $this;
     }
@@ -190,7 +206,7 @@ class ProcessForm implements EntityDefinitionInterface
             Type\ChoiceType::class,
             0,
             [
-                'label'    => $code,
+                'label'    => $this->prepareInputLabel($code),
                 'expanded' => false,
                 'choices'  => $this->yesNoOptions,
                 'required' => true,
@@ -210,7 +226,7 @@ class ProcessForm implements EntityDefinitionInterface
             Type\TextareaType::class,
             0,
             [
-                'label'    => $code,
+                'label'    => $this->prepareInputLabel($code),
                 'required' => true,
                 'constraints' => [new Json()],
                 'help'     => 'spipu.process.help.json'
@@ -225,7 +241,13 @@ class ProcessForm implements EntityDefinitionInterface
      */
     private function createFieldString(string $code): Field
     {
-        return $this->createFieldInput($code, Type\TextType::class);
+        $field = $this->createFieldInput($code, Type\TextType::class);
+
+        if ($code === 'current_user_name' && $this->currentUserName !== null) {
+            $field->setValue($this->currentUserName);
+        }
+
+        return $field;
     }
 
 
@@ -242,9 +264,18 @@ class ProcessForm implements EntityDefinitionInterface
             $fieldType,
             0,
             [
-                'label'    => $code,
-                'required' => true,
+                'label'      => $this->prepareInputLabel($code),
+                'required'   => true
             ]
         );
+    }
+
+    /**
+     * @param string $code
+     * @return string
+     */
+    private function prepareInputLabel(string $code): string
+    {
+        return ucwords(str_replace('_', ' ', $code));
     }
 }
