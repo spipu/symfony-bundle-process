@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\Json;
 
 /**
  * Process Input Form
+ * @SuppressWarnings(PMD.CouplingBetweenObjects)
  */
 class ProcessForm implements EntityDefinitionInterface
 {
@@ -99,7 +100,7 @@ class ProcessForm implements EntityDefinitionInterface
 
         $position = 0;
         foreach ($definition['inputs'] as $code => $type) {
-            $position+= 10;
+            $position += 10;
             $field = $this->createField($code, $type);
             $field->setPosition($position);
             $fieldSet->addField($field);
