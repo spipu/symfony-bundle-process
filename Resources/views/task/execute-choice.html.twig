@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% import '@SpipuUi/macro/buttons.html.twig' as buttons %}
+{% import '@SpipuUi/macro/size.html.twig' as convertSize %}
+
+{% set menuCurrentItem="spipu-process-admin-task" %}
+
+{% block header_title %}{{ parent() }} - {{ block('main_title') }}{% endblock %}
+
+{% block main_title %}{{ 'spipu.process.page.admin.task.choice'|trans() }}{% endblock %}
+
+{% block main_actions %}
+    {{ buttons.back(path('spipu_process_admin_task_list')) }}
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th class="text-left">{{ 'spipu.process.field.process.code'|trans }}</th>
+                        <th class="text-left">{{ 'spipu.process.field.process.name'|trans }}</th>
+                        <th class="text-center">{{ 'spipu.process.field.process.need_inputs'|trans }}</th>
+                        <th class="text-right">{{ 'spipu.ui.grid.action.label'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+{% for process in processes %}
+                    <tr>
+                        <td class="text-left">{{ process.code }}</td>
+                        <td class="text-left">{{ process.name }}</td>
+                        <td class="text-center">{% if process.need_inputs%}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td>
+                        <td class="text-right">
+                            {{ buttons.defaultLink(path('spipu_process_admin_task_execute', {'taskCode': process.code}), 'spipu.process.action.execute', 'success  btn-sm', 'play-circle') }}
+                        </td>
+                    </tr>
+{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

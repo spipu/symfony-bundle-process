@@ -13,6 +13,8 @@ spipu:
                 task:
                     list:     "Process Tasks"
                     show:     "Show Process Task #%id"
+                    choice:   "Select a task to execute"
+                    execute:  "Execute the task #%code"
                 log:
                     list:     "Process Logs"
                     show:     "Show Process Log #%id"
@@ -24,6 +26,15 @@ spipu:
             logs:   "Logs"
 
         field:
+            process:
+                code:                     "Code"
+                name:                     "Name"
+                need_inputs:              "Need Input"
+                parameters:               "Parameters"
+                inputs:                   "Inputs"
+                options:                  "Options"
+                steps:                    "Steps"
+
             task:
                 id:                       "Id"
                 code:                     "Code"
@@ -53,7 +64,15 @@ spipu:
                 duration:                 "Duration"
                 message:                  "Message"
 
+            option:
+                can_be_put_in_queue:        "Can Be Put In Queue"
+                can_be_rerun_automatically: "Can Be Rerun Automatically"
+
+            parameter:
+                empty:                    "No Parameter"
+
             input:
+                type:                     "Type \"%type\""
                 empty:                    "No Input"
 
         status:
@@ -63,9 +82,11 @@ spipu:
             failed:   "Failed"
 
         action:
-            show_task: "Show the task"
-            rerun:     "ReRun the task"
-            kill:      "Kill the task"
+            show_task:      "Show the task"
+            rerun:          "ReRun the task"
+            execute-choice: "Execute new task"
+            execute:        "Execute"
+            kill:           "Kill the task"
 
         refresh:
             title:   "Refresh"
@@ -87,4 +108,5 @@ spipu:
             admin_show:     "Manage Processs - Show Tasks and Logs"
             admin_delete:   "Manage Processs - Delete Tasks and Logs"
             admin_rerun:    "Manage Processs - Rerun Task"
+            admin_execute:  "Manage Processs - Execute Task"
             admin_kill:     "Manage Processs - Kill Task"

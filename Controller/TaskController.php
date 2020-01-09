@@ -3,10 +3,15 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Controller;
 
+use Exception;
+use Spipu\ProcessBundle\Ui\ProcessForm;
+use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\UiBundle\Entity\Form\Field;
 use Spipu\UiBundle\Exception\UiException;
 use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
+use Spipu\UiBundle\Service\Ui\FormFactory;
 use Spipu\UiBundle\Service\Ui\Grid\DataProvider\Doctrine;
 use Spipu\UiBundle\Service\Ui\GridFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -210,11 +215,83 @@ class TaskController extends AbstractController
             $entityManager->flush();
 
             $this->addFlashTrans('success', 'spipu.ui.success.deleted');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addFlash('danger', $e->getMessage());
         }
 
         return $this->redirectToRoute('spipu_process_admin_task_list');
+    }
+
+    /**
+     * @Route(
+     *     "/execute-choice",
+     *     name="spipu_process_admin_task_execute_choice",
+     *     methods="GET"
+     * )
+     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')")
+     * @param ConfigReader $configReader
+     * @return Response
+     * @throws ProcessException
+     */
+    public function executeChoice(ConfigReader $configReader)
+    {
+        $processes = [];
+        foreach (array_keys($configReader->getProcessList()) as $code) {
+            $process = $configReader->getProcessDefinition($code);
+            $processes[$process['code']] = [
+                'code'        => $process['code'],
+                'name'        => $process['name'],
+                'need_inputs' => (count($process['inputs']) > 0),
+            ];
+        }
+
+        ksort($processes);
+
+        return $this->render(
+            '@SpipuProcess/task/execute-choice.html.twig',
+            [
+                'processes' => $processes,
+            ]
+        );
+    }
+
+    /**
+     * @Route(
+     *     "/execute/{taskCode}",
+     *     name="spipu_process_admin_task_execute",
+     * )
+     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')")
+     * @param string $taskCode
+     * @param FormFactory $formFactory
+     * @param ProcessForm $processForm
+     * @return Response
+     * @throws ProcessException
+     * @throws UiException
+     */
+    public function execute(
+        string $taskCode,
+        FormFactory $formFactory,
+        ProcessForm $processForm
+    ) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $processForm->setProcessCode($taskCode);
+        $process = $processForm->getProcessDefinition();
+
+        $manager = $formFactory->create($processForm);
+        $manager->setSubmitButton('spipu.process.action.execute', 'play-circle');
+        if ($manager->validate()) {
+            echo '@todo';
+            exit;
+        }
+
+        return $this->render(
+            '@SpipuProcess/task/execute.html.twig',
+            [
+                'process'     => $process,
+                'formManager' => $manager,
+            ]
+        );
     }
 
     /**

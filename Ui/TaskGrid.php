@@ -149,6 +149,17 @@ class TaskGrid implements GridDefinitionInterface
                     ->useSortable()
             )
             ->setDefaultSort('id', 'desc')
+            ->addGlobalAction(
+                (new Grid\Action(
+                    'execute',
+                    'spipu.process.action.execute-choice',
+                    10,
+                    'spipu_process_admin_task_execute_choice'
+                ))
+                    ->setCssClass('success')
+                    ->setIcon('play')
+            )
+
             ->addRowAction(
                 (new Grid\Action('show', 'spipu.ui.action.show', 10, 'spipu_process_admin_task_show'))
                     ->setCssClass('primary')
