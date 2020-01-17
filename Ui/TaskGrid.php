@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use Spipu\UiBundle\Exception\GridException;
 use Spipu\UiBundle\Service\Ui\Definition\GridDefinitionInterface;
 use Spipu\UiBundle\Entity\Grid;
 use Spipu\UiBundle\Form\Options\YesNo as OptionsYesNo;
@@ -53,7 +54,7 @@ class TaskGrid implements GridDefinitionInterface
 
     /**
      * @return Grid\Grid
-     * @throws \Spipu\UiBundle\Exception\GridException
+     * @throws GridException
      */
     public function getDefinition(): Grid\Grid
     {
@@ -66,7 +67,7 @@ class TaskGrid implements GridDefinitionInterface
 
     /**
      * @return void
-     * @throws \Spipu\UiBundle\Exception\GridException
+     * @throws GridException
      */
     private function prepareGrid(): void
     {

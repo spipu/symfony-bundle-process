@@ -10,21 +10,15 @@ class Inputs
     /**
      * @var Input[]
      */
-    private $inputs;
+    private $inputs = [];
 
     /**
-     * Inputs constructor.
-     * @param array $definitions
-     * @throws InputException
+     * @param Input $input
+     * @return void
      */
-    public function __construct(
-        array $definitions
-    ) {
-        foreach ($definitions as $key => $definition) {
-            $input = new Input($key, $definition['type']);
-
-            $this->inputs[$input->getName()] = $input;
-        }
+    public function addInput(Input $input): void
+    {
+        $this->inputs[$input->getName()] = $input;
     }
 
     /**

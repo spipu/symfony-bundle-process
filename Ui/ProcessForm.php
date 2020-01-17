@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\ProcessBundle\Service\InputsFactory;
@@ -11,6 +12,7 @@ use Spipu\UiBundle\Entity\Form\Field;
 use Spipu\UiBundle\Entity\Form\FieldSet;
 use Spipu\UiBundle\Entity\Form\Form;
 use Spipu\UiBundle\Exception\FormException;
+use Spipu\UiBundle\Form\Options\AbstractOptions;
 use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\UiBundle\Service\Ui\Definition\EntityDefinitionInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -128,7 +130,7 @@ class ProcessForm implements EntityDefinitionInterface
         $position = 0;
         foreach ($inputs->getInputs() as $input) {
             $position += 10;
-            $field = $this->createField($input->getName(), $input->getType());
+            $field = $this->createField($input);
             $field->setPosition($position);
             $fieldSet->addField($field);
         }
@@ -156,14 +158,19 @@ class ProcessForm implements EntityDefinitionInterface
     }
 
     /**
-     * @param string $code
-     * @param string $type
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createField(string $code, string $type): Field
+    private function createField(Input $input): Field
     {
-        switch ($type) {
+        $code = $input->getName();
+
+        if ($input->getOptions()) {
+            return $this->createFieldOptions($code, $input->getOptions());
+        }
+
+        switch ($input->getType()) {
             case 'int':
                 return $this->createFieldInt($code);
 
@@ -283,10 +290,32 @@ class ProcessForm implements EntityDefinitionInterface
 
     /**
      * @param string $code
+     * @param AbstractOptions $options
+     * @return Field
+     * @throws FormException
+     */
+    private function createFieldOptions(string $code, AbstractOptions $options): Field
+    {
+        return new Field(
+            $code,
+            Type\ChoiceType::class,
+            0,
+            [
+                'label'    => $this->prepareInputLabel($code),
+                'expanded' => false,
+                'choices'  => $options,
+                'required' => true,
+            ]
+        );
+    }
+
+    /**
+     * @param string $code
      * @return string
      */
     private function prepareInputLabel(string $code): string
     {
         return ucwords(str_replace('_', ' ', $code));
     }
+
 }
