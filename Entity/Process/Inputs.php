@@ -7,41 +7,23 @@ use Spipu\ProcessBundle\Exception\InputException;
 
 class Inputs
 {
-    const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array'];
-
     /**
-     * @var array
+     * @var Input[]
      */
-    private $definition;
-
-    /**
-     * @var array
-     */
-    private $data = [];
+    private $inputs;
 
     /**
      * Inputs constructor.
-     * @param array $definition
+     * @param array $definitions
      * @throws InputException
      */
     public function __construct(
-        array $definition
+        array $definitions
     ) {
-        $this->definition = $definition;
+        foreach ($definitions as $key => $definition) {
+            $input = new Input($key, $definition['type']);
 
-        $this->validateDefinition();
-    }
-
-    /**
-     * @return void
-     * @throws InputException
-     */
-    private function validateDefinition(): void
-    {
-        foreach ($this->definition as $key => $type) {
-            if (!in_array($type, static::AVAILABLE_TYPES)) {
-                throw new InputException(sprintf('[%s] type for [%s] input is not allowed', $type, $key));
-            }
+            $this->inputs[$input->getName()] = $input;
         }
     }
 
@@ -51,21 +33,11 @@ class Inputs
      */
     public function validate(): bool
     {
-        foreach (array_keys($this->definition) as $key) {
-            if (!array_key_exists($key, $this->data)) {
-                throw new InputException(sprintf('[%s] input is not set', $key));
-            }
+        foreach ($this->inputs as $input) {
+            $input->validate();
         }
 
         return true;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefinition(): array
-    {
-        return $this->definition;
     }
 
     /**
@@ -76,29 +48,7 @@ class Inputs
      */
     public function set(string $key, $value): void
     {
-        if (!array_key_exists($key, $this->definition)) {
-            throw new InputException(sprintf('[%s] input is not authorized', $key));
-        }
-
-        $this->validateValue($key, $value);
-        $this->data[$key] = $value;
-    }
-
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @return bool
-     * @throws InputException
-     */
-    private function validateValue(string $key, $value): bool
-    {
-        $type = $this->definition[$key];
-
-        if (!call_user_func('is_'.$type, $value)) {
-            throw new InputException(sprintf('[%s] must be an %s', $key, $type));
-        }
-
-        return true;
+        $this->getInput($key)->setValue($value);
     }
 
     /**
@@ -108,22 +58,42 @@ class Inputs
      */
     public function get(string $key)
     {
-        if (!array_key_exists($key, $this->definition)) {
-            throw new InputException(sprintf('[%s] input is not authorized', $key));
-        }
-
-        if (!array_key_exists($key, $this->data)) {
-            throw new InputException(sprintf('[%s] input is not set', $key));
-        }
-
-        return $this->data[$key];
+        return $this->getInput($key)->getValue();
     }
 
     /**
      * @return array
+     * @throws InputException
      */
     public function getAll(): array
     {
-        return $this->data;
+        $values = [];
+        foreach ($this->inputs as $input) {
+            $values[$input->getName()] = $input->getValue();
+        }
+
+        return $values;
+    }
+
+    /**
+     * @return Input[]
+     */
+    public function getInputs(): array
+    {
+        return $this->inputs;
+    }
+
+    /**
+     * @param string $key
+     * @return Input
+     * @throws InputException
+     */
+    public function getInput(string $key): Input
+    {
+        if (!array_key_exists($key, $this->inputs)) {
+            throw new InputException(sprintf('[%s] input is not authorized', $key));
+        }
+
+        return $this->inputs[$key];
     }
 }

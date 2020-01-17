@@ -290,26 +290,31 @@ class TaskController extends AbstractController
         $formManager = $formFactory->create($processForm);
         $formManager->setSubmitButton('spipu.process.action.execute', 'play-circle');
         if ($formManager->validate()) {
-            $process = $processManager->load($processCode);
+            try {
+                $process = $processManager->load($processCode);
 
-            foreach ($processDefinition['inputs'] as $inputCode => $inputType) {
-                $inputValue = $formManager->getForm()[$inputCode]->getData();
+                foreach ($process->getInputs()->getInputs() as $input) {
+                    $inputValue = $formManager->getForm()[$input->getName()]->getData();
 
-                switch ($inputType) {
-                    case 'bool':
-                        $inputValue = ($inputValue === '1');
-                        break;
+                    switch ($input->getType()) {
+                        case 'bool':
+                            $inputValue = ($inputValue == 1);
+                            break;
 
-                    case 'array':
-                        $inputValue = json_decode($inputValue, true);
-                        break;
+                        case 'array':
+                            $inputValue = json_decode($inputValue, true);
+                            break;
+                    }
+                    $input->setValue($inputValue);
                 }
-                $process->getInputs()->set($inputCode, $inputValue);
-            }
 
-            $taskId = $processManager->executeAsynchronously($process);
-            sleep(1);
-            return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $taskId]);
+                $taskId = $processManager->executeAsynchronously($process);
+                sleep(1);
+                return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $taskId]);
+            } catch (\Exception $e) {
+                $this->container->get('session')->getFlashBag()->clear();
+                $this->addFlash('danger', $e->getMessage());
+            }
         }
 
         return $this->render(

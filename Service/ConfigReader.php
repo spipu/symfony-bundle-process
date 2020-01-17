@@ -38,8 +38,8 @@ class ConfigReader
     {
         if (null === $this->list) {
             $this->list = [];
-            $processs = $this->container->getParameter('spipu_process');
-            foreach ($processs as $process) {
+            $processes = $this->container->getParameter('spipu_process');
+            foreach ($processes as $process) {
                 $this->list[$process['code']] = $process['name'];
             }
         }
@@ -72,9 +72,9 @@ class ConfigReader
             throw new ProcessException('The asked process does not exists');
         }
 
-        $processs = $this->container->getParameter('spipu_process');
+        $processes = $this->container->getParameter('spipu_process');
 
-        return $processs[$code];
+        return $processes[$code];
     }
 
     /**

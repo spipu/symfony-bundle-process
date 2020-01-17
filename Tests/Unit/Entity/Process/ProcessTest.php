@@ -13,7 +13,7 @@ class ProcessTest extends TestCase
             'test',
             'Test',
             OptionsTest::getOptions($testCase, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => false]),
-            InputsTest::getInputs($testCase, ['name' => 'string']),
+            InputsTest::getInputs($testCase, ['name' => ['type' => 'string']]),
             ParametersTest::getParameters($testCase, ['Foo' => '{{ input.name }}']),
             [
                 'first' => StepTest::getStep(

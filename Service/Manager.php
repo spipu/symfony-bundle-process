@@ -336,18 +336,20 @@ class Manager
     {
         $this->prepareInputs($process);
 
-        foreach ($process->getInputs()->getDefinition() as $key => $type) {
-            $value = $process->getInputs()->get($key);
+        foreach ($process->getInputs()->getInputs() as $input) {
+            $name  = $input->getName();
+            $type  = $input->getType();
+            $value = $input->getValue();
 
             $logger->debug(
                 sprintf(
                     'Input [%s] (%s): %s',
-                    $key,
+                    $name,
                     $type,
                     (is_array($value) ? json_encode($value) : $value)
                 )
             );
-            $process->getParameters()->set('input.'.$key, $value);
+            $process->getParameters()->set('input.'.$name, $value);
         }
     }
 

@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Command;
 
+use Exception;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
 use Symfony\Component\Console\Helper\Table;
@@ -95,7 +96,7 @@ class ProcessRunCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -128,8 +129,8 @@ class ProcessRunCommand extends Command
      */
     private function askInputs(Process $process, array $inputs, InputInterface $input, OutputInterface $output): bool
     {
-        $definition = $process->getInputs()->getDefinition();
-        if (count($definition) === 0) {
+        $inputObjects = $process->getInputs()->getInputs();
+        if (count($inputObjects) === 0) {
             return false;
         }
 
@@ -144,7 +145,9 @@ class ProcessRunCommand extends Command
 
         $first = true;
         $symfonyStyle = null;
-        foreach ($definition as $key => $type) {
+        foreach ($inputObjects as $inputObject) {
+            $key = $inputObject->getName();
+            $type = $inputObject->getType();
             $value = '';
 
             if (array_key_exists($key, $values)) {

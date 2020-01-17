@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use Spipu\ProcessBundle\Entity\Process\Inputs;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\UiBundle\Entity\EntityInterface;
@@ -110,14 +111,16 @@ class ProcessForm implements EntityDefinitionInterface
         if (count($definition['inputs']) === 0) {
             return;
         }
+        $inputs = new Inputs($definition['inputs']);
 
         $fieldSet = new FieldSet('configuration', 'spipu.process.field.process.inputs', 10);
         $fieldSet->setCssClass('col-12');
 
+
         $position = 0;
-        foreach ($definition['inputs'] as $code => $type) {
+        foreach ($inputs->getInputs() as $input) {
             $position += 10;
-            $field = $this->createField($code, $type);
+            $field = $this->createField($input->getName(), $input->getType());
             $field->setPosition($position);
             $fieldSet->addField($field);
         }

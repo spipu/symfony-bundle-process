@@ -14,20 +14,20 @@ class InputsTest extends TestCase
      */
     public static function getInputs(TestCase $testCase, array $description = [])
     {
-        $input = new Inputs($description);
+        $inputs = new Inputs($description);
 
-        return $input;
+        return $inputs;
     }
 
     public function testInvalidType()
     {
         $this->expectException(InputException::class);
-        self::getInputs($this, ['input' => 'wrong']);
+        self::getInputs($this, ['input' => ['type' => 'wrong']]);
     }
 
     public function testInvalidSetterKey()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
         $this->expectException(InputException::class);
         $input->set('wrong', 'value');
@@ -35,7 +35,7 @@ class InputsTest extends TestCase
 
     public function testInvalidGetterKey()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
         $input->set('input', 'value');
 
         $this->expectException(InputException::class);
@@ -44,15 +44,16 @@ class InputsTest extends TestCase
 
     public function testDefinition()
     {
-        $definition = ['input' => 'string'];
-        $input = self::getInputs($this, $definition);
+        $definitions = ['input' => ['type' => 'string']];
+        $inputs = self::getInputs($this, $definitions);
+        $inputs->getInput('input')->getType();
 
-        $this->assertSame($definition, $input->getDefinition());
+        $this->assertSame($definitions['input']['type'], $inputs->getInput('input')->getType());
     }
 
     public function testStringNotSetKey()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
         $this->expectException(InputException::class);
         $input->get('input');
@@ -60,7 +61,7 @@ class InputsTest extends TestCase
 
     public function testStringWrongType()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
         $this->expectException(InputException::class);
         $input->set('input', 10);
@@ -68,14 +69,14 @@ class InputsTest extends TestCase
 
     public function testStringOk()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
         $input->set('input', 'value');
         $this->assertSame('value', $input->get('input'));
     }
 
     public function testIntNotSetKey()
     {
-        $input = self::getInputs($this, ['input' => 'int']);
+        $input = self::getInputs($this, ['input' => ['type' => 'int']]);
 
         $this->expectException(InputException::class);
         $input->get('input');
@@ -83,7 +84,7 @@ class InputsTest extends TestCase
 
     public function testIntWrongType()
     {
-        $input = self::getInputs($this, ['input' => 'int']);
+        $input = self::getInputs($this, ['input' => ['type' => 'int']]);
 
         $this->expectException(InputException::class);
         $input->set('input', '10');
@@ -91,14 +92,14 @@ class InputsTest extends TestCase
 
     public function testIntOk()
     {
-        $input = self::getInputs($this, ['input' => 'int']);
+        $input = self::getInputs($this, ['input' => ['type' => 'int']]);
         $input->set('input', 10);
         $this->assertSame(10, $input->get('input'));
     }
 
     public function testFloatNotSetKey()
     {
-        $input = self::getInputs($this, ['input' => 'float']);
+        $input = self::getInputs($this, ['input' => ['type' => 'float']]);
 
         $this->expectException(InputException::class);
         $input->get('input');
@@ -106,7 +107,7 @@ class InputsTest extends TestCase
 
     public function testFloatWrongType()
     {
-        $input = self::getInputs($this, ['input' => 'float']);
+        $input = self::getInputs($this, ['input' => ['type' => 'float']]);
 
         $this->expectException(InputException::class);
         $input->set('input', '10');
@@ -114,14 +115,17 @@ class InputsTest extends TestCase
 
     public function testFloatOk()
     {
-        $input = self::getInputs($this, ['input' => 'float']);
+        $input = self::getInputs($this, ['input' => ['type' => 'float']]);
         $input->set('input', 10.);
         $this->assertSame(10., $input->get('input'));
+
+        $input->set('input', 9);
+        $this->assertSame(9., $input->get('input'));
     }
 
     public function testBoolNotSetKey()
     {
-        $input = self::getInputs($this, ['input' => 'bool']);
+        $input = self::getInputs($this, ['input' => ['type' => 'bool']]);
 
         $this->expectException(InputException::class);
         $input->get('input');
@@ -129,7 +133,7 @@ class InputsTest extends TestCase
 
     public function testBoolWrongType()
     {
-        $input = self::getInputs($this, ['input' => 'bool']);
+        $input = self::getInputs($this, ['input' => ['type' => 'bool']]);
 
         $this->expectException(InputException::class);
         $input->set('input', '10');
@@ -137,14 +141,14 @@ class InputsTest extends TestCase
 
     public function testBoolOk()
     {
-        $input = self::getInputs($this, ['input' => 'bool']);
+        $input = self::getInputs($this, ['input' => ['type' => 'bool']]);
         $input->set('input', true);
         $this->assertSame(true, $input->get('input'));
     }
 
     public function testArrayNotSetKey()
     {
-        $input = self::getInputs($this, ['input' => 'array']);
+        $input = self::getInputs($this, ['input' => ['type' => 'array']]);
 
         $this->expectException(InputException::class);
         $input->get('input');
@@ -152,7 +156,7 @@ class InputsTest extends TestCase
 
     public function testArrayWrongType()
     {
-        $input = self::getInputs($this, ['input' => 'array']);
+        $input = self::getInputs($this, ['input' => ['type' => 'array']]);
 
         $this->expectException(InputException::class);
         $input->set('input', '10');
@@ -160,14 +164,14 @@ class InputsTest extends TestCase
 
     public function testArrayOk()
     {
-        $input = self::getInputs($this, ['input' => 'array']);
+        $input = self::getInputs($this, ['input' => ['type' => 'array']]);
         $input->set('input', ['value']);
         $this->assertSame(['value'], $input->get('input'));
     }
 
     public function testValidateKo()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
         $this->expectException(InputException::class);
         $input->validate();
@@ -175,7 +179,7 @@ class InputsTest extends TestCase
 
     public function testValidateOk()
     {
-        $input = self::getInputs($this, ['input' => 'string']);
+        $input = self::getInputs($this, ['input' => ['type' => 'string']]);
         $input->set('input', 'value');
         $this->assertTrue($input->validate());
 

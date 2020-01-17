@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\DependencyInjection;
 
-use Spipu\ProcessBundle\Entity\Process\Inputs;
+use Spipu\ProcessBundle\Entity\Process\Input;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -38,8 +38,23 @@ class SpipuProcessConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                     ->arrayNode('inputs')
-                        ->enumPrototype()
-                            ->values(Inputs::AVAILABLE_TYPES)
+                        ->arrayPrototype()
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(
+                                    function ($v) {
+                                        return ['type' => $v];
+                                    }
+                                )
+                            ->end()
+                            ->children()
+                                ->enumNode('type')
+                                    ->values(Input::AVAILABLE_TYPES)
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('options')
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                     ->scalarNode('name')

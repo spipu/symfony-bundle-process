@@ -104,11 +104,11 @@ class SpipuProcessMock extends TestCase
                     'can_be_rerun_automatically' => false,
                 ],
                 'inputs' => [
-                    'input1' => 'string',
-                    'input2' => 'int',
-                    'input3' => 'float',
-                    'input4' => 'bool',
-                    'input5' => 'array',
+                    'input1' => ['type' => 'string'],
+                    'input2' => ['type' => 'int'],
+                    'input3' => ['type' => 'float'],
+                    'input4' => ['type' => 'bool'],
+                    'input5' => ['type' => 'array'],
                 ],
                 'parameters' => [
                     'param1' => 'Foo',
@@ -138,7 +138,7 @@ class SpipuProcessMock extends TestCase
                     'can_be_rerun_automatically' => true,
                 ],
                 'inputs' => [
-                    'generic_exception' => 'bool'
+                    'generic_exception' => ['type' => 'bool'],
                 ],
                 'parameters' => [],
                 'steps' => [
