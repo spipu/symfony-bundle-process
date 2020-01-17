@@ -44,25 +44,33 @@ class Manager
     private $asynchronousCommand;
 
     /**
+     * @var InputsFactory
+     */
+    private $inputsFactory;
+
+    /**
      * Manager constructor.
      * @param ConfigReader $configReader
      * @param MainParameters $mainParameters
      * @param LoggerProcessInterface $logger
      * @param EntityManagerInterface $entityManager
      * @param AsynchronousCommand $asynchronousCommand
+     * @param InputsFactory $inputsFactory
      */
     public function __construct(
         ConfigReader $configReader,
         MainParameters $mainParameters,
         LoggerProcessInterface $logger,
         EntityManagerInterface $entityManager,
-        AsynchronousCommand $asynchronousCommand
+        AsynchronousCommand $asynchronousCommand,
+        InputsFactory $inputsFactory
     ) {
         $this->configReader = $configReader;
         $this->mainParameters = $mainParameters;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->asynchronousCommand = $asynchronousCommand;
+        $this->inputsFactory = $inputsFactory;
     }
 
     /**
@@ -177,9 +185,7 @@ class Manager
      */
     private function loadPrepareParameters(array $parametersDefinition): Process\Parameters
     {
-        $parameters = new Process\Parameters($parametersDefinition);
-
-        return $parameters;
+        return new Process\Parameters($parametersDefinition);
     }
 
     /**
@@ -189,9 +195,7 @@ class Manager
      */
     private function loadPrepareInputs(array $inputsDefinition): Process\Inputs
     {
-        $inputs = new Process\Inputs($inputsDefinition);
-
-        return $inputs;
+        return $this->inputsFactory->create($inputsDefinition);
     }
 
     /**
@@ -201,9 +205,7 @@ class Manager
      */
     private function loadPrepareOptions(array $optionsDefinition): Process\Options
     {
-        $options = new Process\Options($optionsDefinition);
-
-        return $options;
+        return new Process\Options($optionsDefinition);
     }
 
     /**

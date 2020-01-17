@@ -52,7 +52,8 @@ class ManagerTest extends TestCase
             $mainParameters,
             $logger,
             $entityManager,
-            $asynchronousCommand
+            $asynchronousCommand,
+            InputsFactoryTest::getService($testCase)
         );
     }
 

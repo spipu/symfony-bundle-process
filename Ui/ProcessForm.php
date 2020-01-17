@@ -3,9 +3,9 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Ui;
 
-use Spipu\ProcessBundle\Entity\Process\Inputs;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
+use Spipu\ProcessBundle\Service\InputsFactory;
 use Spipu\UiBundle\Entity\EntityInterface;
 use Spipu\UiBundle\Entity\Form\Field;
 use Spipu\UiBundle\Entity\Form\FieldSet;
@@ -34,6 +34,11 @@ class ProcessForm implements EntityDefinitionInterface
     private $configReader;
 
     /**
+     * @var InputsFactory
+     */
+    private $inputsFactory;
+
+    /**
      * @var YesNo
      */
     private $yesNoOptions;
@@ -51,13 +56,16 @@ class ProcessForm implements EntityDefinitionInterface
     /**
      * ConfigurationForm constructor.
      * @param ConfigReader $configReader
+     * @param InputsFactory $inputsFactory
      * @param YesNo $yesNoOptions
      */
     public function __construct(
         ConfigReader $configReader,
+        InputsFactory $inputsFactory,
         YesNo $yesNoOptions
     ) {
         $this->configReader = $configReader;
+        $this->inputsFactory = $inputsFactory;
         $this->yesNoOptions = $yesNoOptions;
     }
 
@@ -111,7 +119,7 @@ class ProcessForm implements EntityDefinitionInterface
         if (count($definition['inputs']) === 0) {
             return;
         }
-        $inputs = new Inputs($definition['inputs']);
+        $inputs = $this->inputsFactory->create($definition['inputs']);
 
         $fieldSet = new FieldSet('configuration', 'spipu.process.field.process.inputs', 10);
         $fieldSet->setCssClass('col-12');

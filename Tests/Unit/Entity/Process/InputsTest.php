@@ -4,6 +4,7 @@ namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Inputs;
 use Spipu\ProcessBundle\Exception\InputException;
+use Spipu\ProcessBundle\Tests\Unit\Service\InputsFactoryTest;
 
 class InputsTest extends TestCase
 {
@@ -14,9 +15,7 @@ class InputsTest extends TestCase
      */
     public static function getInputs(TestCase $testCase, array $description = [])
     {
-        $inputs = new Inputs($description);
-
-        return $inputs;
+        return InputsFactoryTest::getService($testCase)->create($description);
     }
 
     public function testInvalidType()
