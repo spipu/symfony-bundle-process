@@ -5,6 +5,7 @@ namespace Spipu\ProcessBundle\DependencyInjection;
 
 use Spipu\CoreBundle\DependencyInjection\RolesHierarchiExtensionExtensionInterface;
 use Spipu\CoreBundle\Service\RoleDefinitionInterface;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\RoleDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -51,6 +52,7 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchiExt
      * @param array $process
      * @param string $processCode
      * @return array
+     * @throws ProcessException
      * @SuppressWarnings(PMD.CyclomaticComplexity)
      * @SuppressWarnings(PMD.NPathComplexity)
      */
@@ -58,11 +60,32 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchiExt
     {
         $process['code'] = $processCode;
 
+        foreach ($process['inputs'] as $inputCode => &$input) {
+            $input['name'] = $inputCode;
+            $this->validateConfigInput($input);
+        }
+
         foreach ($process['steps'] as $stepCode => &$step) {
             $step['code'] = $stepCode;
         }
 
         return $process;
+    }
+
+    /**
+     * @param array $input
+     * @return void
+     * @throws ProcessException
+     */
+    private function validateConfigInput(array $input): void
+    {
+        if (count($input['allowed_mime_types']) > 0 && $input['type'] !== 'file') {
+            throw new ProcessException('Config Error - allowed_mime_types can be used only with file type');
+        }
+
+        if (!empty($input['options']) && $input['type'] === 'file') {
+            throw new ProcessException('Config Error - options can not be used with file type');
+        }
     }
 
     /**

@@ -138,7 +138,9 @@ class Task implements EntityInterface, TimestampableInterface
         }
 
         foreach ($inputs as $key => $input) {
-            $inputs[$key] = json_encode($input);
+            if (is_array($input) || is_object($input)) {
+                $inputs[$key] = json_encode($input);
+            }
         }
 
         return $inputs;

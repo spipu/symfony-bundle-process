@@ -17,6 +17,7 @@ use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\UiBundle\Service\Ui\Definition\EntityDefinitionInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Json;
 
 /**
@@ -183,6 +184,9 @@ class ProcessForm implements EntityDefinitionInterface
             case 'array':
                 return $this->createFieldArray($code);
 
+            case 'file':
+                return $this->createFieldFile($code, $input->getAllowedMimeTypes());
+
             case 'string':
                 return $this->createFieldString($code);
 
@@ -219,7 +223,7 @@ class ProcessForm implements EntityDefinitionInterface
      */
     private function createFieldBool(string $code): Field
     {
-        return  new Field(
+        return new Field(
             $code,
             Type\ChoiceType::class,
             0,
@@ -239,7 +243,7 @@ class ProcessForm implements EntityDefinitionInterface
      */
     private function createFieldArray(string $code): Field
     {
-        return  new Field(
+        return new Field(
             $code,
             Type\TextareaType::class,
             0,
@@ -290,6 +294,24 @@ class ProcessForm implements EntityDefinitionInterface
 
     /**
      * @param string $code
+     * @param array $allowedMimeTypes
+     * @return Field
+     * @throws FormException
+     */
+    private function createFieldFile(string $code, array $allowedMimeTypes): Field
+    {
+        $field = $this->createFieldInput($code, Type\FileType::class);
+
+        if (count($allowedMimeTypes) > 0) {
+            $field->addOption('constraints', [new File(['mimeTypes' => $allowedMimeTypes])]);
+            $field->addOption('help', implode(',', $allowedMimeTypes));
+        }
+
+        return $field;
+    }
+    
+    /**
+     * @param string $code
      * @param AbstractOptions $options
      * @return Field
      * @throws FormException
@@ -317,5 +339,4 @@ class ProcessForm implements EntityDefinitionInterface
     {
         return ucwords(str_replace('_', ' ', $code));
     }
-
 }

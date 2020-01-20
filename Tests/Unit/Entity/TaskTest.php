@@ -42,13 +42,17 @@ class TaskTest extends TestCase
         $this->assertGreaterThan($date, $entity->getTryLastAt());
 
         $inputs = [
-           'firstname' => 'John',
-           'lastname'  => 'Doe',
+            'firstname' => 'John',
+            'lastname'  => 'Doe',
+            'test'     => ['foo', 'var'],
         ];
 
         $inputsAsJson = [];
         foreach ($inputs as $key => $value) {
-            $inputsAsJson[$key] = json_encode($value);
+            if (is_array($value) || is_object($value)) {
+                $value = json_encode($value);
+            }
+            $inputsAsJson[$key] = $value;
         }
 
         $entity->setInputs(json_encode($inputs));

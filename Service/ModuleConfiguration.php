@@ -127,4 +127,20 @@ class ModuleConfiguration
 
         return $value;
     }
+
+    /**
+     * @return string
+     */
+    public function getFolderImport(): string
+    {
+        return (string) $this->manager->get('process.folder.import');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFolderExport(): string
+    {
+        return (string) $this->manager->get('process.folder.export');
+    }
 }

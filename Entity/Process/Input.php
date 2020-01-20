@@ -8,7 +8,7 @@ use Spipu\UiBundle\Form\Options\AbstractOptions;
 
 class Input
 {
-    const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array'];
+    const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file'];
 
     /**
      * @var string
@@ -26,6 +26,11 @@ class Input
     private $options;
 
     /**
+     * @var string[]
+     */
+    private $allowedMimeTypes;
+
+    /**
      * @var mixed
      */
     private $value;
@@ -35,12 +40,14 @@ class Input
      * @param string $name
      * @param string $type
      * @param AbstractOptions|null $options
+     * @param array $allowedMimeTypes
      * @throws InputException
      */
     public function __construct(
         string $name,
         string $type,
-        AbstractOptions $options = null
+        AbstractOptions $options = null,
+        array $allowedMimeTypes = []
     ) {
         if (!in_array($type, static::AVAILABLE_TYPES)) {
             throw new InputException(
@@ -51,6 +58,7 @@ class Input
         $this->name = $name;
         $this->type = $type;
         $this->options = $options;
+        $this->allowedMimeTypes = $allowedMimeTypes;
     }
 
     /**
@@ -75,6 +83,14 @@ class Input
     public function getOptions(): ?AbstractOptions
     {
         return $this->options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedMimeTypes(): array
+    {
+        return $this->allowedMimeTypes;
     }
 
     /**

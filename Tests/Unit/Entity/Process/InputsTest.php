@@ -15,6 +15,12 @@ class InputsTest extends TestCase
      */
     public static function getInputs(TestCase $testCase, array $description = [])
     {
+        foreach($description as $name => &$config) {
+            $config['name'] = $name;
+            if (!array_key_exists('allowed_mime_types', $config)) {
+                $config['allowed_mime_types'] = [];
+            }
+        }
         return InputsFactoryTest::getService($testCase)->create($description);
     }
 

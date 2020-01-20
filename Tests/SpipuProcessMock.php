@@ -104,11 +104,12 @@ class SpipuProcessMock extends TestCase
                     'can_be_rerun_automatically' => false,
                 ],
                 'inputs' => [
-                    'input1' => ['type' => 'string'],
-                    'input2' => ['type' => 'int'],
-                    'input3' => ['type' => 'float'],
-                    'input4' => ['type' => 'bool'],
-                    'input5' => ['type' => 'array'],
+                    'input1' => ['type' => 'string', 'allowed_mime_types' => []],
+                    'input2' => ['type' => 'int',    'allowed_mime_types' => []],
+                    'input3' => ['type' => 'float',  'allowed_mime_types' => []],
+                    'input4' => ['type' => 'bool',   'allowed_mime_types' => []],
+                    'input5' => ['type' => 'array',  'allowed_mime_types' => []],
+                    'input6' => ['type' => 'file',   'allowed_mime_types' => ['csv']],
                 ],
                 'parameters' => [
                     'param1' => 'Foo',
@@ -138,7 +139,7 @@ class SpipuProcessMock extends TestCase
                     'can_be_rerun_automatically' => true,
                 ],
                 'inputs' => [
-                    'generic_exception' => ['type' => 'bool'],
+                    'generic_exception' => ['type' => 'bool',   'allowed_mime_types' => []],
                 ],
                 'parameters' => [],
                 'steps' => [
@@ -159,6 +160,14 @@ class SpipuProcessMock extends TestCase
         $workflows = static::getConfigurationSampleData();
         foreach ($workflows as $workflowCode => &$workflow) {
             $workflow['code'] = $workflowCode;
+            foreach ($workflow['inputs'] as $inputCode => &$input) {
+                $input['name'] = $inputCode;
+
+                if (!array_key_exists('allowed_mime_types', $input)) {
+                    $input['allowed_mime_types'] = [];
+                }
+            }
+
             foreach ($workflow['steps'] as $stepCode => &$step) {
                 $step['code'] = $stepCode;
             }

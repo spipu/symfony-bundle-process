@@ -178,33 +178,36 @@ class ProcessRunCommand extends Command
      * @param string $type
      * @return int|string
      * @throws InputException
+     * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
     private function validateInput(string $value, string $type)
     {
-        if ($type === 'string') {
-            return (string) $value;
-        }
+        switch ($type) {
+            case 'string':
+                return (string) $value;
 
-        if ($type === 'int') {
-            return (int) $value;
-        }
+            case 'file':
+                $value = (string) $value;
+                if (!is_file($value) || !is_readable($value)) {
+                    throw new InputException('This is not a existing or readable file');
+                }
+                return $value;
 
-        if ($type === 'float') {
-            return (float) $value;
-        }
+            case 'int':
+                return (int) $value;
 
-        if ($type === 'bool') {
-            return in_array(strtolower($value), ['1', 'true', 'y', 'yes']);
-        }
+            case 'float':
+                return (float) $value;
 
-        if ($type === 'array') {
-            $value = json_decode($value, true);
+            case 'bool':
+                return in_array(strtolower($value), ['1', 'true', 'y', 'yes']);
 
-            if ($value === null) {
-                throw new InputException('json format must be used for array type');
-            }
-
-            return $value;
+            case 'array':
+                $value = json_decode($value, true);
+                if ($value === null) {
+                    throw new InputException('json format must be used for array type');
+                }
+                return $value;
         }
 
         throw new InputException('The type is not authorized');

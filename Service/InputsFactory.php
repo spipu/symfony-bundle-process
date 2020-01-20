@@ -34,28 +34,26 @@ class InputsFactory
     public function create(array $definitions): Inputs
     {
         $inputs = new Inputs();
-        foreach ($definitions as $key => $definition) {
-            $inputs->addInput($this->createInput($key, $definition));
+        foreach ($definitions as $definition) {
+            $inputs->addInput($this->createInput($definition));
         }
 
         return $inputs;
     }
 
     /**
-     * @param string $key
      * @param array $definition
      * @return Input
      * @throws InputException
      */
-    private function createInput(string $key, array $definition): Input
+    private function createInput(array $definition): Input
     {
         $options = null;
-
         if (array_key_exists('options', $definition)) {
             /** @var AbstractOptions $options */
             $options = $this->container->get($definition['options']);
         }
 
-        return new Input($key, $definition['type'], $options);
+        return new Input($definition['name'], $definition['type'], $options, $definition['allowed_mime_types']);
     }
 }

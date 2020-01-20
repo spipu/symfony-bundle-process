@@ -4,6 +4,8 @@ declare(strict_types = 1);
 namespace Spipu\ProcessBundle\Controller;
 
 use Exception;
+use Spipu\ProcessBundle\Entity\Process\Input;
+use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Ui\ProcessForm;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
@@ -23,6 +25,7 @@ use Spipu\ProcessBundle\Ui\LogGrid;
 use Spipu\ProcessBundle\Ui\TaskGrid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -297,6 +300,10 @@ class TaskController extends AbstractController
                     $inputValue = $formManager->getForm()[$input->getName()]->getData();
 
                     switch ($input->getType()) {
+                        case 'file':
+                            $inputValue = $this->manageInputFile($process, $input, $inputValue);
+                            break;
+
                         case 'bool':
                             $inputValue = ($inputValue == 1);
                             break;
@@ -324,6 +331,35 @@ class TaskController extends AbstractController
                 'formManager' => $formManager,
             ]
         );
+    }
+
+    /**
+     * @param Process $process
+     * @param Input $input
+     * @param UploadedFile $file
+     * @return string
+     */
+    private function manageInputFile(Process $process, Input $input, UploadedFile $file): string
+    {
+        $processCode = str_replace(['\\', '/', '.'], '', mb_strtolower($process->getCode()));
+        $inputCode = str_replace(['\\', '/', '.'], '', mb_strtolower($input->getName()));
+
+        $folder = $this->configuration->getFolderImport() . '/' . $processCode;
+        $folder = str_replace(['\\', '//'], '/', $folder);
+
+        $extension = $file->guessExtension();
+        if ($extension === '' || $extension === null) {
+            $extension = 'bin';
+        }
+
+        $filename = $inputCode . '_' . date('Ymd_His') . '_' . uniqid() . '.' . $extension;
+
+        if (!is_dir($folder)) {
+            mkdir($folder, 0775, true);
+        }
+        $file->move($folder, $filename);
+
+        return $folder . '/' . $filename;
     }
 
     /**
