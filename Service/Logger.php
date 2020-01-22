@@ -90,6 +90,8 @@ class Logger implements LoggerProcessInterface
         $this->model->setStatus(Status::RUNNING);
         $this->model->setTask($task);
 
+        $this->entityManager->persist($this->model);
+
         $this->nbSteps = $nbSteps;
         $this->setCurrentStep(0);
 
@@ -161,8 +163,17 @@ class Logger implements LoggerProcessInterface
 
         $this->model->setContent(json_encode($this->messages));
 
-        $this->entityManager->persist($this->model);
-        $this->entityManager->flush();
+        try {
+            $this->entityManager->flush();
+        } catch (\Exception $e) {
+            echo "FATAL ERROR DURING ENTITY MANAGER FLUSH!!!";
+            echo "Log Content";
+            echo "============================";
+            print_r($this->messages);
+            echo "============================";
+
+            throw $e;
+        }
     }
 
     /**
