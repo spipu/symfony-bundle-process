@@ -14,6 +14,7 @@ use Spipu\UiBundle\Exception\UiException;
 use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\UiBundle\Service\Ui\FormFactory;
+use Spipu\UiBundle\Service\Ui\FormManagerInterface;
 use Spipu\UiBundle\Service\Ui\Grid\DataProvider\Doctrine;
 use Spipu\UiBundle\Service\Ui\GridFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -271,6 +272,7 @@ class TaskController extends AbstractController
      * @param FormFactory $formFactory
      * @param ProcessForm $processForm
      * @param ProcessManager $processManager
+     * @param Request $request
      * @return Response
      * @throws ProcessException
      * @throws UiException
@@ -279,7 +281,8 @@ class TaskController extends AbstractController
         string $processCode,
         FormFactory $formFactory,
         ProcessForm $processForm,
-        ProcessManager $processManager
+        ProcessManager $processManager,
+        Request $request
     ) {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -294,35 +297,19 @@ class TaskController extends AbstractController
         $formManager->setSubmitButton('spipu.process.action.execute', 'play-circle');
         if ($formManager->validate()) {
             try {
-                $process = $processManager->load($processCode);
-
-                foreach ($process->getInputs()->getInputs() as $input) {
-                    $inputValue = $formManager->getForm()[$input->getName()]->getData();
-
-                    switch ($input->getType()) {
-                        case 'file':
-                            $inputValue = $this->manageInputFile($process, $input, $inputValue);
-                            break;
-
-                        case 'bool':
-                            $inputValue = ($inputValue == 1);
-                            break;
-
-                        case 'array':
-                            $inputValue = json_decode($inputValue, true);
-                            break;
-                    }
-                    $input->setValue($inputValue);
-                }
-
-                $taskId = $processManager->executeAsynchronously($process);
-                sleep(1);
-                return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $taskId]);
-            } catch (\Exception $e) {
+                return $this->redirectToRoute(
+                    'spipu_process_admin_task_show',
+                    [
+                        'id' => $this->launchProcess($processManager, $processCode, $formManager)
+                    ]
+                );
+            } catch (Exception $e) {
                 $this->container->get('session')->getFlashBag()->clear();
                 $this->addFlash('danger', $e->getMessage());
             }
         }
+
+        $this->forceFormParameters($formManager, $request);
 
         return $this->render(
             '@SpipuProcess/task/execute.html.twig',
@@ -331,6 +318,64 @@ class TaskController extends AbstractController
                 'formManager' => $formManager,
             ]
         );
+    }
+
+    /**
+     * @param ProcessManager $processManager
+     * @param string $processCode
+     * @param FormManagerInterface $formManager
+     * @return int
+     * @throws Exception
+     */
+    private function launchProcess(
+        ProcessManager $processManager,
+        string $processCode,
+        FormManagerInterface $formManager
+    ): int {
+        $process = $processManager->load($processCode);
+
+        foreach ($process->getInputs()->getInputs() as $input) {
+            $inputValue = $formManager->getForm()[$input->getName()]->getData();
+
+            switch ($input->getType()) {
+                case 'file':
+                    $inputValue = $this->manageInputFile($process, $input, $inputValue);
+                    break;
+
+                case 'bool':
+                    $inputValue = ($inputValue == 1);
+                    break;
+
+                case 'array':
+                    $inputValue = json_decode($inputValue, true);
+                    break;
+            }
+            $input->setValue($inputValue);
+        }
+
+        $taskId = $processManager->executeAsynchronously($process);
+
+        sleep(1);
+
+        return $taskId;
+    }
+
+    /**
+     * @param FormManagerInterface $formManager
+     * @param Request $request
+     * @return void
+     */
+    private function forceFormParameters(FormManagerInterface $formManager, Request $request): void
+    {
+        $processParams = $request->query->get('process');
+        if (is_array($processParams)) {
+            $form = $formManager->getForm();
+            foreach ($processParams as $param => $value) {
+                if ($form->has($param) && !$form->get($param)->getData()) {
+                    $form->get($param)->setData($value);
+                }
+            }
+        }
     }
 
     /**
