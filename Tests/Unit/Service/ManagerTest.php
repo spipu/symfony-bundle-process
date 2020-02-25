@@ -253,7 +253,6 @@ class ManagerTest extends TestCase
         $manager->executeAsynchronously($process);
     }
 
-
     public function testExecuteAsynchronousAuthorized()
     {
         $manager = static::getService($this, true);
@@ -262,6 +261,29 @@ class ManagerTest extends TestCase
         $process->getInputs()->set('generic_exception', true);
 
         $taskId = $manager->executeAsynchronously($process);
+
+        $this->assertSame(1, $taskId);
+    }
+
+    public function testScheduleExecutionNotAuthorized()
+    {
+        $manager = static::getService($this);
+
+        $process = $manager->load('test');
+
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('This process can not be scheduled, because it can not be put in queue');
+        $manager->scheduleExecution($process, new \DateTime());
+    }
+
+    public function testScheduleExecutionAuthorized()
+    {
+        $manager = static::getService($this);
+
+        $process = $manager->load('other');
+        $process->getInputs()->set('generic_exception', true);
+
+        $taskId = $manager->scheduleExecution($process, new \DateTime());
 
         $this->assertSame(1, $taskId);
     }

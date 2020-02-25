@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Service;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\ProcessBundle\Entity\Task;
@@ -221,7 +222,9 @@ class Manager
             ->setInputs("[]")
             ->setStatus(Status::CREATED)
             ->setTryNumber(0)
-            ->setTryLastAt(null);
+            ->setTryLastAt(null)
+            ->setScheduledAt(null)
+            ->setExecutedAt(null);
 
         return $task;
     }
@@ -236,7 +239,7 @@ class Manager
     public function execute(Process\Process $process, callable $initCallback = null)
     {
         if ($process->getTask()) {
-            $process->getTask()->setExecutedAt(new \DateTime());
+            $process->getTask()->setExecutedAt(new DateTime());
         }
 
         $this->executeUpdateTask($process, Status::RUNNING);
@@ -291,6 +294,28 @@ class Manager
         }
 
         return $result;
+    }
+
+    /**
+     * @param Process\Process $process
+     * @param \DateTimeInterface $scheduleDate
+     * @return int
+     * @throws InputException
+     * @throws ProcessException
+     */
+    public function scheduleExecution(Process\Process $process, \DateTimeInterface $scheduleDate): int
+    {
+        if (!$process->getOptions()->canBePutInQueue()) {
+            throw new ProcessException(
+                'This process can not be scheduled, because it can not be put in queue'
+            );
+        }
+
+        $this->prepareInputs($process);
+        $process->getTask()->setScheduledAt($scheduleDate);
+        $this->executeUpdateTask($process, Status::CREATED);
+
+        return $process->getTask()->getId();
     }
 
     /**

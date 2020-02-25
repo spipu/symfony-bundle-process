@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Controller;
 
+use DateTimeInterface;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
@@ -300,7 +301,12 @@ class TaskController extends AbstractController
                 return $this->redirectToRoute(
                     'spipu_process_admin_task_show',
                     [
-                        'id' => $this->launchProcess($processManager, $processCode, $formManager)
+                        'id' => $this->launchProcess(
+                            $processManager,
+                            $processCode,
+                            $formManager,
+                            $processForm->getScheduledAt()
+                        )
                     ]
                 );
             } catch (Exception $e) {
@@ -324,13 +330,15 @@ class TaskController extends AbstractController
      * @param ProcessManager $processManager
      * @param string $processCode
      * @param FormManagerInterface $formManager
+     * @param DateTimeInterface|null $scheduledAt
      * @return int
      * @throws Exception
      */
     private function launchProcess(
         ProcessManager $processManager,
         string $processCode,
-        FormManagerInterface $formManager
+        FormManagerInterface $formManager,
+        ?DateTimeInterface $scheduledAt
     ): int {
         $process = $processManager->load($processCode);
 
@@ -351,6 +359,10 @@ class TaskController extends AbstractController
                     break;
             }
             $input->setValue($inputValue);
+        }
+
+        if ($scheduledAt) {
+            return $processManager->scheduleExecution($process, $scheduledAt);
         }
 
         $taskId = $processManager->executeAsynchronously($process);

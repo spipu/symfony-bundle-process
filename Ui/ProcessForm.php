@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use DateTimeInterface;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
@@ -16,9 +17,11 @@ use Spipu\UiBundle\Form\Options\AbstractOptions;
 use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\UiBundle\Service\Ui\Definition\EntityDefinitionInterface;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Json;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Process Input Form
@@ -47,6 +50,11 @@ class ProcessForm implements EntityDefinitionInterface
     private $yesNoOptions;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var string
      */
     private $processCode;
@@ -57,19 +65,27 @@ class ProcessForm implements EntityDefinitionInterface
     private $currentUserName = null;
 
     /**
+     * @var DateTimeInterface|null;
+     */
+    private $scheduledAt = null;
+
+    /**
      * ConfigurationForm constructor.
      * @param ConfigReader $configReader
      * @param InputsFactory $inputsFactory
      * @param YesNo $yesNoOptions
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ConfigReader $configReader,
         InputsFactory $inputsFactory,
-        YesNo $yesNoOptions
+        YesNo $yesNoOptions,
+        TranslatorInterface $translator
     ) {
         $this->configReader = $configReader;
         $this->inputsFactory = $inputsFactory;
         $this->yesNoOptions = $yesNoOptions;
+        $this->translator = $translator;
     }
 
     /**
@@ -124,10 +140,8 @@ class ProcessForm implements EntityDefinitionInterface
         }
         $inputs = $this->inputsFactory->create($definition['inputs']);
 
-        $fieldSet = new FieldSet('configuration', 'spipu.process.field.process.inputs', 10);
-        $fieldSet->setCssClass('col-12');
-
-
+        $fieldSet = new FieldSet('configuration', 'spipu.process.fieldset.inputs', 10);
+        $fieldSet->setCssClass('col-12 col-md-6');
         $position = 0;
         foreach ($inputs->getInputs() as $input) {
             $position += 10;
@@ -135,8 +149,35 @@ class ProcessForm implements EntityDefinitionInterface
             $field->setPosition($position);
             $fieldSet->addField($field);
         }
-
         $this->definition->addFieldSet($fieldSet);
+
+        $this->definition
+            ->addFieldSet(
+                (new FieldSet('execution', 'spipu.process.field.task.scheduled_at', 20))
+                    ->setCssClass('col-12 col-md-6')
+                    ->addField(new Field(
+                        'taskExecutedAtDate',
+                        Type\DateType::class,
+                        10,
+                        [
+                            'label'    => 'spipu.process.field.task.scheduled_at_date',
+                            'required' => false,
+                            'trim'     => true,
+                            'widget' => 'single_text',
+                        ]
+                    ))
+                    ->addField(new Field(
+                        'taskExecutedAtTime',
+                        Type\TimeType::class,
+                        20,
+                        [
+                            'label'    => 'spipu.process.field.task.scheduled_at_time',
+                            'required' => false,
+                            'trim'     => true,
+                            'widget' => 'single_text',
+                        ]
+                    ))
+            );
     }
 
     /**
@@ -146,16 +187,6 @@ class ProcessForm implements EntityDefinitionInterface
     public function getProcessDefinition(): array
     {
         return $this->configReader->getProcessDefinition($this->processCode);
-    }
-
-    /**
-     * @param FormInterface $form
-     * @param EntityInterface|null $resource
-     * @return void
-     * @SuppressWarnings(PMD.UnusedFormalParameter)
-     */
-    public function setSpecificFields(FormInterface $form, EntityInterface $resource = null): void
-    {
     }
 
     /**
@@ -338,5 +369,50 @@ class ProcessForm implements EntityDefinitionInterface
     private function prepareInputLabel(string $code): string
     {
         return ucwords(str_replace('_', ' ', $code));
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param EntityInterface|null $resource
+     * @return void
+     * @throws FormException
+     * @SuppressWarnings(PMD.UnusedFormalParameter)
+     */
+    public function setSpecificFields(FormInterface $form, EntityInterface $resource = null): void
+    {
+        $date = $form['taskExecutedAtDate']->getData();
+        $time = $form['taskExecutedAtTime']->getData();
+
+        if ($date && !$time) {
+            $form['taskExecutedAtTime']->addError(
+                new FormError($this->translator->trans('spipu.process.error.required'))
+            );
+            throw new FormException('spipu.process.error.generic');
+        }
+
+        if ($time && !$date) {
+            $form['taskExecutedAtDate']->addError(
+                new FormError($this->translator->trans('spipu.process.error.required'))
+            );
+            throw new FormException('spipu.process.error.generic');
+        }
+
+        if (!$time && !$date) {
+            $this->scheduledAt = null;
+            return;
+        }
+
+        /** @var \DateTime $date */
+        /** @var \DateTime $time */
+
+        $this->scheduledAt = $date->setTime((int) $time->format('H'), (int) $time->format('i'));
+    }
+
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getScheduledAt(): ?DateTimeInterface
+    {
+        return $this->scheduledAt;
     }
 }

@@ -21,7 +21,7 @@ spipu:
 
         fieldset:
             task:        "Task"
-            exsecution:  "Execution"
+            execution:   "Execution"
             inputs:      "Inputs"
             logs:        "Logs"
 
@@ -45,6 +45,8 @@ spipu:
                 try_last_message:         "Last Message"
                 can_be_run_automatically: "Auto Rerun"
                 scheduled_at:             "Scheduled"
+                scheduled_at_date:        "Date"
+                scheduled_at_time:        "Time"
                 executed_at:              "Executed"
                 created_at:               "Created"
                 updated_at:               "Updated"
@@ -100,6 +102,8 @@ spipu:
             rerun:    "This task can not be rerun in this status"
             kill:     "This task can not be killed in this status"
             disable:  "This action has been disabled in the app configuration"
+            required: "This field is required"
+            generic:  "There is an error on this form"
 
         help:
             json:     "Must be a valid Json format"

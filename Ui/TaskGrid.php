@@ -68,6 +68,7 @@ class TaskGrid implements GridDefinitionInterface
     /**
      * @return void
      * @throws GridException
+     * @SuppressWarnings(PMD.ExcessiveMethodLength)
      */
     private function prepareGrid(): void
     {
@@ -138,13 +139,19 @@ class TaskGrid implements GridDefinitionInterface
                     ->useSortable()
             )
             ->addColumn(
-                (new Grid\Column('created_at', 'spipu.process.field.task.created_at', 'createdAt', 80))
+                (new Grid\Column('scheduled_at', 'spipu.process.field.task.scheduled_at', 'scheduledAt', 80))
                     ->setType((new Grid\ColumnType(Grid\ColumnType::TYPE_DATETIME)))
                     ->setFilter((new Grid\ColumnFilter(true))->useRange())
                     ->useSortable()
             )
             ->addColumn(
-                (new Grid\Column('updated_at', 'spipu.process.field.task.updated_at', 'updatedAt', 90))
+                (new Grid\Column('executed_at', 'spipu.process.field.task.executed_at', 'executedAt', 90))
+                    ->setType((new Grid\ColumnType(Grid\ColumnType::TYPE_DATETIME)))
+                    ->setFilter((new Grid\ColumnFilter(true))->useRange())
+                    ->useSortable()
+            )
+            ->addColumn(
+                (new Grid\Column('updated_at', 'spipu.process.field.task.updated_at', 'updatedAt', 110))
                     ->setType((new Grid\ColumnType(Grid\ColumnType::TYPE_DATETIME)))
                     ->setFilter((new Grid\ColumnFilter(true))->useRange())
                     ->useSortable()

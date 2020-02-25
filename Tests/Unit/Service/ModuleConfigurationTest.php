@@ -27,6 +27,8 @@ class ModuleConfigurationTest extends TestCase
             'process.cleanup.finished_logs_after'  => 5,
             'process.cleanup.finished_tasks'       => 1,
             'process.cleanup.finished_tasks_after' => 7,
+            'process.folder.import'                => './var/import/',
+            'process.folder.export'                => './var/export/',
         ];
 
         $values = array_merge($defaultValues, $values);
@@ -147,6 +149,8 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame('from@test.fr', $moduleConfiguration->getFailedEmailFrom());
         $this->assertSame('to@test.fr', $moduleConfiguration->getFailedEmailTo());
         $this->assertSame(44, $moduleConfiguration->getFailedMaxRetry());
+        $this->assertSame('./var/import/', $moduleConfiguration->getFolderImport());
+        $this->assertSame('./var/export/', $moduleConfiguration->getFolderExport());
 
         $values = [
             'process.cleanup.finished_logs_after'  => -1,
