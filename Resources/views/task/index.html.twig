@@ -3,6 +3,8 @@
 
 {% set menuCurrentItem="spipu-process-admin-task" %}
 
+{% block main_class %}container-fluid{% endblock %}
+
 {% block header_title %}{{ parent() }} - {{ block('main_title') }}{% endblock %}
 
 {% block main_title %}{{ 'spipu.process.page.admin.task.list'|trans() }}{% endblock %}
