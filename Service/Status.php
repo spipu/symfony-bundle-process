@@ -59,6 +59,14 @@ class Status
     /**
      * @return string
      */
+    public function getCreatedStatus(): string
+    {
+        return self::CREATED;
+    }
+
+    /**
+     * @return string
+     */
     public function getFinishedStatus(): string
     {
         return self::FINISHED;

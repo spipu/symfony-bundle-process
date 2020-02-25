@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Repository;
 
+use DateTime;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -38,7 +39,7 @@ class TaskRepository extends ServiceEntityRepository
      * @param int $failedMaxRetry
      * @return int[]
      */
-    public function getIdsToExecuteAutomatically(int $failedMaxRetry): array
+    public function getIdsToRerunAutomatically(int $failedMaxRetry): array
     {
         $query = $this
             ->createQueryBuilder('t')
@@ -49,6 +50,31 @@ class TaskRepository extends ServiceEntityRepository
             ->setParameter('statuses', $this->status->getExecutableStatuses())
             ->setParameter('maxTry', $failedMaxRetry)
             ->setParameter('executable', true)
+            ->getQuery();
+
+        $rows = $query->getArrayResult();
+
+        $list = [];
+        foreach ($rows as $row) {
+            $list[] = (int) $row['id'];
+        }
+
+        return $list;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getScheduledIdsToRun(): array
+    {
+        $query = $this
+            ->createQueryBuilder('t')
+            ->select('t.id')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.scheduledAt is not null')
+            ->andWhere('t.scheduledAt <= :currentDate')
+            ->setParameter('status', $this->status->getCreatedStatus())
+            ->setParameter('currentDate', new DateTime())
             ->getQuery();
 
         $rows = $query->getArrayResult();

@@ -77,10 +77,13 @@ class CronManager
             return false;
         }
 
-        $taskIds = $this->processTaskRepository->getIdsToExecuteAutomatically(
+        $scheduledTaskIds = $this->processTaskRepository->getScheduledIdsToRun();
+
+        $rerunTaskIds = $this->processTaskRepository->getIdsToRerunAutomatically(
             $this->processConfiguration->getFailedMaxRetry()
         );
 
+        $taskIds = array_unique(array_merge($scheduledTaskIds, $rerunTaskIds));
         if (count($taskIds) == 0) {
             $output->writeln('  => No task found');
             return false;
@@ -105,16 +108,26 @@ class CronManager
     {
         $task = $this->processTaskRepository->find($taskId);
 
-        if (!$task->getCanBeRerunAutomatically()) {
-            return false;
+        $isScheduledTask = ($task->getScheduledAt() && $task->getStatus() === $this->processStatus->getCreatedStatus());
+
+        if (!$isScheduledTask) {
+            if (!$task->getCanBeRerunAutomatically()) {
+                return false;
+            }
+
+            if ($task->getTryNumber() >= $this->processConfiguration->getFailedMaxRetry()) {
+                return false;
+            }
+
+            if (!$this->processStatus->canRerun($task->getStatus())) {
+                return false;
+            }
         }
 
-        if ($task->getTryNumber() >= $this->processConfiguration->getFailedMaxRetry()) {
-            return false;
-        }
-
-        if (!$this->processStatus->canRerun($task->getStatus())) {
-            return false;
+        if ($isScheduledTask) {
+            if ($task->getScheduledAt() > (new DateTime())) {
+                return false;
+            }
         }
 
         try {
