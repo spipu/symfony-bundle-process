@@ -235,6 +235,10 @@ class Manager
      */
     public function execute(Process\Process $process, callable $initCallback = null)
     {
+        if ($process->getTask()) {
+            $process->getTask()->setExecutedAt(new \DateTime());
+        }
+
         $this->executeUpdateTask($process, Status::RUNNING);
 
         $logger = clone $this->logger;

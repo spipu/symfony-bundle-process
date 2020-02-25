@@ -20,10 +20,10 @@ spipu:
                     show:     "Show Process Log #%id"
 
         fieldset:
-            task:   "Task"
-            try:    "Try"
-            inputs: "Inputs"
-            logs:   "Logs"
+            task:        "Task"
+            exsecution:  "Execution"
+            inputs:      "Inputs"
+            logs:        "Logs"
 
         field:
             process:
@@ -44,6 +44,8 @@ spipu:
                 try_number:               "Try Nb"
                 try_last_message:         "Last Message"
                 can_be_run_automatically: "Auto Rerun"
+                scheduled_at:             "Scheduled"
+                executed_at:              "Executed"
                 created_at:               "Created"
                 updated_at:               "Updated"
 

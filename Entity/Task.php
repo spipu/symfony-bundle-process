@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Spipu\ProcessBundle\Entity;
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -53,7 +54,19 @@ class Task implements EntityInterface, TimestampableInterface
     private $logs;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var DateTimeInterface|null
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $scheduledAt;
+
+    /**
+     * @var DateTimeInterface|null
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $executedAt;
+
+    /**
+     * @var DateTimeInterface|null
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $tryLastAt;
@@ -216,18 +229,54 @@ class Task implements EntityInterface, TimestampableInterface
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getTryLastAt(): ?\DateTimeInterface
+    public function getScheduledAt(): ?DateTimeInterface
+    {
+        return $this->scheduledAt;
+    }
+
+    /**
+     * @param DateTimeInterface|null $scheduledAt
+     * @return Task
+     */
+    public function setScheduledAt(?DateTimeInterface $scheduledAt): self
+    {
+        $this->scheduledAt = $scheduledAt;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getExecutedAt(): ?DateTimeInterface
+    {
+        return $this->executedAt;
+    }
+
+    /**
+     * @param DateTimeInterface|null $executedAt
+     * @return Task
+     */
+    public function setExecutedAt(?DateTimeInterface $executedAt): self
+    {
+        $this->executedAt = $executedAt;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getTryLastAt(): ?DateTimeInterface
     {
         return $this->tryLastAt;
     }
 
     /**
-     * @param \DateTimeInterface|null $tryLastAt
+     * @param DateTimeInterface|null $tryLastAt
      * @return Task
      */
-    public function setTryLastAt(?\DateTimeInterface $tryLastAt): self
+    public function setTryLastAt(?DateTimeInterface $tryLastAt): self
     {
         $this->tryLastAt = $tryLastAt;
 
