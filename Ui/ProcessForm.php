@@ -135,21 +135,20 @@ class ProcessForm implements EntityDefinitionInterface
 
         $definition = $this->getProcessDefinition();
 
-        if (count($definition['inputs']) === 0) {
-            return;
-        }
-        $inputs = $this->inputsFactory->create($definition['inputs']);
+        if (count($definition['inputs']) > 0) {
+            $inputs = $this->inputsFactory->create($definition['inputs']);
 
-        $fieldSet = new FieldSet('configuration', 'spipu.process.fieldset.inputs', 10);
-        $fieldSet->setCssClass('col-12 col-md-6');
-        $position = 0;
-        foreach ($inputs->getInputs() as $input) {
-            $position += 10;
-            $field = $this->createField($input);
-            $field->setPosition($position);
-            $fieldSet->addField($field);
+            $fieldSet = new FieldSet('configuration', 'spipu.process.fieldset.inputs', 10);
+            $fieldSet->setCssClass('col-12 col-md-6');
+            $position = 0;
+            foreach ($inputs->getInputs() as $input) {
+                $position += 10;
+                $field = $this->createField($input);
+                $field->setPosition($position);
+                $fieldSet->addField($field);
+            }
+            $this->definition->addFieldSet($fieldSet);
         }
-        $this->definition->addFieldSet($fieldSet);
 
         $this->definition
             ->addFieldSet(
