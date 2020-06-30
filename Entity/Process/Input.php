@@ -21,6 +21,11 @@ class Input
     private $type;
 
     /**
+     * @var bool
+     */
+    private $required = true;
+
+    /**
      * @var AbstractOptions|null
      */
     private $options;
@@ -39,6 +44,7 @@ class Input
      * Input constructor.
      * @param string $name
      * @param string $type
+     * @param bool $required
      * @param AbstractOptions|null $options
      * @param array $allowedMimeTypes
      * @throws InputException
@@ -46,6 +52,7 @@ class Input
     public function __construct(
         string $name,
         string $type,
+        bool $required,
         AbstractOptions $options = null,
         array $allowedMimeTypes = []
     ) {
@@ -57,6 +64,7 @@ class Input
 
         $this->name = $name;
         $this->type = $type;
+        $this->required = $required;
         $this->options = $options;
         $this->allowedMimeTypes = $allowedMimeTypes;
     }
@@ -75,6 +83,14 @@ class Input
     public function getType(): string
     {
         return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequired(): bool
+    {
+        return $this->required;
     }
 
     /**
@@ -97,22 +113,56 @@ class Input
      * @param mixed $value
      * @return void
      * @throws InputException
+     * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
     public function setValue($value): void
     {
-        if ($this->type === 'float' && is_int($value)) {
-            $value = (float) $value;
+        $value = $this->prepareValue($value);
+
+        if ($this->required && ($value === null || (is_array($value) && count($value) === 0))) {
+            throw new InputException(sprintf('[%s] is required', $this->name));
+        }
+
+        if ($value === null) {
+            $this->value = null;
+            return;
         }
 
         if (!call_user_func('is_'.$this->type, $value)) {
             throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
         }
 
-        if ($this->options !== null && !$this->options->hasKey($value)) {
-            throw new InputException(sprintf('[%s] This value is not authorized', $this->name));
+        if ($this->options !== null) {
+            $list = is_array($value) ? $value : [$value];
+            foreach ($list as $key) {
+                if (!$this->options->hasKey($key)) {
+                    throw new InputException(sprintf('[%s] This value is not authorized', $this->name));
+                }
+            }
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    private function prepareValue($value)
+    {
+        if ($this->type === 'float' && is_int($value)) {
+            $value = (float) $value;
+        }
+
+        if ($value === '') {
+            $value = null;
+        }
+
+        if ($this->type === 'array' && $value === null) {
+            $value = [];
+        }
+
+        return $value;
     }
 
     /**
@@ -132,7 +182,7 @@ class Input
      */
     public function validate(): bool
     {
-        if ($this->value === null) {
+        if ($this->value === null && $this->required) {
             throw new InputException(sprintf('[%s] input is not set', $this->name));
         }
 

@@ -105,8 +105,6 @@ class SpipuProcessConfigurationTest extends TestCase
         $processor = new Processor();
         $result = $processor->processConfiguration($configuration, $configs);
 
-
-
         $this->assertEquals($expected, $result);
     }
 }

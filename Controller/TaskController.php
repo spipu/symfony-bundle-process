@@ -355,7 +355,9 @@ class TaskController extends AbstractController
                     break;
 
                 case 'array':
-                    $inputValue = json_decode($inputValue, true);
+                    if (!is_array($inputValue)) {
+                        $inputValue = json_decode($inputValue, true);
+                    }
                     break;
             }
             $input->setValue($inputValue);

@@ -26,6 +26,11 @@ class ProcessRunCommand extends Command
     private $processManager;
 
     /**
+     * @var SymfonyStyle
+     */
+    private $symfonyStyle = null;
+
+    /**
      * RunProcess constructor.
      * @param ProcessManager $processManager
      * @param null|string $name
@@ -126,6 +131,7 @@ class ProcessRunCommand extends Command
      * @param OutputInterface $output
      * @return bool
      * @throws InputException
+     * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
     private function askInputs(Process $process, array $inputs, InputInterface $input, OutputInterface $output): bool
     {
@@ -143,8 +149,6 @@ class ProcessRunCommand extends Command
             $values[$value[0]] = $value[1];
         }
 
-        $first = true;
-        $symfonyStyle = null;
         foreach ($inputObjects as $inputObject) {
             $key = $inputObject->getName();
             $type = $inputObject->getType();
@@ -155,22 +159,35 @@ class ProcessRunCommand extends Command
             }
 
             if (!array_key_exists($key, $values)) {
-                if ($first) {
-                    $symfonyStyle = new SymfonyStyle($input, $output);
-                    $symfonyStyle->note('This process needs some inputs');
-                    $first = false;
-                }
-                $value = $symfonyStyle->ask("$key ($type)");
+                $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optionnal');
+                $value = $this->getSymfonyStyle($input, $output)->ask($title);
                 if ($value === null) {
                     $value = '';
                 }
             }
 
-            $value = $this->validateInput($value, $type);
+            if ($inputObject->isRequired() && $value !== '') {
+                $value = $this->validateInput($value, $type);
+            }
             $process->getInputs()->set($key, $value);
         }
 
         return true;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return SymfonyStyle
+     */
+    private function getSymfonyStyle(InputInterface $input, OutputInterface $output): SymfonyStyle
+    {
+        if ($this->symfonyStyle === null) {
+            $this->symfonyStyle = new SymfonyStyle($input, $output);
+            $this->symfonyStyle->note('This process needs some inputs');
+        }
+
+        return $this->symfonyStyle;
     }
 
     /**

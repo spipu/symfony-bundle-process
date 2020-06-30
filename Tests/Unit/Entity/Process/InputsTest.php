@@ -20,6 +20,9 @@ class InputsTest extends TestCase
             if (!array_key_exists('allowed_mime_types', $config)) {
                 $config['allowed_mime_types'] = [];
             }
+            if (!array_key_exists('required', $config)) {
+                $config['required'] = true;
+            }
         }
         return InputsFactoryTest::getService($testCase)->create($description);
     }
@@ -189,5 +192,61 @@ class InputsTest extends TestCase
         $this->assertTrue($input->validate());
 
         $this->assertSame(['input' => 'value'], $input->getAll());
+    }
+
+    public function testRequiredStringOk()
+    {
+        $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => true]]);
+        $this->assertTrue($input->getInput('input')->isRequired());
+
+        $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => false]]);
+        $this->assertFalse($input->getInput('input')->isRequired());
+
+        $input->set('input', '');
+        $this->assertTrue($input->validate());
+        $this->assertNull($input->get('input'));
+
+        $input->set('input', null);
+        $this->assertTrue($input->validate());
+        $this->assertNull($input->get('input'));
+    }
+
+    public function testRequiredStringKo()
+    {
+        $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => true]]);
+        $this->assertTrue($input->getInput('input')->isRequired());
+
+        $this->expectException(InputException::class);
+        $input->set('input', '');
+    }
+
+    public function testRequiredArrayOk()
+    {
+        $input = self::getInputs($this, ['input' => ['type' => 'array', 'required' => true]]);
+        $this->assertTrue($input->getInput('input')->isRequired());
+
+        $input = self::getInputs($this, ['input' => ['type' => 'array', 'required' => false]]);
+        $this->assertFalse($input->getInput('input')->isRequired());
+
+        $input->set('input', []);
+        $this->assertTrue($input->validate());
+        $this->assertSame([], $input->get('input'));
+
+        $input->set('input', '');
+        $this->assertTrue($input->validate());
+        $this->assertSame([], $input->get('input'));
+
+        $input->set('input', null);
+        $this->assertTrue($input->validate());
+        $this->assertSame([], $input->get('input'));
+    }
+
+    public function testRequiredArrayKo()
+    {
+        $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => true]]);
+        $this->assertTrue($input->getInput('input')->isRequired());
+
+        $this->expectException(InputException::class);
+        $input->set('input', []);
     }
 }

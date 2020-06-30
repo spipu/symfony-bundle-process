@@ -82,7 +82,7 @@ class ManagerTest extends TestCase
         $process->getInputs()->set('input2', 1);
         $process->getInputs()->set('input3', 1.);
         $process->getInputs()->set('input4', true);
-        $process->getInputs()->set('input5', []);
+        $process->getInputs()->set('input5', ['ok']);
 
         $this->assertSame('test', $process->getCode());
         $this->assertSame('Test', $process->getName());

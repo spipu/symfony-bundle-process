@@ -54,6 +54,12 @@ class InputsFactory
             $options = $this->container->get($definition['options']);
         }
 
-        return new Input($definition['name'], $definition['type'], $options, $definition['allowed_mime_types']);
+        return new Input(
+            $definition['name'],
+            $definition['type'],
+            $definition['required'],
+            $options,
+            $definition['allowed_mime_types']
+        );
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use DateTime;
 use DateTimeInterface;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Exception\ProcessException;
@@ -13,7 +14,6 @@ use Spipu\UiBundle\Entity\Form\Field;
 use Spipu\UiBundle\Entity\Form\FieldSet;
 use Spipu\UiBundle\Entity\Form\Form;
 use Spipu\UiBundle\Exception\FormException;
-use Spipu\UiBundle\Form\Options\AbstractOptions;
 use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\UiBundle\Service\Ui\Definition\EntityDefinitionInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -195,91 +195,123 @@ class ProcessForm implements EntityDefinitionInterface
      */
     private function createField(Input $input): Field
     {
-        $code = $input->getName();
-
         if ($input->getOptions()) {
-            return $this->createFieldOptions($code, $input->getOptions());
+            return $this->createFieldWithOption($input);
         }
 
+        return $this->createFieldWithoutOption($input);
+    }
+
+    /**
+     * @param Input $input
+     * @return Field
+     * @throws FormException
+     */
+    private function createFieldWithOption(Input $input): Field
+    {
+        if (!in_array($input->getType(), ['string', 'array'])) {
+            throw new FormException(
+                sprintf(
+                    'Unknown input type [%s] with option for field [%s]',
+                    $input->getType(),
+                    $input->getName()
+                )
+            );
+        }
+
+        return $this->createFieldOptions($input);
+    }
+
+    /**
+     * @param Input $input
+     * @return Field
+     * @throws FormException
+     */
+    private function createFieldWithoutOption(Input $input): Field
+    {
         switch ($input->getType()) {
             case 'int':
-                return $this->createFieldInt($code);
+                return $this->createFieldInt($input);
 
             case 'float':
-                return $this->createFieldFloat($code);
+                return $this->createFieldFloat($input);
 
             case 'bool':
-                return $this->createFieldBool($code);
+                return $this->createFieldBool($input);
 
             case 'array':
-                return $this->createFieldArray($code);
+                return $this->createFieldArray($input);
 
             case 'file':
-                return $this->createFieldFile($code, $input->getAllowedMimeTypes());
+                return $this->createFieldFile($input);
 
             case 'string':
-                return $this->createFieldString($code);
-
-            default:
-                throw new FormException('Unknown input type');
+                return $this->createFieldString($input);
         }
+
+        throw new FormException(
+            sprintf(
+                'Unknown input type [%s] for field [%s]',
+                $input->getType(),
+                $input->getName()
+            )
+        );
     }
 
-
     /**
-     * @param string $code
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldInt(string $code): Field
+    private function createFieldInt(Input $input): Field
     {
-        return $this->createFieldInput($code, Type\IntegerType::class);
+        return $this->createFieldInput($input, Type\IntegerType::class);
     }
 
     /**
-     * @param string $code
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldFloat(string $code): Field
+    private function createFieldFloat(Input $input): Field
     {
-        return $this->createFieldInput($code, Type\NumberType::class);
+        return $this->createFieldInput($input, Type\NumberType::class);
     }
 
     /**
-     * @param string $code
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldBool(string $code): Field
+    private function createFieldBool(Input $input): Field
     {
         return new Field(
-            $code,
+            $input->getName(),
             Type\ChoiceType::class,
             0,
             [
-                'label'    => $this->prepareInputLabel($code),
+                'label'    => $this->prepareInputLabel($input->getName()),
                 'expanded' => false,
                 'choices'  => $this->yesNoOptions,
-                'required' => true,
+                'required' => $input->isRequired(),
             ]
         );
     }
 
     /**
-     * @param string $code
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldArray(string $code): Field
+    private function createFieldArray(Input $input): Field
     {
         return new Field(
-            $code,
+            $input->getName(),
             Type\TextareaType::class,
             0,
             [
-                'label'    => $this->prepareInputLabel($code),
-                'required' => true,
+                'label'    => $this->prepareInputLabel($input->getName()),
+                'required' => $input->isRequired(),
                 'constraints' => [new Json()],
                 'help'     => 'spipu.process.help.json'
             ]
@@ -287,15 +319,15 @@ class ProcessForm implements EntityDefinitionInterface
     }
 
     /**
-     * @param string $code
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldString(string $code): Field
+    private function createFieldString(Input $input): Field
     {
-        $field = $this->createFieldInput($code, Type\TextType::class);
+        $field = $this->createFieldInput($input, Type\TextType::class);
 
-        if ($code === 'current_user_name' && $this->currentUserName !== null) {
+        if ($input->getName() === 'current_user_name' && $this->currentUserName !== null) {
             $field->setValue($this->currentUserName);
         }
 
@@ -304,34 +336,34 @@ class ProcessForm implements EntityDefinitionInterface
 
 
     /**
-     * @param string $code
+     * @param Input $input
      * @param string $fieldType
      * @return Field
      * @throws FormException
      */
-    private function createFieldInput(string $code, string $fieldType): Field
+    private function createFieldInput(Input $input, string $fieldType): Field
     {
         return new Field(
-            $code,
+            $input->getName(),
             $fieldType,
             0,
             [
-                'label'      => $this->prepareInputLabel($code),
-                'required'   => true
+                'label'      => $this->prepareInputLabel($input->getName()),
+                'required'   => $input->isRequired()
             ]
         );
     }
 
     /**
-     * @param string $code
-     * @param array $allowedMimeTypes
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldFile(string $code, array $allowedMimeTypes): Field
+    private function createFieldFile(Input $input): Field
     {
-        $field = $this->createFieldInput($code, Type\FileType::class);
+        $field = $this->createFieldInput($input, Type\FileType::class);
 
+        $allowedMimeTypes = $input->getAllowedMimeTypes();
         if (count($allowedMimeTypes) > 0) {
             $field->addOption('constraints', [new File(['mimeTypes' => $allowedMimeTypes])]);
             $field->addOption('help', implode(',', $allowedMimeTypes));
@@ -341,24 +373,24 @@ class ProcessForm implements EntityDefinitionInterface
     }
     
     /**
-     * @param string $code
-     * @param AbstractOptions $options
+     * @param Input $input
      * @return Field
      * @throws FormException
      */
-    private function createFieldOptions(string $code, AbstractOptions $options): Field
+    private function createFieldOptions(Input $input): Field
     {
-        return new Field(
-            $code,
-            Type\ChoiceType::class,
-            0,
-            [
-                'label'    => $this->prepareInputLabel($code),
-                'expanded' => false,
-                'choices'  => $options,
-                'required' => true,
-            ]
-        );
+        $options = [
+            'label'    => $this->prepareInputLabel($input->getName()),
+            'expanded' => false,
+            'choices'  => $input->getOptions(),
+            'required' => $input->isRequired(),
+        ];
+
+        if ($input->getType() === 'array') {
+            $options['multiple'] = true;
+        }
+
+        return new Field($input->getName(), Type\ChoiceType::class, 0, $options);
     }
 
     /**
@@ -401,8 +433,8 @@ class ProcessForm implements EntityDefinitionInterface
             return;
         }
 
-        /** @var \DateTime $date */
-        /** @var \DateTime $time */
+        /** @var DateTime $date */
+        /** @var DateTime $time */
 
         $this->scheduledAt = $date->setTime((int) $time->format('H'), (int) $time->format('i'));
     }
