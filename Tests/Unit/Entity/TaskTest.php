@@ -1,6 +1,7 @@
 <?php
 namespace Spipu\ProcessBundle\Tests\Unit\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Service\Status;
@@ -10,36 +11,54 @@ class TaskTest extends TestCase
 {
     public function testEntity()
     {
-        $date = new \DateTime();
-
         $entity = SpipuProcessMock::getTaskEntity(1);
+
         $this->assertSame(1, $entity->getId());
         $this->assertSame(0, $entity->getTryNumber());
         $this->assertSame(false, $entity->getCanBeRerunAutomatically());
         $this->assertSame(null, $entity->getTryLastAt());
+        $this->assertSame(null, $entity->getPidValue());
+        $this->assertSame(null, $entity->getPidLastSeen());
+        $this->assertSame(null, $entity->getExecutedAt());
+        $this->assertSame(null, $entity->getScheduledAt());
 
         $entity->setCode('code');
         $entity->setTryLastMessage('message');
         $entity->setStatus(Status::RUNNING);
         $entity->setCanBeRerunAutomatically(true);
-        $entity->setTryLastAt($date);
         $entity->setTryNumber(42);
         $entity->setProgress(43);
+        $entity->setPidValue(44);
 
         $this->assertSame('code', $entity->getCode());
         $this->assertSame('message', $entity->getTryLastMessage());
         $this->assertSame(Status::RUNNING, $entity->getStatus());
         $this->assertSame(true, $entity->getCanBeRerunAutomatically());
-        $this->assertSame($date, $entity->getTryLastAt());
         $this->assertSame(42, $entity->getTryNumber());
         $this->assertSame(43, $entity->getProgress());
+        $this->assertSame(44, $entity->getPidValue());
+
+        $dateA = new DateTime();
+        $dateB = new DateTime();
+        $dateC = new DateTime();
+        $dateD = new DateTime();
+
+        $entity->setTryLastAt($dateA);
+        $entity->setPidLastSeen($dateB);
+        $entity->setExecutedAt($dateC);
+        $entity->setScheduledAt($dateD);
+
+        $this->assertSame($dateA, $entity->getTryLastAt());
+        $this->assertSame($dateB, $entity->getPidLastSeen());
+        $this->assertSame($dateC, $entity->getExecutedAt());
+        $this->assertSame($dateD, $entity->getScheduledAt());
 
         $entity->incrementTry('new message', false);
 
         $this->assertSame('new message', $entity->getTryLastMessage());
         $this->assertSame(false, $entity->getCanBeRerunAutomatically());
         $this->assertSame(43, $entity->getTryNumber());
-        $this->assertGreaterThan($date, $entity->getTryLastAt());
+        $this->assertGreaterThan($dateA, $entity->getTryLastAt());
 
         $inputs = [
             'firstname' => 'John',

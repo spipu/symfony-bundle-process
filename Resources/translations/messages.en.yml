@@ -48,6 +48,8 @@ spipu:
                 scheduled_at_date:        "Date"
                 scheduled_at_time:        "Time"
                 executed_at:              "Executed"
+                pid_value:                "PID Value"
+                pid_last_seen:            "PID Last Seen"
                 created_at:               "Created"
                 updated_at:               "Updated"
 

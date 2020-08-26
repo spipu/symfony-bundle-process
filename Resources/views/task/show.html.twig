@@ -62,11 +62,11 @@
                 <table class="table table-striped table-hover table-sm mb-0">
                     <tr>
                         <th>{{ 'spipu.process.field.task.scheduled_at'|trans }}</th>
-                        <td>{% if resource.scheduledAt %}{{ resource.scheduledAt|date('Y-m-d H:i:s')  }}{% else %}-{% endif %}</td>
+                        <td>{{ resource.scheduledAt ? resource.scheduledAt|date('Y-m-d H:i:s') : '-' }}</td>
                     </tr>
                     <tr>
                         <th>{{ 'spipu.process.field.task.executed_at'|trans }}</th>
-                        <td>{% if resource.executedAt %}{{ resource.executedAt|date('Y-m-d H:i:s')  }}{% else %}-{% endif %}</td>
+                        <td>{{ resource.executedAt ? resource.executedAt|date('Y-m-d H:i:s') : '-' }}</td>
                     </tr>
                     <tr>
                         <th class="w-25">{{ 'spipu.process.field.task.try_number'|trans }}</th>
@@ -74,15 +74,23 @@
                     </tr>
                     <tr>
                         <th>{{ 'spipu.process.field.task.try_last_at'|trans }}</th>
-                        <td>{{ resource.tryLastAt ? resource.tryLastAt|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ resource.tryLastAt ? resource.tryLastAt|date('Y-m-d H:i:s') : '-' }}</td>
                     </tr>
                     <tr>
                         <th>{{ 'spipu.process.field.task.try_last_message'|trans }}</th>
-                        <td>{{ resource.tryLastMessage }}</td>
+                        <td>{{ resource.tryLastMessage ? resource.tryLastMessage : '-' }}</td>
                     </tr>
                     <tr>
                         <th>{{ 'spipu.process.field.task.can_be_run_automatically'|trans }}</th>
                         <td>{% include '@SpipuUi/entity/view/yes-no.html.twig' with {'data': resource.canBeRerunAutomatically, 'field': fieldYesNo} %}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.task.pid_value'|trans }}</th>
+                        <td>{{ resource.pidValue ? resource.pidValue : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'spipu.process.field.task.pid_last_seen'|trans }}</th>
+                        <td>{{ resource.pidLastSeen ? resource.pidLastSeen|date('Y-m-d H:i:s') : '-' }}</td>
                     </tr>
                 </table>
             </div>

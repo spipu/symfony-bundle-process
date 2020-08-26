@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Inputs;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Tests\Unit\Service\InputsFactoryTest;
+use Spipu\UiBundle\Tests\OptionIntegerMock;
 
 class InputsTest extends TestCase
 {
@@ -24,7 +25,12 @@ class InputsTest extends TestCase
                 $config['required'] = true;
             }
         }
-        return InputsFactoryTest::getService($testCase)->create($description);
+
+        $services = [
+            'optionsMock' => new OptionIntegerMock(),
+        ];
+
+        return InputsFactoryTest::getService($testCase, $services)->create($description);
     }
 
     public function testInvalidType()
@@ -103,6 +109,8 @@ class InputsTest extends TestCase
         $input = self::getInputs($this, ['input' => ['type' => 'int']]);
         $input->set('input', 10);
         $this->assertSame(10, $input->get('input'));
+        $this->assertSame(null, $input->getInput('input')->getOptions());
+        $this->assertSame([], $input->getInput('input')->getAllowedMimeTypes());
     }
 
     public function testFloatNotSetKey()
@@ -248,5 +256,45 @@ class InputsTest extends TestCase
 
         $this->expectException(InputException::class);
         $input->set('input', []);
+    }
+
+    public function testOptionsOk()
+    {
+        $input = self::getInputs(
+            $this,
+            [
+                'input' => [
+                    'type'    => 'int',
+                    'options' => 'optionsMock',
+                ]
+            ]
+        );
+
+        $this->assertInstanceOf(OptionIntegerMock::class, $input->getInput('input')->getOptions());
+
+        $input->set('input', 0);
+        $this->assertSame(0, $input->get('input'));
+
+        $input->set('input', 1);
+        $this->assertSame(1, $input->get('input'));
+
+        $this->expectException(InputException::class);
+        $input->set('input', 2);
+    }
+
+    public function testFileOk()
+    {
+        $input = self::getInputs(
+            $this,
+            [
+                'input' => [
+                    'type'    => 'file',
+                    'allowed_mime_types' => ['jpg', 'png'],
+                ]
+            ]
+        );
+
+        $this->assertSame('file', $input->getInput('input')->getType());
+        $this->assertSame(['jpg', 'png'], $input->getInput('input')->getAllowedMimeTypes());
     }
 }

@@ -96,6 +96,18 @@ class Task implements EntityInterface, TimestampableInterface
     private $progress = 0;
 
     /**
+     * @var int|null
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $pidValue = null;
+
+    /**
+     * @var DateTimeInterface|null
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $pidLastSeen = null;
+
+    /**
      * ProcessTask constructor.
      */
     public function __construct()
@@ -372,6 +384,44 @@ class Task implements EntityInterface, TimestampableInterface
     public function setProgress(int $progress): self
     {
         $this->progress = $progress;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPidValue(): ?int
+    {
+        return $this->pidValue;
+    }
+
+    /**
+     * @param int|null $pidValue
+     * @return Task
+     */
+    public function setPidValue(?int $pidValue): self
+    {
+        $this->pidValue = $pidValue;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getPidLastSeen(): ?DateTimeInterface
+    {
+        return $this->pidLastSeen;
+    }
+
+    /**
+     * @param DateTimeInterface|null $pidLastSeen
+     * @return Task
+     */
+    public function setPidLastSeen(?DateTimeInterface $pidLastSeen): self
+    {
+        $this->pidLastSeen = $pidLastSeen;
 
         return $this;
     }
