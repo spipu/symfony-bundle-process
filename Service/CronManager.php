@@ -5,6 +5,8 @@ namespace Spipu\ProcessBundle\Service;
 
 use DateInterval;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Spipu\ProcessBundle\Repository\LogRepository;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,27 +43,34 @@ class CronManager
     private $processConfiguration;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * CronManager constructor.
      * @param TaskRepository $processTaskRepository
      * @param LogRepository $processLogRepository
      * @param Manager $processManager
      * @param Status $processStatus
      * @param ModuleConfiguration $processConfiguration
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         TaskRepository $processTaskRepository,
         LogRepository $processLogRepository,
         Manager $processManager,
         Status $processStatus,
-        ModuleConfiguration $processConfiguration
+        ModuleConfiguration $processConfiguration,
+        EntityManagerInterface  $entityManager
     ) {
         $this->processTaskRepository = $processTaskRepository;
         $this->processLogRepository = $processLogRepository;
         $this->processManager = $processManager;
         $this->processStatus = $processStatus;
         $this->processConfiguration = $processConfiguration;
+        $this->entityManager = $entityManager;
     }
-
 
     /**
      * Rerun the waiting tasks
@@ -133,7 +142,7 @@ class CronManager
         try {
             $process = $this->processManager->loadFromTask($task);
             $this->processManager->execute($process);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // We do not need to log anything, all is already done in the process manager.
             $output->writeln('  <error>Error</error> - Task #'.$task->getId().' - '.$e->getMessage());
             return false;
@@ -185,20 +194,85 @@ class CronManager
     }
 
     /**
-     * @param int $nbdays
+     * @param int $nbDays
      * @return \DateTimeInterface
      */
-    private function prepareLimitDate(int $nbdays): \DateTimeInterface
+    private function prepareLimitDate(int $nbDays): \DateTimeInterface
     {
         $date = new DateTime();
 
         $interval = 'PT1H';
-        if ($nbdays > 0) {
-            $interval = 'P'.$nbdays.'DT1H';
+        if ($nbDays > 0) {
+            $interval = 'P'.$nbDays.'DT1H';
         }
 
         $date->sub(new DateInterval($interval));
 
         return $date;
+    }
+
+    /**
+     * Check the PID of the running tasks
+     * @param OutputInterface $output
+     * @return bool
+     */
+    public function checkRunningTasksPid(OutputInterface $output): bool
+    {
+        $output->writeln('Search running tasks');
+
+        $taskIds = $this->processTaskRepository->getRunningIdsToCheck(5);
+        if (count($taskIds) == 0) {
+            $output->writeln('  => No task found');
+            return false;
+        }
+
+        $output->writeln(sprintf('  => %d task(s) found', count($taskIds)));
+
+        // We are using ids because we must reload it just before the check, to be sure of its status.
+        foreach ($taskIds as $taskId) {
+            $this->checkRunningTaskPid($output, $taskId);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param int $taskId
+     * @return bool
+     */
+    private function checkRunningTaskPid(OutputInterface $output, int $taskId): bool
+    {
+        $task = $this->processTaskRepository->find($taskId);
+
+        $output->writeln('   - Task #'.$task->getId());
+
+        if ($task->getStatus() !== $this->processStatus->getRunningStatus()) {
+            $output->writeln('     => <comment>Wrong Status</comment>');
+            return false;
+        }
+
+        if ($task->getPidValue() === null || $task->getPidValue() < 1) {
+            $output->writeln('     => <comment>No PID</comment>');
+            return false;
+        }
+
+        $pid = $task->getPidValue();
+        $sid = @posix_getsid($pid);
+
+        if (!$sid) {
+            $output->writeln('     => <error>Process not found</error>');
+            $task->incrementTry('Process not found', false);
+            $task->setStatus(Status::FAILED);
+            $this->entityManager->flush();
+
+            return false;
+        }
+
+        $output->writeln('     => <info>Process found</info>');
+        $task->setPidLastSeen(new DateTime());
+        $this->entityManager->flush();
+
+        return true;
     }
 }

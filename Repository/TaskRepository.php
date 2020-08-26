@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Repository;
 
+use DateInterval;
 use DateTime;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\Status;
@@ -103,5 +104,40 @@ class TaskRepository extends ServiceEntityRepository
             ->getQuery();
 
         return $query->execute();
+    }
+
+    /**
+     * @param int $nbMinutes
+     * @return int[]
+     */
+    public function getRunningIdsToCheck(int $nbMinutes): array
+    {
+        if ($nbMinutes < 1) {
+            $nbMinutes = 5;
+        }
+
+        $date = new DateTime();
+        $date->sub(new DateInterval('PT' . $nbMinutes . 'M'));
+
+        $query = $this
+            ->createQueryBuilder('t')
+            ->select('t.id')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.pidValue is not null')
+            ->andWhere('t.pidValue > 0')
+            ->andWhere('t.pidLastSeen is not null')
+            ->andWhere('t.pidLastSeen <= :currentDate')
+            ->setParameter('status', $this->status->getRunningStatus())
+            ->setParameter('currentDate', $date)
+            ->getQuery();
+
+        $rows = $query->getArrayResult();
+
+        $list = [];
+        foreach ($rows as $row) {
+            $list[] = (int) $row['id'];
+        }
+
+        return $list;
     }
 }

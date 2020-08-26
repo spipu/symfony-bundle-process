@@ -13,7 +13,8 @@
     "require": {
         "spipu/ui-bundle": "*",
         "spipu/configuration-bundle": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-posix": "*"
     },
     "autoload": {
         "psr-4": {

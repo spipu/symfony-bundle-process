@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Command;
 
+use Exception;
 use Spipu\ProcessBundle\Service\CronManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -23,8 +24,9 @@ class ProcessCronManagerCommand extends Command
      * @var array
      */
     private $availableActions = [
-        'rerun'   => 'actionRerun',
-        'cleanup' => 'actionCleanup'
+        'rerun'     => 'actionRerun',
+        'cleanup'   => 'actionCleanup',
+        'check-pid' => 'actionCheckRunningTasks',
     ];
 
     /**
@@ -67,7 +69,7 @@ class ProcessCronManagerCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -104,5 +106,17 @@ class ProcessCronManagerCommand extends Command
         $this->cronManager->cleanFinishedTasks($output);
         $this->cronManager->cleanFinishedLogs($output);
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - CleanUp - End');
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return void
+     * @SuppressWarnings(PMD.UnusedPrivateMethod)
+     */
+    private function actionCheckRunningTasks(OutputInterface $output): void
+    {
+        $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Check Running Tasks - Begin');
+        $this->cronManager->checkRunningTasksPid($output);
+        $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Check Running Tasks - End');
     }
 }

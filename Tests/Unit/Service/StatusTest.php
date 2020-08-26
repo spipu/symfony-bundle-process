@@ -40,13 +40,23 @@ class StatusTest extends TestCase
         );
 
         $this->assertSame(
+            Status::CREATED,
+            $service->getCreatedStatus()
+        );
+
+        $this->assertSame(
+            Status::RUNNING,
+            $service->getRunningStatus()
+        );
+
+        $this->assertSame(
             Status::FINISHED,
             $service->getFinishedStatus()
         );
 
         $this->assertSame(
-            Status::CREATED,
-            $service->getCreatedStatus()
+            Status::FAILED,
+            $service->getFailedStatus()
         );
 
         $this->assertSame(false, $service->canKill(Status::CREATED));

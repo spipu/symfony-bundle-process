@@ -67,8 +67,24 @@ class Status
     /**
      * @return string
      */
+    public function getRunningStatus(): string
+    {
+        return self::RUNNING;
+    }
+
+    /**
+     * @return string
+     */
     public function getFinishedStatus(): string
     {
         return self::FINISHED;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFailedStatus(): string
+    {
+        return self::FAILED;
     }
 }
