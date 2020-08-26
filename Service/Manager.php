@@ -240,6 +240,8 @@ class Manager
     {
         if ($process->getTask()) {
             $process->getTask()->setExecutedAt(new DateTime());
+            $process->getTask()->setPidValue(getmypid());
+            $process->getTask()->setPidLastSeen(new DateTime());
         }
 
         $this->executeUpdateTask($process, Status::RUNNING);
