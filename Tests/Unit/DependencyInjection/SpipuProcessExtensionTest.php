@@ -2,7 +2,7 @@
 namespace Spipu\ProcessBundle\Tests\Unit\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Spipu\CoreBundle\DependencyInjection\RolesHierarchiExtensionExtensionInterface;
+use Spipu\CoreBundle\DependencyInjection\RolesHierarchyExtensionExtensionInterface;
 use Spipu\CoreBundle\Service\RoleDefinitionInterface;
 use Spipu\CoreBundle\Tests\SymfonyMock;
 use Spipu\ProcessBundle\DependencyInjection\SpipuProcessConfiguration;
@@ -23,7 +23,7 @@ class SpipuProcessExtensionTest extends TestCase
 
         $this->assertSame('spipu_process', $extension->getAlias());
 
-        $this->assertInstanceOf(RolesHierarchiExtensionExtensionInterface::class, $extension);
+        $this->assertInstanceOf(RolesHierarchyExtensionExtensionInterface::class, $extension);
         $this->assertInstanceOf(RoleDefinitionInterface::class, $extension->getRolesHierarchy());
 
         $this->assertInstanceOf(ConfigurationExtensionInterface::class, $extension);

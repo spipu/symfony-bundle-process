@@ -240,6 +240,7 @@ class CronManager
      * @param OutputInterface $output
      * @param int $taskId
      * @return bool
+     * @SuppressWarnings(PMD.ErrorControlOperator)
      */
     private function checkRunningTaskPid(OutputInterface $output, int $taskId): bool
     {

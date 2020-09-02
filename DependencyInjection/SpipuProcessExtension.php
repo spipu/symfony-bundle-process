@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\DependencyInjection;
 
-use Spipu\CoreBundle\DependencyInjection\RolesHierarchiExtensionExtensionInterface;
+use Spipu\CoreBundle\DependencyInjection\RolesHierarchyExtensionExtensionInterface;
 use Spipu\CoreBundle\Service\RoleDefinitionInterface;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\RoleDefinition;
@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-final class SpipuProcessExtension extends Extension implements RolesHierarchiExtensionExtensionInterface
+final class SpipuProcessExtension extends Extension implements RolesHierarchyExtensionExtensionInterface
 {
     /**
      * Get the alias in config file
