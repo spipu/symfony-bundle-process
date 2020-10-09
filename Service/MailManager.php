@@ -5,6 +5,8 @@ namespace Spipu\ProcessBundle\Service;
 
 use Spipu\CoreBundle\Service\MailManager as BaseMailManager;
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
+use Spipu\ProcessBundle\Event\LogFailedEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MailManager
 {
@@ -22,21 +24,28 @@ class MailManager
      * @var Url
      */
     private $url;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * Mailer constructor.
      * @param ModuleConfiguration $configuration
      * @param BaseMailManager $mailManager
      * @param Url $url
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ModuleConfiguration $configuration,
         BaseMailManager $mailManager,
-        Url $url
+        Url $url,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->configuration = $configuration;
         $this->mailManager = $mailManager;
         $this->url = $url;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -45,11 +54,15 @@ class MailManager
      */
     public function sendAlert(ProcessLog $processLog): bool
     {
+        $logUrl = $this->url->getLogUrl($processLog->getId());
+
+        $event = new LogFailedEvent($processLog, $logUrl);
+        $this->eventDispatcher->dispatch($event, $event->getEventCode());
+
         if (!$this->configuration->hasFailedSendEmail()) {
             return false;
         }
 
-        $logUrl = $this->url->getLogUrl($processLog->getId());
 
         $message = "
     Hi,

@@ -3,8 +3,10 @@ namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Tests\SpipuCoreMock;
+use Spipu\CoreBundle\Tests\SymfonyMock;
 use Spipu\ProcessBundle\Service\MailManager;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
+use Spipu\UiBundle\Event\FormDefinitionEvent;
 
 class MailManagerTest extends TestCase
 {
@@ -13,8 +15,13 @@ class MailManagerTest extends TestCase
         $configuration = ModuleConfigurationTest::getService($this, ['process.failed.send_email' => false]);
         $url = UrlTest::getService($this);
         $mailManager = SpipuCoreMock::getMailManager($this);
+        $eventDispatcher = SymfonyMock::getEventDispatcher($this);
+        $eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->anything(), 'spipu.process.log.failed');
 
-        $service = new MailManager($configuration, $mailManager, $url);
+        $service = new MailManager($configuration, $mailManager, $url, $eventDispatcher);
 
         $log = SpipuProcessMock::getLogEntity(1);
 
@@ -35,8 +42,13 @@ class MailManagerTest extends TestCase
                 'to@mock.fr'
             );
 
-        $service = new MailManager($configuration, $mailManager, $url);
+        $eventDispatcher = SymfonyMock::getEventDispatcher($this);
+        $eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->anything(), 'spipu.process.log.failed');
 
+        $service = new MailManager($configuration, $mailManager, $url, $eventDispatcher);
 
         $log = SpipuProcessMock::getLogEntity(1);
         $log->setCode('MOCK');
