@@ -5,6 +5,7 @@ namespace Spipu\ProcessBundle\Service;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Spipu\ProcessBundle\Entity\Task as ProcessTask;
 use Spipu\ProcessBundle\Exception\ProcessException;
@@ -47,7 +48,7 @@ class Logger implements LoggerProcessInterface
     /**
      * Logger constructor.
      * @param EntityManagerInterface $entityManager
-     * @param MailManager $mailer
+     * @param MailManager|null $mailer
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -141,7 +142,7 @@ class Logger implements LoggerProcessInterface
             $this->warning('A technical alert email will been sent');
             try {
                 $this->mailer->sendAlert($this->getModel());
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->critical(' => ERROR when sending the email');
                 $this->critical((string) $e);
             }
@@ -153,7 +154,7 @@ class Logger implements LoggerProcessInterface
     /**
      * save the model
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     private function saveModel()
     {
@@ -165,7 +166,7 @@ class Logger implements LoggerProcessInterface
 
         try {
             $this->entityManager->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "FATAL ERROR DURING ENTITY MANAGER FLUSH!!!";
             echo "Log Content";
             echo "============================";
@@ -320,5 +321,24 @@ class Logger implements LoggerProcessInterface
     public function getModel(): ?ProcessLog
     {
         return $this->model;
+    }
+
+    /**
+     * @param ProcessLog $log
+     * @return void
+     */
+    public function initFromExistingLog(ProcessLog $log): void
+    {
+        $this->model = $log;
+        $this->nbSteps = 1;
+
+        try {
+            $this->messages = json_decode($log->getContent(), true);
+            if (!is_array($this->messages)) {
+                $this->messages = [];
+            }
+        } catch (Exception $e) {
+            $this->messages = [];
+        }
     }
 }

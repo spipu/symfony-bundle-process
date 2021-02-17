@@ -5,6 +5,7 @@ namespace Spipu\ProcessBundle\Service;
 
 use DateInterval;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Spipu\ProcessBundle\Repository\LogRepository;
@@ -48,6 +49,11 @@ class CronManager
     private $entityManager;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * CronManager constructor.
      * @param TaskRepository $processTaskRepository
      * @param LogRepository $processLogRepository
@@ -55,6 +61,7 @@ class CronManager
      * @param Status $processStatus
      * @param ModuleConfiguration $processConfiguration
      * @param EntityManagerInterface $entityManager
+     * @param Logger $logger
      */
     public function __construct(
         TaskRepository $processTaskRepository,
@@ -62,7 +69,8 @@ class CronManager
         Manager $processManager,
         Status $processStatus,
         ModuleConfiguration $processConfiguration,
-        EntityManagerInterface  $entityManager
+        EntityManagerInterface  $entityManager,
+        Logger $logger
     ) {
         $this->processTaskRepository = $processTaskRepository;
         $this->processLogRepository = $processLogRepository;
@@ -70,6 +78,7 @@ class CronManager
         $this->processStatus = $processStatus;
         $this->processConfiguration = $processConfiguration;
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -195,9 +204,9 @@ class CronManager
 
     /**
      * @param int $nbDays
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
-    private function prepareLimitDate(int $nbDays): \DateTimeInterface
+    private function prepareLimitDate(int $nbDays): DateTimeInterface
     {
         $date = new DateTime();
 
@@ -262,8 +271,17 @@ class CronManager
         $sid = @posix_getsid($pid);
 
         if (!$sid) {
-            $output->writeln('     => <error>Process not found</error>');
-            $task->incrementTry('Process not found', false);
+            $errorMessage = 'Process not found';
+            $output->writeln("     => <error>$errorMessage</error>");
+
+            $log = $task->getLogs()->last();
+            if ($log) {
+                $logger = clone $this->logger;
+                $logger->initFromExistingLog($log);
+                $logger->critical($errorMessage);
+                $logger->finish(Status::FAILED);
+            }
+            $task->incrementTry($errorMessage, false);
             $task->setStatus(Status::FAILED);
             $this->entityManager->flush();
 
