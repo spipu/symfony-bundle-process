@@ -43,7 +43,7 @@
                 <table class="table table-striped table-hover table-sm mb-0">
                     {% for name, value in process.parameters %}
                         <tr><th>{{ name }}</th></tr>
-                        <tr><td>{{ value }}</td></tr>
+                        <tr><td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td></tr>
                     {% else %}
                         <tr><td>{{ 'spipu.process.field.parameter.empty'|trans }}</td></tr>
                     {% endfor %}
