@@ -6,6 +6,7 @@ namespace Spipu\ProcessBundle\Command;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
+use Spipu\ProcessBundle\Service\LoggerOutput;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,6 +20,7 @@ class ProcessRunCommand extends Command
 {
     const ARGUMENT_PROCESS = 'process';
     const OPTION_INPUT = 'inputs';
+    const OPTION_DEBUG = 'debug';
 
     /**
      * @var ProcessManager
@@ -65,6 +67,12 @@ class ProcessRunCommand extends Command
                 'i',
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'Inputs of the process (if needed)'
+            )
+            ->addOption(
+                static::OPTION_DEBUG,
+                'd',
+                InputOption::VALUE_NONE,
+                'Display the logs on console'
             );
     }
 
@@ -114,7 +122,15 @@ class ProcessRunCommand extends Command
         $inputs = $input->getOption(static::OPTION_INPUT);
         $this->askInputs($process, $inputs, $input, $output);
 
+        // Debug mode or not.
+        $loggerOutput = null;
+        if ($input->getOption(static::OPTION_DEBUG)) {
+            $output->writeln('Enable Debug Output');
+            $loggerOutput = new LoggerOutput($output);
+        }
+
         // Execute the process.
+        $this->processManager->setLoggerOutput($loggerOutput);
         $result = $this->processManager->execute($process);
 
         // Display the result.

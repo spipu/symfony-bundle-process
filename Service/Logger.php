@@ -46,6 +46,11 @@ class Logger implements LoggerProcessInterface
     private $currentStep;
 
     /**
+     * @var LoggerOutputInterface|null
+     */
+    private $loggerOutput;
+
+    /**
      * Logger constructor.
      * @param EntityManagerInterface $entityManager
      * @param MailManager|null $mailer
@@ -101,6 +106,14 @@ class Logger implements LoggerProcessInterface
         return $this->model->getId();
     }
 
+    /**
+     * @param LoggerOutputInterface|null $loggerOutput
+     * @return void
+     */
+    public function setLoggerOutput(?LoggerOutputInterface $loggerOutput): void
+    {
+        $this->loggerOutput = $loggerOutput;
+    }
 
     /**
      * Set the current step, from 0 to n-1
@@ -304,13 +317,19 @@ class Logger implements LoggerProcessInterface
      */
     public function log($level, $message, array $context = array())
     {
-        $this->messages[] = [
+        $messageRow = [
             'date'        => (new DateTime())->getTimestamp(),
             'memory'      => memory_get_usage(),
             'memory_peak' => memory_get_peak_usage(),
             'level'       => (string) $level,
             'message'     => (string) mb_convert_encoding($message, 'UTF-8'),
         ];
+
+        if ($this->loggerOutput) {
+            $this->loggerOutput->write($messageRow);
+        }
+
+        $this->messages[] = $messageRow;
 
         $this->saveModel();
     }

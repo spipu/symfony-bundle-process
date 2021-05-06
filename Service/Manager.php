@@ -50,6 +50,11 @@ class Manager
     private $inputsFactory;
 
     /**
+     * @var LoggerOutputInterface|null
+     */
+    private $loggerOutput;
+
+    /**
      * Manager constructor.
      * @param ConfigReader $configReader
      * @param MainParameters $mainParameters
@@ -81,6 +86,15 @@ class Manager
     public function getConfigReader(): ConfigReader
     {
         return $this->configReader;
+    }
+
+    /**
+     * @param LoggerOutputInterface|null $loggerOutput
+     * @return void
+     */
+    public function setLoggerOutput(?LoggerOutputInterface $loggerOutput): void
+    {
+        $this->loggerOutput = $loggerOutput;
     }
 
     /**
@@ -247,6 +261,10 @@ class Manager
         $this->executeUpdateTask($process, Status::RUNNING);
 
         $logger = clone $this->logger;
+
+        if ($this->loggerOutput) {
+            $logger->setLoggerOutput($this->loggerOutput);
+        }
 
         $logId = $logger->init($process->getCode(), count($process->getSteps()), $process->getTask());
         $process->setLogId($logId);

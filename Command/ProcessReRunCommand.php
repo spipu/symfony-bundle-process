@@ -5,16 +5,19 @@ namespace Spipu\ProcessBundle\Command;
 
 use Exception;
 use Spipu\ProcessBundle\Repository\TaskRepository;
+use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\Status as ProcessStatus;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessReRunCommand extends Command
 {
     const ARGUMENT_TASK = 'task-id';
+    const OPTION_DEBUG = 'debug';
 
     /**
      * @var TaskRepository
@@ -66,6 +69,12 @@ class ProcessReRunCommand extends Command
                 static::ARGUMENT_TASK,
                 InputArgument::REQUIRED,
                 'The id of the task to re-run'
+            )
+            ->addOption(
+                static::OPTION_DEBUG,
+                'd',
+                InputOption::VALUE_NONE,
+                'Display the logs on console'
             );
     }
 
@@ -120,6 +129,14 @@ class ProcessReRunCommand extends Command
         $output->writeln(' - Process: '.$task->getCode());
         $output->writeln(' - Status: '.$task->getStatus());
 
+        // Debug mode or not.
+        $loggerOutput = null;
+        if ($input->getOption(static::OPTION_DEBUG)) {
+            $output->writeln('Enable Debug Output');
+            $loggerOutput = new LoggerOutput($output);
+        }
+
+        $this->processManager->setLoggerOutput($loggerOutput);
         $process = $this->processManager->loadFromTask($task);
         $result = $this->processManager->execute($process);
 
