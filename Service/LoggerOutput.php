@@ -34,7 +34,7 @@ class LoggerOutput implements LoggerOutputInterface
                 number_format($message['memory'] / (1024 * 1024), 2, '.', ''),
                 number_format($message['memory_peak'] / (1024 * 1024), 2, '.', ''),
                 $message['level'],
-                $message['message'],
+                $message['message']
             )
         );
     }
