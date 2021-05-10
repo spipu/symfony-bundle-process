@@ -29,13 +29,33 @@ class LoggerOutput implements LoggerOutputInterface
     {
         $this->output->writeln(
             sprintf(
-                '[%s][%s Mo][%s Mo][%s] %s',
+                '[%s][%s][%s][%s] %s',
                 date('Y-m-d H:i:s', $message['date']),
-                number_format($message['memory'] / (1024 * 1024), 2, '.', ''),
-                number_format($message['memory_peak'] / (1024 * 1024), 2, '.', ''),
-                $message['level'],
+                $this->formatMemory((int) $message['memory']),
+                $this->formatMemory((int) $message['memory_peak']),
+                $this->formatLevel($message['level']),
                 $message['message']
             )
         );
+    }
+
+    /**
+     * @param int $value
+     * @return string
+     */
+    private function formatMemory(int $value): string
+    {
+        $stringValue = number_format(((float) $value) / (1024. * 1024.), 2, '.', '');
+
+        return str_pad($stringValue, 6, ' ', STR_PAD_LEFT) . ' Mo';
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function formatLevel(string $value): string
+    {
+        return str_pad($value, 7, '_', STR_PAD_RIGHT);
     }
 }
