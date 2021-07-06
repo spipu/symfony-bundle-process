@@ -93,14 +93,17 @@ class TaskController extends AbstractController
      * @param YesNo $yesNoOptions
      * @param GridFactory $gridFactory
      * @param LogGrid $logGrid
+     * @param ConfigReader $configReader
      * @return Response
+     * @throws ProcessException
      * @throws UiException
      */
     public function show(
         Task $resource,
         YesNo $yesNoOptions,
         GridFactory $gridFactory,
-        LogGrid $logGrid
+        LogGrid $logGrid,
+        ConfigReader $configReader
     ): Response {
         $manager = $gridFactory->create($logGrid);
         $manager->setRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
@@ -111,14 +114,19 @@ class TaskController extends AbstractController
 
         $manager->validate();
 
+        $processConfig = $configReader->getProcessDefinition($resource->getCode());
+        $canKill  = $this->status->canKill($resource->getStatus()) && $this->configuration->hasTaskCanKill();
+        $canRerun = $this->status->canRerun($resource->getStatus());
+
         return $this->render(
             '@SpipuProcess/task/show.html.twig',
             [
-                'resource' => $resource,
-                'manager'  => $manager,
-                'canKill'  => $this->status->canKill($resource->getStatus()) && $this->configuration->hasTaskCanKill(),
-                'canRerun' => $this->status->canRerun($resource->getStatus()),
-                'fieldYesNo' => new Field('yes_no', ChoiceType::class, 10, ['choices'  => $yesNoOptions]),
+                'resource'      => $resource,
+                'processConfig' => $processConfig,
+                'manager'       => $manager,
+                'canKill'       => $canKill,
+                'canRerun'      => $canRerun,
+                'fieldYesNo'    => new Field('yes_no', ChoiceType::class, 10, ['choices'  => $yesNoOptions]),
             ]
         );
     }
@@ -131,11 +139,14 @@ class TaskController extends AbstractController
      * )
      * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_RERUN')")
      * @param Task $resource
+     * @param ProcessManager $processManager
      * @param AsynchronousCommand $asynchronousCommand
      * @return Response
+     * @throws Exception
      */
     public function rerun(
         Task $resource,
+        ProcessManager $processManager,
         AsynchronousCommand $asynchronousCommand
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -144,6 +155,12 @@ class TaskController extends AbstractController
 
         if (!$this->status->canRerun($resource->getStatus())) {
             $this->addFlashTrans('danger', 'spipu.process.error.rerun');
+            return $redirect;
+        }
+
+        $process = $processManager->loadFromTask($resource);
+        if ($processManager->isProcessLockedByAnotherOne($process)) {
+            $this->addFlashTrans('danger', 'spipu.process.error.locked');
             return $redirect;
         }
 
@@ -239,7 +256,7 @@ class TaskController extends AbstractController
      * @return Response
      * @throws ProcessException
      */
-    public function executeChoice(ConfigReader $configReader)
+    public function executeChoice(ConfigReader $configReader): Response
     {
         $processes = [];
         foreach (array_keys($configReader->getProcessList()) as $code) {
@@ -249,6 +266,7 @@ class TaskController extends AbstractController
                     'code' => $process['code'],
                     'name' => $process['name'],
                     'need_inputs' => (count($process['inputs']) > 0),
+                    'locks' => $process['options']['process_lock'],
                 ];
             }
         }
@@ -284,7 +302,7 @@ class TaskController extends AbstractController
         ProcessForm $processForm,
         ProcessManager $processManager,
         Request $request
-    ) {
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $processForm->setProcessCode($processCode);

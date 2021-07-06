@@ -125,6 +125,7 @@ class CronManager
     private function rerunWaitingTask(OutputInterface $output, int $taskId): bool
     {
         $task = $this->processTaskRepository->find($taskId);
+        $this->entityManager->refresh($task);
 
         $isScheduledTask = ($task->getScheduledAt() && $task->getStatus() === $this->processStatus->getCreatedStatus());
 

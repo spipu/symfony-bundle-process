@@ -34,6 +34,7 @@ spipu:
                 inputs:                   "Inputs"
                 options:                  "Options"
                 steps:                    "Steps"
+                locks:                    "Locks"
 
             task:
                 id:                       "Id"
@@ -106,7 +107,7 @@ spipu:
             disable:  "This action has been disabled in the app configuration"
             required: "This field is required"
             generic:  "There is an error on this form"
-
+            locked:   "This process can not be executed, because it is locked by another one"
         help:
             json:     "Must be a valid Json format"
 

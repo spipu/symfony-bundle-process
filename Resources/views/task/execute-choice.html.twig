@@ -21,6 +21,7 @@
                         <th class="text-left">{{ 'spipu.process.field.process.code'|trans }}</th>
                         <th class="text-left">{{ 'spipu.process.field.process.name'|trans }}</th>
                         <th class="text-center">{{ 'spipu.process.field.process.need_inputs'|trans }}</th>
+                        <th class="text-left">{{ 'spipu.process.field.process.locks'|trans }}</th>
                         <th class="text-right">{{ 'spipu.ui.grid.action.label'|trans }}</th>
                     </tr>
                 </thead>
@@ -30,6 +31,13 @@
                         <td class="text-left">{{ process.code }}</td>
                         <td class="text-left">{{ process.name }}</td>
                         <td class="text-center">{% if process.need_inputs%}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td>
+                        <td class="text-left">
+                            {% for lock in process.locks %}
+                                {{ lock }}<br />
+                            {% else %}
+                                -
+                            {% endfor %}
+                        </td>
                         <td class="text-right">
                             {{ buttons.defaultLink(path('spipu_process_admin_task_execute', {'processCode': process.code}), 'spipu.process.action.execute', 'success  btn-sm', 'play-circle') }}
                         </td>

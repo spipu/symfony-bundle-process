@@ -4,7 +4,9 @@ declare(strict_types = 1);
 namespace Spipu\ProcessBundle\Service;
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Entity\Process;
@@ -12,10 +14,12 @@ use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\OptionException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Throwable;
 
 /**
  * Class Manager
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PMD.ExcessiveClassComplexity)
  */
 class Manager
 {
@@ -134,7 +138,7 @@ class Manager
     /**
      * @param Task $task
      * @return Process\Process
-     * @throws \Exception
+     * @throws Exception
      */
     public function loadFromTask(Task $task): Process\Process
     {
@@ -149,7 +153,7 @@ class Manager
             foreach ($inputsData as $key => $value) {
                 $process->getInputs()->set($key, $value);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $task->incrementTry($e->getMessage(), false);
             $task->setStatus(Status::FAILED);
             $this->entityManager->persist($task);
@@ -184,13 +188,11 @@ class Manager
      */
     private function loadPrepareStep(array $stepDefinition): Process\Step
     {
-        $step = new Process\Step(
+        return new Process\Step(
             $stepDefinition['code'],
             $this->configReader->getStepClassFromClassname($stepDefinition['class']),
             $this->loadPrepareParameters($stepDefinition['parameters'])
         );
-
-        return $step;
     }
 
     /**
@@ -248,10 +250,16 @@ class Manager
      * @param Process\Process $process
      * @param callable|null $initCallback
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(Process\Process $process, callable $initCallback = null)
     {
+        if ($this->isProcessLockedByAnotherOne($process)) {
+            throw new ProcessException(
+                'This process can not be executed, because it is locked by another one'
+            );
+        }
+
         if ($process->getTask()) {
             $process->getTask()->setExecutedAt(new DateTime());
             $process->getTask()->setPidValue(getmypid());
@@ -299,7 +307,7 @@ class Manager
 
             $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), $rerun);
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $logger->critical((string) $e);
             $logger->warning(
                 sprintf(
@@ -318,12 +326,12 @@ class Manager
 
     /**
      * @param Process\Process $process
-     * @param \DateTimeInterface $scheduleDate
+     * @param DateTimeInterface $scheduleDate
      * @return int
      * @throws InputException
      * @throws ProcessException
      */
-    public function scheduleExecution(Process\Process $process, \DateTimeInterface $scheduleDate): int
+    public function scheduleExecution(Process\Process $process, DateTimeInterface $scheduleDate): int
     {
         if (!$process->getOptions()->canBePutInQueue()) {
             throw new ProcessException(
@@ -341,7 +349,7 @@ class Manager
     /**
      * @param Process\Process $process
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function executeAsynchronously(Process\Process $process): int
     {
@@ -351,12 +359,70 @@ class Manager
             );
         }
 
+        if ($this->isProcessLockedByAnotherOne($process)) {
+            return $this->scheduleExecution($process, new DateTime());
+        }
+
         $this->prepareInputs($process);
         $this->executeUpdateTask($process, Status::CREATED);
 
         $this->asynchronousCommand->execute('spipu:process:rerun', [$process->getTask()->getId()]);
 
         return $process->getTask()->getId();
+    }
+
+    /**
+     * @param Process\Process $process
+     * @return bool
+     */
+    public function isProcessLockedByAnotherOne(Process\Process $process): bool
+    {
+        $processLocks = $process->getOptions()->getProcessLocks();
+        if (count($processLocks) === 0) {
+            return false;
+        }
+
+        $query = $this->buildLockQuery(
+            $processLocks,
+            $process->getTask() ? $process->getTask()->getId() : null
+        );
+
+        try {
+            $result = $this->entityManager->getConnection()->executeQuery($query)->fetchOne();
+            return (!empty($result));
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $processLocks
+     * @param int|null $taskId
+     * @return string
+     */
+    private function buildLockQuery(array $processLocks, ?int $taskId): string
+    {
+        foreach ($processLocks as &$processLock) {
+            $processLock = $this->entityManager->getConnection()->quote($processLock);
+        }
+
+        $statuses = [Status::CREATED, Status::RUNNING, Status::FAILED];
+        foreach ($statuses as &$status) {
+            $status = $this->entityManager->getConnection()->quote($status);
+        }
+
+        $query = sprintf(
+            "SELECT `id` FROM `spipu_process_task` WHERE `code` IN (%s) AND `status` IN (%s)",
+            implode(',', $processLocks),
+            implode(',', $statuses)
+        );
+
+        if ($taskId !== null) {
+            $query .= ' AND id < ' . $taskId;
+        }
+        $query .= ' ORDER BY `id` ASC LIMIT 1';
+
+        return $query;
     }
 
      /**
