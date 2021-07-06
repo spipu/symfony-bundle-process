@@ -8,7 +8,7 @@ use Spipu\ProcessBundle\Exception\OptionException;
 class Options
 {
     /**
-     * @var bool[]
+     * @var array
      */
     private $options = [];
 
@@ -30,8 +30,16 @@ class Options
      */
     private function validateDefinition(): void
     {
-        foreach ($this->options as $key => $value) {
-            $this->options[$key] = ($value ? true : false);
+        $booleanKeys = [
+            'can_be_put_in_queue',
+            'can_be_rerun_automatically',
+        ];
+        foreach ($booleanKeys as $booleanKey) {
+            $this->options[$booleanKey] = (bool) ($this->options[$booleanKey]);
+        }
+
+        if (!is_array($this->options['process_lock'])) {
+            $this->options['process_lock'] = [$this->options['process_lock']];
         }
 
         if ($this->canBeRerunAutomatically() && !$this->canBePutInQueue()) {
@@ -56,7 +64,7 @@ class Options
      */
     public function canBePutInQueue(): bool
     {
-        return $this->options['can_be_put_in_queue'];
+        return (bool) $this->options['can_be_put_in_queue'];
     }
 
     /**
@@ -66,6 +74,14 @@ class Options
      */
     public function canBeRerunAutomatically(): bool
     {
-        return $this->options['can_be_rerun_automatically'];
+        return (bool) $this->options['can_be_rerun_automatically'];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getProcessLocks(): array
+    {
+        return (array) $this->options['process_lock'];
     }
 }
