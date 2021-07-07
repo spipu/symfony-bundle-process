@@ -10,8 +10,8 @@ interface LoggerInterface extends \Psr\Log\LoggerInterface
 {
     /**
      * Set the progress on the current step
-     * @param int $progress
+     * @param int $progressOnCurrentStep
      * @return void
      */
-    public function setProgress(int $progress): void;
+    public function setProgress(int $progressOnCurrentStep): void;
 }

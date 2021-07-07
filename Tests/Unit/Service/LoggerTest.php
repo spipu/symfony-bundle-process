@@ -87,7 +87,7 @@ class LoggerTest extends TestCase
         $logger->init('test', 2, $task);
         $this->assertSame($task, $logger->getModel()->getTask());
 
-        $logger->setCurrentStep(0);
+        $logger->setCurrentStep(0, false);
         $this->assertSame(0, $logger->getModel()->getProgress());
         $this->assertSame(0, $task->getProgress());
 
@@ -99,7 +99,7 @@ class LoggerTest extends TestCase
         $this->assertSame(49, $logger->getModel()->getProgress());
         $this->assertSame(49, $task->getProgress());
 
-        $logger->setCurrentStep(1);
+        $logger->setCurrentStep(1, false);
         $this->assertSame(50, $logger->getModel()->getProgress());
         $this->assertSame(50, $task->getProgress());
 

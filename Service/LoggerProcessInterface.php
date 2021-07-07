@@ -22,9 +22,10 @@ interface LoggerProcessInterface extends LoggerInterface
     /**
      * Set the current step, form 0 to n-1
      * @param int $currentStep
+     * @param bool $ignoreInProgress
      * @return void
      */
-    public function setCurrentStep(int $currentStep): void;
+    public function setCurrentStep(int $currentStep, bool $ignoreInProgress): void;
 
     /**
      * Finish the logger for the current process

@@ -46,6 +46,11 @@ class Logger implements LoggerProcessInterface
     private $currentStep;
 
     /**
+     * @var bool
+     */
+    private $ignoreInProgress;
+
+    /**
      * @var LoggerOutputInterface|null
      */
     private $loggerOutput;
@@ -99,7 +104,7 @@ class Logger implements LoggerProcessInterface
         $this->entityManager->persist($this->model);
 
         $this->nbSteps = $nbSteps;
-        $this->setCurrentStep(0);
+        $this->setCurrentStep(0, false);
 
         $this->info(sprintf('Process Started [%s]', $processCode));
 
@@ -118,11 +123,13 @@ class Logger implements LoggerProcessInterface
     /**
      * Set the current step, from 0 to n-1
      * @param int $currentStep
+     * @param bool $ignoreInProgress
      * @return void
      */
-    public function setCurrentStep(int $currentStep): void
+    public function setCurrentStep(int $currentStep, bool $ignoreInProgress): void
     {
         $this->currentStep = $currentStep;
+        $this->ignoreInProgress = $ignoreInProgress;
         $this->setProgress(0);
     }
 
@@ -133,6 +140,10 @@ class Logger implements LoggerProcessInterface
      */
     public function setProgress(int $progressOnCurrentStep): void
     {
+        if ($this->ignoreInProgress) {
+            $progressOnCurrentStep = 0;
+        }
+
         $progress = (0.01 * (float) $progressOnCurrentStep) + (float) $this->currentStep;
         $progress = 100. * $progress / ((float) $this->nbSteps);
 

@@ -275,7 +275,8 @@ class Manager
             $logger->setLoggerOutput($this->loggerOutput);
         }
 
-        $logId = $logger->init($process->getCode(), count($process->getSteps()), $process->getTask());
+        $nbSteps = $this->countMatterSteps($process);
+        $logId = $logger->init($process->getCode(), $nbSteps, $process->getTask());
         $process->setLogId($logId);
 
         if ($initCallback) {
@@ -323,6 +324,23 @@ class Manager
         }
 
         return $result;
+    }
+
+    /**
+     * @param Process\Process $process
+     * @return int
+     */
+    private function countMatterSteps(Process\Process $process): int
+    {
+        $nbSteps = 0;
+
+        foreach ($process->getSteps() as $step) {
+            if (!$step->isIgnoreInProgress()) {
+                $nbSteps++;
+            }
+        }
+
+        return ($nbSteps > 0) ? $nbSteps : 1;
     }
 
     /**
@@ -493,10 +511,13 @@ class Manager
      */
     private function executeSteps(Process\Process $process, LoggerProcessInterface $logger)
     {
-        $kSteps = 0;
+        $kSteps = -1;
         $result = null;
         foreach ($process->getSteps() as $step) {
-            $logger->setCurrentStep($kSteps);
+            if (!$step->isIgnoreInProgress()) {
+                $kSteps++;
+            }
+            $logger->setCurrentStep(($kSteps > 0 ? $kSteps : 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
             $startTime = microtime(true);
@@ -505,9 +526,9 @@ class Manager
 
             $process->getParameters()->set('time.'.$step->getCode(), microtime(true) - $startTime);
             $process->getParameters()->set('result.'.$step->getCode(), $result);
-            $kSteps++;
         }
-        $logger->setCurrentStep($kSteps);
+        $kSteps++;
+        $logger->setCurrentStep($kSteps, false);
 
         return $result;
     }
