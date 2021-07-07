@@ -191,7 +191,8 @@ class Manager
         return new Process\Step(
             $stepDefinition['code'],
             $this->configReader->getStepClassFromClassname($stepDefinition['class']),
-            $this->loadPrepareParameters($stepDefinition['parameters'])
+            $this->loadPrepareParameters($stepDefinition['parameters']),
+            $stepDefinition['ignore_in_progress']
         );
     }
 

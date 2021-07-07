@@ -123,6 +123,7 @@ class SpipuProcessMock extends TestCase
                             'string' => '{{ param2 }} first',
                             'array'  => [1],
                         ],
+                        'ignore_in_progress' => false,
                     ],
                     'second' => [
                         'class' => self::COUNT_CLASSNAME,
@@ -130,6 +131,7 @@ class SpipuProcessMock extends TestCase
                             'string' => '{{ param2 }} second',
                             'array'  => [1, 2, 3],
                         ],
+                        'ignore_in_progress' => false,
                     ],
                 ],
             ],
@@ -148,6 +150,7 @@ class SpipuProcessMock extends TestCase
                     'error' => [
                         'class' => self::ERROR_CLASSNAME,
                         'parameters' => [],
+                        'ignore_in_progress' => false,
                     ],
                 ],
             ],

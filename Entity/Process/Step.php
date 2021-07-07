@@ -23,19 +23,27 @@ class Step
     private $processor;
 
     /**
+     * @var bool
+     */
+    private $ignoreInProgress;
+
+    /**
      * Process constructor.
      * @param string $code
      * @param StepInterface $processor
      * @param Parameters $parameters
+     * @param bool $ignoreInProgress
      */
     public function __construct(
         string $code,
         StepInterface $processor,
-        Parameters $parameters
+        Parameters $parameters,
+        bool $ignoreInProgress
     ) {
         $this->code = $code;
         $this->processor = $processor;
         $this->parameters = $parameters;
+        $this->ignoreInProgress = $ignoreInProgress;
     }
 
     /**
@@ -60,5 +68,13 @@ class Step
     public function getParameters(): Parameters
     {
         return $this->parameters;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIgnoreInProgress(): bool
+    {
+        return $this->ignoreInProgress;
     }
 }
