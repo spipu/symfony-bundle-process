@@ -328,7 +328,7 @@ class TaskController extends AbstractController
                     ]
                 );
             } catch (Exception $e) {
-                $this->container->get('session')->getFlashBag()->clear();
+                $this->container->get('request_stack')->getSession()->getFlashBag()->clear();
                 $this->addFlash('danger', $e->getMessage());
             }
         }

@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
+use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\RowReaderException;
 use Spipu\ProcessBundle\Exception\StepException;
@@ -56,7 +57,7 @@ class ImportFileToTable implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return array
      * @throws StepException
      * @throws RowReaderException
      */
@@ -152,7 +153,7 @@ class ImportFileToTable implements StepInterface
             $output = trim(explode(" ", $output)[0]);
 
             return intval($output);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0;
         }
     }
@@ -247,7 +248,7 @@ class ImportFileToTable implements StepInterface
 
         try {
             $this->connection->getWrappedConnection()->exec($query);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
     }
