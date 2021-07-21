@@ -6,12 +6,35 @@ services:
         autowire: true
         autoconfigure: true
 
+    # Services that need the container
+    Spipu\ProcessBundle\Service\ConfigReader:
+        autowire: true
+        arguments:
+            $container: '@service_container'
+
+    Spipu\ProcessBundle\Service\InputsFactory:
+        autowire: true
+        arguments:
+            $container: '@service_container'
+
+    Spipu\ProcessBundle\Service\MainParameters:
+        autowire: true
+        arguments:
+            $container: '@service_container'
+
     # Steps
     Spipu\ProcessBundle\Step\:
         resource: '../../Step/*'
         tags: ['spipu.process.step']
         public: true
         autowire: true
+
+    Spipu\ProcessBundle\Step\File\ImportFileToTable:
+        tags: ['spipu.process.step']
+        public: true
+        autowire: true
+        arguments:
+            $container: '@service_container'
 
     Spipu\ProcessBundle\Step\File\RowReader\Action\:
         resource: '../../Step/File/RowReader/Action/*'

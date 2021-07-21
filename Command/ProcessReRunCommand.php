@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
@@ -16,8 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessReRunCommand extends Command
 {
-    const ARGUMENT_TASK = 'task-id';
-    const OPTION_DEBUG = 'debug';
+    public const ARGUMENT_TASK = 'task-id';
+    public const OPTION_DEBUG = 'debug';
 
     /**
      * @var TaskRepository

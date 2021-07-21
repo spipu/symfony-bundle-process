@@ -1,12 +1,12 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File\RowReader\Action;
 
 class ToFloat implements ActionInterface
 {
-    const DEFAULT_DECIMAL = 4;
-    const DEFAULT_SEPARATOR = '.';
+    public const DEFAULT_DECIMAL = 4;
+    public const DEFAULT_SEPARATOR = '.';
 
     /**
      * @return string

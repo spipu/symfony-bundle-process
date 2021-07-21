@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
@@ -18,9 +18,9 @@ use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 
 class ProcessRunCommand extends Command
 {
-    const ARGUMENT_PROCESS = 'process';
-    const OPTION_INPUT = 'inputs';
-    const OPTION_DEBUG = 'debug';
+    public const ARGUMENT_PROCESS = 'process';
+    public const OPTION_INPUT = 'inputs';
+    public const OPTION_DEBUG = 'debug';
 
     /**
      * @var ProcessManager

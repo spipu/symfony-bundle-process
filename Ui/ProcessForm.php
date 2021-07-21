@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Ui;
 
@@ -371,7 +371,7 @@ class ProcessForm implements EntityDefinitionInterface
 
         return $field;
     }
-    
+
     /**
      * @param Input $input
      * @return Field

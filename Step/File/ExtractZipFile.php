@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
@@ -45,7 +45,7 @@ class ExtractZipFile implements StepInterface
         ZipArchive::ER_REMOVE       => "Can't remove file",
         ZipArchive::ER_DELETED      => "Entry has been deleted",
     ];
-    
+
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger

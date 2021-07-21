@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessCronManagerCommand extends Command
 {
-    const ARGUMENT_ACTION = 'cron_action';
+    public const ARGUMENT_ACTION = 'cron_action';
 
     /**
      * @var CronManager
