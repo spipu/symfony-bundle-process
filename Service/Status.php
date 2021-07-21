@@ -1,14 +1,14 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
 class Status
 {
-    const CREATED  = 'created';
-    const RUNNING  = 'running';
-    const FINISHED = 'finished';
-    const FAILED   = 'failed';
+    public const CREATED  = 'created';
+    public const RUNNING  = 'running';
+    public const FINISHED = 'finished';
+    public const FAILED   = 'failed';
 
     /**
      * List of available statuses

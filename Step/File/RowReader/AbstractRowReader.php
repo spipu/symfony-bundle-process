@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File\RowReader;
 
@@ -162,7 +162,8 @@ abstract class AbstractRowReader implements RowReaderInterface
      */
     private function prepareActions(&$actions): bool
     {
-        if ($actions === false
+        if (
+            $actions === false
             || $actions === null
             || $actions === ''
         ) {

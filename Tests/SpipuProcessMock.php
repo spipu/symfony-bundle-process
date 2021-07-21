@@ -14,8 +14,8 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class SpipuProcessMock extends TestCase
 {
-    const COUNT_CLASSNAME = StepCountMock::class;
-    const ERROR_CLASSNAME = StepErrorMock::class;
+    public const COUNT_CLASSNAME = StepCountMock::class;
+    public const ERROR_CLASSNAME = StepErrorMock::class;
 
     /**
      * @param int|null $id

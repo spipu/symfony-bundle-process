@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
@@ -69,7 +69,7 @@ class CronManager
         Manager $processManager,
         Status $processStatus,
         ModuleConfiguration $processConfiguration,
-        EntityManagerInterface  $entityManager,
+        EntityManagerInterface $entityManager,
         Logger $logger
     ) {
         $this->processTaskRepository = $processTaskRepository;

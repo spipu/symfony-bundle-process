@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Entity\Process;
 
@@ -8,7 +8,7 @@ use Spipu\UiBundle\Form\Options\AbstractOptions;
 
 class Input
 {
-    const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file'];
+    public const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file'];
 
     /**
      * @var string
