@@ -1,8 +1,19 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\DependencyInjection;
 
+use Exception;
 use Spipu\CoreBundle\DependencyInjection\RolesHierarchyExtensionExtensionInterface;
 use Spipu\CoreBundle\Service\RoleDefinitionInterface;
 use Spipu\ProcessBundle\Exception\ProcessException;
@@ -28,7 +39,7 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchyExt
      * @param array $configs
      * @param ContainerBuilder $container
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
     public function load(array $configs, ContainerBuilder $container): void

@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File\RowReader;
@@ -230,7 +240,7 @@ abstract class AbstractRowReader implements RowReaderInterface
             $this->connection->quoteIdentifier($mapping['source']['field']),
             $this->connection->quoteIdentifier($mapping['source']['table'])
         );
-        $list = $this->connection->getWrappedConnection()->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+        $list = $this->connection->getWrappedConnection()->query($query)->fetchAllAssociative();
         $mapping['values'] = [];
         foreach ($list as $row) {
             $mapping['values'][$row['code']] = $row['id'];

@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
@@ -18,7 +28,7 @@ class ArchiveLocalFile implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return string
      * @throws StepException
      */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger)

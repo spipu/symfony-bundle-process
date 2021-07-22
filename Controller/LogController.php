@@ -1,8 +1,19 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Controller;
 
+use Exception;
 use Spipu\UiBundle\Exception\GridException;
 use Spipu\UiBundle\Exception\UiException;
 use Spipu\UiBundle\Service\Ui\GridFactory;
@@ -110,7 +121,7 @@ class LogController extends AbstractController
             $entityManager->flush();
 
             $this->addFlashTrans('success', 'spipu.ui.success.deleted');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addFlash('danger', $e->getMessage());
         }
 

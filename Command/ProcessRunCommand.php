@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
@@ -88,10 +98,10 @@ class ProcessRunCommand extends Command
     {
         if (!$input->getArgument(static::ARGUMENT_PROCESS)) {
             $output->writeln('');
-            $output->writeln('Available processs:');
-            $processs = $this->processManager->getConfigReader()->getProcessList();
+            $output->writeln('Available process:');
+            $process = $this->processManager->getConfigReader()->getProcessList();
             $list = [];
-            foreach ($processs as $code => $name) {
+            foreach ($process as $code => $name) {
                 $list[] = ['code' => $code, 'name' => $name];
             }
             $table = new Table($output);
@@ -175,7 +185,7 @@ class ProcessRunCommand extends Command
             }
 
             if (!array_key_exists($key, $values)) {
-                $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optionnal');
+                $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optional');
                 $value = $this->getSymfonyStyle($input, $output)->ask($title);
                 if ($value === null) {
                     $value = '';
@@ -217,10 +227,9 @@ class ProcessRunCommand extends Command
     {
         switch ($type) {
             case 'string':
-                return (string) $value;
+                return $value;
 
             case 'file':
-                $value = (string) $value;
                 if (!is_file($value) || !is_readable($value)) {
                     throw new InputException('This is not a existing or readable file');
                 }

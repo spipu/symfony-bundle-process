@@ -1,8 +1,19 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Database;
 
+use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
@@ -34,7 +45,7 @@ class AddIndexToTable implements StepInterface
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger)
     {
@@ -69,7 +80,7 @@ class AddIndexToTable implements StepInterface
         );
         try {
             $this->connection->getWrappedConnection()->exec($query);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $logger->error(' => Error with the following query');
             $logger->error($query);
             throw $e;

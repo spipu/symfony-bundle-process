@@ -1,8 +1,19 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Repository;
 
+use DateTimeInterface;
 use Spipu\ProcessBundle\Entity\Log;
 use Spipu\ProcessBundle\Service\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -35,10 +46,10 @@ class LogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \DateTimeInterface $limitDate
+     * @param DateTimeInterface $limitDate
      * @return int
      */
-    public function deleteFinishedLogs(\DateTimeInterface $limitDate): int
+    public function deleteFinishedLogs(DateTimeInterface $limitDate): int
     {
         $query = $this
             ->createQueryBuilder('l')
