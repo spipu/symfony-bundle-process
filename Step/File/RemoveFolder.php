@@ -54,7 +54,7 @@ class RemoveFolder implements StepInterface
         $items = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($items as $item) {
-            $item = $dir.'/'.$item;
+            $item = $dir . '/' . $item;
 
             is_dir($item) ? $this->removeDir($item) : unlink($item);
         }

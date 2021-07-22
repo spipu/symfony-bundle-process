@@ -120,7 +120,7 @@ class TaskController extends AbstractController
 
         /** @var Doctrine $dataProvider */
         $dataProvider = $manager->getDataProvider();
-        $dataProvider->addCondition('main.task = '.(int) $resource->getId());
+        $dataProvider->addCondition('main.task = ' . (int) $resource->getId());
 
         $manager->validate();
 

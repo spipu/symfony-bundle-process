@@ -28,7 +28,7 @@ class Sleep implements StepInterface
     {
         $seconds = (int) $parameters->get('seconds');
 
-        $logger->debug('Sleep for '.$seconds.' seconds');
+        $logger->debug('Sleep for ' . $seconds . ' seconds');
 
         sleep($seconds);
 

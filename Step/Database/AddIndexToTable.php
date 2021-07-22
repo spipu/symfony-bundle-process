@@ -56,7 +56,7 @@ class AddIndexToTable implements StepInterface
         $logger->debug(sprintf('Fields: [%s]', implode(', ', $fields)));
 
         // Build the Index name.
-        $indexName = md5($tablename.'_'.implode('_', $fields));
+        $indexName = md5($tablename . '_' . implode('_', $fields));
 
         // Look at if the index already exists.
         $schema = $this->connection->getSchemaManager();

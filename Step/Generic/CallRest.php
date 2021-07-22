@@ -151,7 +151,7 @@ class CallRest implements StepInterface
         $method = strtoupper($method);
 
         if (!in_array($method, array('GET', 'POST', 'PUT', 'PATCH', 'DELETE'))) {
-            throw new StepException('The method ['.$method.'] is not allowed');
+            throw new StepException('The method [' . $method . '] is not allowed');
         }
 
         return $method;
@@ -194,7 +194,7 @@ class CallRest implements StepInterface
         // Manage HTTP authentication.
         if (!empty($options['login']) && !empty($options['password'])) {
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($curl, CURLOPT_USERPWD, $options['login'].':'.$options['password']);
+            curl_setopt($curl, CURLOPT_USERPWD, $options['login'] . ':' . $options['password']);
             unset($options['login']);
             unset($options['password']);
         }
@@ -285,7 +285,7 @@ class CallRest implements StepInterface
         if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+)$/', trim($header), $match)) {
             $this->status = array(
                 'code' => $match[1],
-                'message' => 'http status '.$match[1],
+                'message' => 'http status ' . $match[1],
             );
         }
 

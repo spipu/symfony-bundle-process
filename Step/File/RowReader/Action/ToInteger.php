@@ -41,7 +41,7 @@ class ToInteger implements ActionInterface
         if ($value !== null) {
             $value = preg_replace('/^[\+]?[0]*([0-9]+)$/', '$1', $value);
             if (!preg_match('/^[0-9]+$/', $value)) {
-                throw new RowReaderException('Invalid Integer Value: ['.$value.']');
+                throw new RowReaderException('Invalid Integer Value: [' . $value . ']');
             }
         }
 

@@ -27,26 +27,26 @@ class BuildResume implements StepInterface
     public function execute(ParametersInterface $parameters, LoggerInterface $logger)
     {
         $resume = [
-            'Imported File:    '.$parameters->get('result.get_file'),
-            'Read Lines:       '.$parameters->get('result.import_file')['read'],
-            'Imported Lines:   '.$parameters->get('result.import_file')['imported'],
+            'Imported File:    ' . $parameters->get('result.get_file'),
+            'Read Lines:       ' . $parameters->get('result.import_file')['read'],
+            'Imported Lines:   ' . $parameters->get('result.import_file')['imported'],
         ];
 
         $updateDatabaseResult = $parameters->get('result.update_database');
         if (array_key_exists('inserted', $updateDatabaseResult)) {
-            $resume[] = 'Inserted Rows:    '.$updateDatabaseResult['inserted'];
+            $resume[] = 'Inserted Rows:    ' . $updateDatabaseResult['inserted'];
         }
         if (array_key_exists('updated', $updateDatabaseResult)) {
-            $resume[] = 'Updated Rows:     '.$updateDatabaseResult['updated'];
+            $resume[] = 'Updated Rows:     ' . $updateDatabaseResult['updated'];
         }
         if (array_key_exists('deleted', $updateDatabaseResult)) {
-            $resume[] = 'Deleted Rows:     '.$updateDatabaseResult['deleted'];
+            $resume[] = 'Deleted Rows:     ' . $updateDatabaseResult['deleted'];
         }
         if (array_key_exists('disabled', $updateDatabaseResult)) {
-            $resume[] = 'Disabled Rows:    '.$updateDatabaseResult['disabled'];
+            $resume[] = 'Disabled Rows:    ' . $updateDatabaseResult['disabled'];
         }
 
-        $resume[] = 'Archived File:    '.$parameters->get('result.archive_file');
+        $resume[] = 'Archived File:    ' . $parameters->get('result.archive_file');
 
         $logger->notice(implode("\n", $resume));
 

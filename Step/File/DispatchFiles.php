@@ -56,7 +56,7 @@ class DispatchFiles implements StepInterface
                 mkdir($item['destination'], 0775, true);
             }
             foreach ($files as $key => $file) {
-                if (preg_match('/^'.$item['file_pattern'].'$/', $file)) {
+                if (preg_match('/^' . $item['file_pattern'] . '$/', $file)) {
                     $found++;
                     unset($files[$key]);
                     $files = array_values($files);

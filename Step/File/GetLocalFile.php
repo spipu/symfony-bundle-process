@@ -39,7 +39,7 @@ class GetLocalFile implements StepInterface
 
         $files = $this->getFiles($folder, $filePattern);
         if (count($files) > 1) {
-            throw new StepException('More than 1 file is available for this pattern: '.implode(', ', $files));
+            throw new StepException('More than 1 file is available for this pattern: ' . implode(', ', $files));
         }
         if (count($files) === 0) {
             throw new StepException('No file found for this pattern');
@@ -47,7 +47,7 @@ class GetLocalFile implements StepInterface
         $file = $files[0];
         $logger->debug(sprintf('File found: %s', $file));
 
-        return $folder.$file;
+        return $folder . $file;
     }
 
     /**
@@ -66,11 +66,11 @@ class GetLocalFile implements StepInterface
 
         $list = [];
         foreach ($fileList as $file) {
-            if (!is_file($folder.'/'.$file)) {
+            if (!is_file($folder . '/' . $file)) {
                 continue;
             }
 
-            if (!preg_match('/^'.$filePattern.'$/', $file)) {
+            if (!preg_match('/^' . $filePattern . '$/', $file)) {
                 continue;
             }
 

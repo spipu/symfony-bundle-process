@@ -42,7 +42,7 @@ class Status extends AbstractOptions
         $list = [];
 
         foreach ($this->service->getStatuses() as $code) {
-            $list[$code] = 'spipu.process.status.'.$code;
+            $list[$code] = 'spipu.process.status.' . $code;
         }
 
         return $list;

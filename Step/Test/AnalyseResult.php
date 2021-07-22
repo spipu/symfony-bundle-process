@@ -30,16 +30,16 @@ class AnalyseResult implements StepInterface
     {
         $result = $parameters->get('result');
         if (!is_array($result) || !array_key_exists('content', $result)) {
-            throw new StepException('Invalid result: '.print_r($result, true));
+            throw new StepException('Invalid result: ' . print_r($result, true));
         }
 
         $content = json_decode($result['content'], true);
         if ($content === null) {
-            throw new StepException('Invalid json result: '.print_r($result, true));
+            throw new StepException('Invalid json result: ' . print_r($result, true));
         }
 
         if (!array_key_exists('products', $content)) {
-            throw new StepException('products key is missing: '.print_r($result, true));
+            throw new StepException('products key is missing: ' . print_r($result, true));
         }
 
         $logger->notice(print_r($content['products'], true));

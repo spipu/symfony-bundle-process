@@ -67,7 +67,7 @@ class ProcessCronManagerCommand extends Command
             ->addArgument(
                 static::ARGUMENT_ACTION,
                 InputArgument::REQUIRED,
-                'The code of the cron action to execute : ['.implode('|', array_keys($this->availableActions)).']'
+                'The code of the cron action to execute : [' . implode('|', array_keys($this->availableActions)) . ']'
             )
         ;
     }

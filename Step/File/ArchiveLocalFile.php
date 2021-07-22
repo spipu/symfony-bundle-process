@@ -56,7 +56,7 @@ class ArchiveLocalFile implements StepInterface
         }
 
         $time = (new DateTime())->format('YmdHisv');
-        $archiveFilename = $folder.basename($filename).'.'.$time;
+        $archiveFilename = $folder . basename($filename) . '.' . $time;
 
         $this->logger->debug(sprintf('File archived [%s]', basename($archiveFilename)));
         rename($filename, $archiveFilename);

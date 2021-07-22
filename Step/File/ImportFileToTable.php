@@ -156,7 +156,7 @@ class ImportFileToTable implements StepInterface
      */
     private function getNbLines(string $filename): int
     {
-        $cmd = 'wc -l '.escapeshellarg($filename);
+        $cmd = 'wc -l ' . escapeshellarg($filename);
         try {
             $output = shell_exec($cmd);
             $output = trim(explode("\n", $output)[0]);
@@ -246,13 +246,13 @@ class ImportFileToTable implements StepInterface
                     $value = 'NULL';
                 }
             }
-            $row = '('.implode(',', $row).')';
+            $row = '(' . implode(',', $row) . ')';
         }
 
         $query = sprintf(
             'INSERT INTO %s %s VALUES %s;',
             $this->connection->quoteIdentifier($tablename),
-            '('.implode(',', $columns).')',
+            '(' . implode(',', $columns) . ')',
             implode(', ', $rows)
         );
 

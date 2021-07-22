@@ -120,7 +120,7 @@ class ProcessReRunCommand extends Command
     {
         $taskId = (int) $input->getArgument(static::ARGUMENT_TASK);
 
-        $output->writeln('Rerun task #'.$taskId);
+        $output->writeln('Rerun task #' . $taskId);
 
         $task = $this->processTaskRepository->find($taskId);
         if (!$task) {
@@ -136,8 +136,8 @@ class ProcessReRunCommand extends Command
             );
         }
 
-        $output->writeln(' - Process: '.$task->getCode());
-        $output->writeln(' - Status: '.$task->getStatus());
+        $output->writeln(' - Process: ' . $task->getCode());
+        $output->writeln(' - Status: ' . $task->getStatus());
 
         // Debug mode or not.
         $loggerOutput = null;

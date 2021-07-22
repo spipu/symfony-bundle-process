@@ -50,7 +50,7 @@ class Url
     public function getLogUrl(int $processLogId): string
     {
         return
-            $this->configurationManager->get('app.website.url').
+            $this->configurationManager->get('app.website.url') .
             $this->router->generate('spipu_process_admin_log_show', ['id' => $processLogId]);
     }
 
@@ -63,7 +63,7 @@ class Url
     public function getTaskUrl(int $processTaskId): string
     {
         return
-            $this->configurationManager->get('app.website.url').
+            $this->configurationManager->get('app.website.url') .
             $this->router->generate('spipu_process_admin_task_show', ['id' => $processTaskId]);
     }
 }

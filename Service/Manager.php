@@ -158,7 +158,7 @@ class Manager
 
             $inputsData = json_decode($task->getInputs(), true);
             if (!is_array($inputsData)) {
-                throw new InputException('Invalid Inputs Data from Task #'.$task->getId());
+                throw new InputException('Invalid Inputs Data from Task #' . $task->getId());
             }
             foreach ($inputsData as $key => $value) {
                 $process->getInputs()->set($key, $value);
@@ -495,7 +495,7 @@ class Manager
                     (is_array($value) ? json_encode($value) : $value)
                 )
             );
-            $process->getParameters()->set('input.'.$name, $value);
+            $process->getParameters()->set('input.' . $name, $value);
         }
     }
 
@@ -534,8 +534,8 @@ class Manager
 
             $result = $step->getProcessor()->execute($step->getParameters(), $logger);
 
-            $process->getParameters()->set('time.'.$step->getCode(), microtime(true) - $startTime);
-            $process->getParameters()->set('result.'.$step->getCode(), $result);
+            $process->getParameters()->set('time.' . $step->getCode(), microtime(true) - $startTime);
+            $process->getParameters()->set('result.' . $step->getCode(), $result);
         }
         $kSteps++;
         $logger->setCurrentStep($kSteps, false);

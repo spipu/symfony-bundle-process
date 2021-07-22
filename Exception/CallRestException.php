@@ -120,7 +120,7 @@ class CallRestException extends StepException
             return $this->codeMapping[$code];
         }
 
-        return "CURLE_".((string) $code);
+        return 'CURLE_' . ((string) $code);
     }
 
     /**

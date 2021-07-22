@@ -125,7 +125,7 @@ class ProcessRunCommand extends Command
     {
         // Init the new process.
         $processCode = $input->getArgument(static::ARGUMENT_PROCESS);
-        $output->writeln('Execute process: '.$processCode);
+        $output->writeln('Execute process: ' . $processCode);
         $process = $this->processManager->load($processCode);
 
         // Init the inputs.

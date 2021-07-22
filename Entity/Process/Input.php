@@ -138,7 +138,7 @@ class Input
             return;
         }
 
-        if (!call_user_func('is_'.$this->type, $value)) {
+        if (!call_user_func('is_' . $this->type, $value)) {
             throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
         }
 

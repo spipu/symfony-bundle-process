@@ -164,7 +164,7 @@ class CronManager
             $this->processManager->execute($process);
         } catch (Exception $e) {
             // We do not need to log anything, all is already done in the process manager.
-            $output->writeln('  <error>Error</error> - Task #'.$task->getId().' - '.$e->getMessage());
+            $output->writeln('  <error>Error</error> - Task #' . $task->getId() . ' - ' . $e->getMessage());
             return false;
         }
 
@@ -187,7 +187,7 @@ class CronManager
         $limitDate = $this->prepareLimitDate($this->processConfiguration->getCleanupFinishedLogsAfter());
         $nbCleaned = $this->processLogRepository->deleteFinishedLogs($limitDate);
 
-        $output->writeln('  => Deleted Logs: '.$nbCleaned.'');
+        $output->writeln('  => Deleted Logs: ' . $nbCleaned);
 
         return true;
     }
@@ -208,7 +208,7 @@ class CronManager
         $limitDate = $this->prepareLimitDate($this->processConfiguration->getCleanupFinishedTasksAfter());
         $nbCleaned = $this->processTaskRepository->deleteFinishedTasks($limitDate);
 
-        $output->writeln('  => Deleted Tasks: '.$nbCleaned.'');
+        $output->writeln('  => Deleted Tasks: ' . $nbCleaned);
 
         return true;
     }
@@ -223,7 +223,7 @@ class CronManager
 
         $interval = 'PT1H';
         if ($nbDays > 0) {
-            $interval = 'P'.$nbDays.'DT1H';
+            $interval = 'P' . $nbDays . 'DT1H';
         }
 
         $date->sub(new DateInterval($interval));
@@ -266,7 +266,7 @@ class CronManager
     {
         $task = $this->processTaskRepository->find($taskId);
 
-        $output->writeln('   - Task #'.$task->getId());
+        $output->writeln('   - Task #' . $task->getId());
 
         if ($task->getStatus() !== $this->processStatus->getRunningStatus()) {
             $output->writeln('     => <comment>Wrong Status</comment>');
