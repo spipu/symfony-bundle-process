@@ -71,7 +71,7 @@ class ImportFileToTable implements StepInterface
      * @throws StepException
      * @throws RowReaderException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $filename  = $parameters->get('filename');
         $logger->debug(sprintf('File to import: [%s]', $filename));

@@ -40,11 +40,11 @@ class CallRest implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return array
      * @throws CallRestException
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $url     = $parameters->get('url');
         $method  = $this->getMethod($parameters);
@@ -71,7 +71,7 @@ class CallRest implements StepInterface
         $error = null;
         if (curl_errno($curl)) {
             $error = [
-                'code'    => (int) curl_errno($curl),
+                'code'    => curl_errno($curl),
                 'message' => curl_error($curl),
             ];
         }
@@ -279,7 +279,7 @@ class CallRest implements StepInterface
      * @return int
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    public function readHeader($resURL, string $header)
+    public function readHeader($resURL, string $header): int
     {
         // Analyse the headers without status message.
         if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+)$/', trim($header), $match)) {

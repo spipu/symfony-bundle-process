@@ -45,10 +45,10 @@ class CleanDuplicatesData implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return array
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $tablename = $parameters->get('tablename');
         $fields = $parameters->get('fields');
@@ -136,19 +136,19 @@ class CleanDuplicatesData implements StepInterface
 
     /**
      * @param string[] $fields
-     * @param string $idx1
-     * @param string $idx2
+     * @param string $alias1
+     * @param string $alias2
      * @return string
      */
-    private function getCondition(array $fields, string $idx1, string $idx2)
+    private function getCondition(array $fields, string $alias1, string $alias2): string
     {
         $condition = array();
         foreach ($fields as $field) {
             /**@var array condition*/
             $condition[] = sprintf(
                 '%1$s.%3$s = %2$s.%3$s',
-                $idx1,
-                $idx2,
+                $alias1,
+                $alias2,
                 $this->connection->quoteIdentifier($field)
             );
         }

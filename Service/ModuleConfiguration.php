@@ -45,7 +45,7 @@ class ModuleConfiguration
      */
     public function hasTaskAutomaticRerun(): bool
     {
-        return ($this->manager->get('process.task.automatic_rerun') == 1);
+        return ($this->getConfigurationValue('process.task.automatic_rerun') == 1);
     }
 
     /**
@@ -53,7 +53,7 @@ class ModuleConfiguration
      */
     public function hasTaskCanKill(): bool
     {
-        return ($this->manager->get('process.task.can_kill') == 1);
+        return ($this->getConfigurationValue('process.task.can_kill') == 1);
     }
 
     /**
@@ -61,7 +61,7 @@ class ModuleConfiguration
      */
     public function hasFailedSendEmail(): bool
     {
-        return ($this->manager->get('process.failed.send_email') == 1);
+        return ($this->getConfigurationValue('process.failed.send_email') == 1);
     }
 
     /**
@@ -69,7 +69,7 @@ class ModuleConfiguration
      */
     public function getFailedEmailTo(): string
     {
-        return $this->manager->get('process.failed.email');
+        return (string) $this->getConfigurationValue('process.failed.email');
     }
 
     /**
@@ -77,15 +77,15 @@ class ModuleConfiguration
      */
     public function getFailedEmailFrom(): string
     {
-        return $this->manager->get($this->mailSenderConfig);
+        return (string) $this->getConfigurationValue($this->mailSenderConfig);
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getFailedMaxRetry(): int
     {
-        $value = $this->manager->get('process.failed.max_retry');
+        $value = (int) $this->getConfigurationValue('process.failed.max_retry');
 
         if ($value < 0) {
             $value = 0;
@@ -99,7 +99,7 @@ class ModuleConfiguration
      */
     public function hasCleanupFinishedLogs(): bool
     {
-        return ($this->manager->get('process.cleanup.finished_logs') == 1);
+        return ($this->getConfigurationValue('process.cleanup.finished_logs') == 1);
     }
 
     /**
@@ -107,7 +107,7 @@ class ModuleConfiguration
      */
     public function getCleanupFinishedLogsAfter(): int
     {
-        $value = $this->manager->get('process.cleanup.finished_logs_after');
+        $value = (int) $this->getConfigurationValue('process.cleanup.finished_logs_after');
 
         if ($value < 0) {
             $value = 0;
@@ -121,7 +121,7 @@ class ModuleConfiguration
      */
     public function hasCleanupFinishedTasks(): bool
     {
-        return ($this->manager->get('process.cleanup.finished_tasks') == 1);
+        return ($this->getConfigurationValue('process.cleanup.finished_tasks') == 1);
     }
 
     /**
@@ -129,7 +129,7 @@ class ModuleConfiguration
      */
     public function getCleanupFinishedTasksAfter(): int
     {
-        $value = $this->manager->get('process.cleanup.finished_tasks_after');
+        $value = (int) $this->getConfigurationValue('process.cleanup.finished_tasks_after');
 
         if ($value < 0) {
             $value = 0;
@@ -143,7 +143,7 @@ class ModuleConfiguration
      */
     public function getFolderImport(): string
     {
-        return (string) $this->manager->get('process.folder.import');
+        return (string) $this->getConfigurationValue('process.folder.import');
     }
 
     /**
@@ -151,6 +151,15 @@ class ModuleConfiguration
      */
     public function getFolderExport(): string
     {
-        return (string) $this->manager->get('process.folder.export');
+        return (string) $this->getConfigurationValue('process.folder.export');
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    private function getConfigurationValue(string $key)
+    {
+        return $this->manager->get($key);
     }
 }

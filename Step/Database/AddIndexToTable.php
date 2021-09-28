@@ -47,7 +47,7 @@ class AddIndexToTable implements StepInterface
      * @return bool
      * @throws Exception
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $tablename = $parameters->get('tablename');
         $logger->debug(sprintf('Table: [%s]', $tablename));

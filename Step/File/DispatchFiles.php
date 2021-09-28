@@ -37,7 +37,7 @@ class DispatchFiles implements StepInterface
      * @return int
      * @throws Exception
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): int
     {
         $this->logger = $logger;
 

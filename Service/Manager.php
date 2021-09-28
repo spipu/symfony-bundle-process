@@ -293,7 +293,6 @@ class Manager
             call_user_func($initCallback, $process);
         }
 
-        $result = null;
         try {
             $this->executePrepareOptions($process, $logger);
             $this->executePrepareInputs($process, $logger);

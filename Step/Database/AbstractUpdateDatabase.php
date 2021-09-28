@@ -52,7 +52,7 @@ abstract class AbstractUpdateDatabase implements StepInterface
      * @return array
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $this->logger = $logger;
 

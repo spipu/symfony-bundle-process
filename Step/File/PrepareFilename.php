@@ -26,7 +26,7 @@ class PrepareFilename implements StepInterface
      * @return string
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $folder    = $parameters->get('folder');
         $code      = $parameters->get('code');

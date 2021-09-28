@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
-use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
@@ -30,9 +29,9 @@ class RemoveFolder implements StepInterface
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
      * @return true
-     * @throws Exception
+     * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $folder  = $parameters->get('folder');
 

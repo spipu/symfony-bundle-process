@@ -24,7 +24,7 @@ class BuildResume implements StepInterface
      * @param LoggerInterface $logger
      * @return array
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $resume = [
             'Imported File:    ' . $parameters->get('result.get_file'),

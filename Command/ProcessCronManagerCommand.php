@@ -90,7 +90,7 @@ class ProcessCronManagerCommand extends Command
 
         $this->{$this->availableActions[$action]}($output);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

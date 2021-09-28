@@ -42,7 +42,7 @@ class Url
     }
 
     /**
-     * Get an process log url
+     * Get a process log url
      *
      * @param int $processLogId
      * @return string
@@ -55,7 +55,7 @@ class Url
     }
 
     /**
-     * Get an process task url
+     * Get a process task url
      *
      * @param int $processTaskId
      * @return string

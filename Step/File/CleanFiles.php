@@ -26,7 +26,7 @@ class CleanFiles implements StepInterface
      * @return bool
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $folder = (string) $parameters->get('folder');
         if (substr($folder, -1) !== DIRECTORY_SEPARATOR) {

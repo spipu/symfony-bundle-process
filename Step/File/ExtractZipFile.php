@@ -60,13 +60,13 @@ class ExtractZipFile implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return bool
+     * @return string
      * @throws Exception
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
-        $file = $parameters->get('file');
-        $destination = $parameters->get('destination');
+        $file = (string) $parameters->get('file');
+        $destination = (string) $parameters->get('destination');
 
         $logger->debug(sprintf('File: [%s]', $file));
         $logger->debug(sprintf('Destination: [%s]', $destination));
