@@ -18,6 +18,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Repository\LogRepository;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -105,8 +106,10 @@ class CronManager
             return false;
         }
 
+        $waitingDate = $this->getLimitWaitingTaskDate();
+
         $scheduledTaskIds = $this->processTaskRepository->getScheduledIdsToRun();
-        $waitingTaskIds = $this->processTaskRepository->getWaitingIdsToRun();
+        $waitingTaskIds = $this->processTaskRepository->getWaitingIdsToRun($waitingDate);
 
         $rerunTaskIds = $this->processTaskRepository->getIdsToRerunAutomatically(
             $this->processConfiguration->getFailedMaxRetry()
@@ -129,6 +132,17 @@ class CronManager
     }
 
     /**
+     * @return DateTime
+     */
+    private function getLimitWaitingTaskDate(): DateTime
+    {
+        $date = new DateTime();
+        $date->sub(new DateInterval('PT15M'));
+
+        return $date;
+    }
+
+    /**
      * @param OutputInterface $output
      * @param int $taskId
      * @return bool
@@ -138,7 +152,7 @@ class CronManager
         $task = $this->processTaskRepository->find($taskId);
         $this->entityManager->refresh($task);
 
-        $isScheduledTask = ($task->getScheduledAt() && $task->getStatus() === $this->processStatus->getCreatedStatus());
+        $isScheduledTask = $this->isScheduledTask($task);
 
         if (!$isScheduledTask) {
             if (!$task->getCanBeRerunAutomatically()) {
@@ -155,7 +169,7 @@ class CronManager
         }
 
         if ($isScheduledTask) {
-            if ($task->getScheduledAt() > (new DateTime())) {
+            if ($task->getScheduledAt() && $task->getScheduledAt() > (new DateTime())) {
                 return false;
             }
         }
@@ -305,5 +319,19 @@ class CronManager
         $this->entityManager->flush();
 
         return true;
+    }
+
+    /**
+     * @param Task $task
+     * @return bool
+     */
+    private function isScheduledTask(Task $task): bool
+    {
+        $waitingDate = $this->getLimitWaitingTaskDate();
+
+        return (
+            ($task->getStatus() === $this->processStatus->getCreatedStatus())
+            && ($task->getScheduledAt() || ($task->getCreatedAt() < $waitingDate))
+        );
     }
 }

@@ -153,13 +153,11 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param DateTime $waitingDate
      * @return int[]
      */
-    public function getWaitingIdsToRun(): array
+    public function getWaitingIdsToRun(DateTime $waitingDate): array
     {
-        $date = new DateTime();
-        $date->sub(new DateInterval('PT15M'));
-
         $query = $this
             ->createQueryBuilder('t')
             ->select('t.id')
@@ -167,7 +165,7 @@ class TaskRepository extends ServiceEntityRepository
             ->andWhere('t.scheduledAt is null')
             ->andWhere('t.createdAt <= :waitingDate')
             ->setParameter('status', $this->status->getCreatedStatus())
-            ->setParameter('waitingDate', $date)
+            ->setParameter('waitingDate', $waitingDate)
             ->getQuery();
 
         $rows = $query->getArrayResult();
