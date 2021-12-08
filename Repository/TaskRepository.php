@@ -151,4 +151,32 @@ class TaskRepository extends ServiceEntityRepository
 
         return $list;
     }
+
+    /**
+     * @return int[]
+     */
+    public function getWaitingIdsToRun(): array
+    {
+        $date = new DateTime();
+        $date->sub(new DateInterval('PT15M'));
+
+        $query = $this
+            ->createQueryBuilder('t')
+            ->select('t.id')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.scheduledAt is null')
+            ->andWhere('t.createdAt <= :waitingDate')
+            ->setParameter('status', $this->status->getCreatedStatus())
+            ->setParameter('waitingDate', $date)
+            ->getQuery();
+
+        $rows = $query->getArrayResult();
+
+        $list = [];
+        foreach ($rows as $row) {
+            $list[] = (int) $row['id'];
+        }
+
+        return $list;
+    }
 }

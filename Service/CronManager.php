@@ -106,12 +106,13 @@ class CronManager
         }
 
         $scheduledTaskIds = $this->processTaskRepository->getScheduledIdsToRun();
+        $waitingTaskIds = $this->processTaskRepository->getWaitingIdsToRun();
 
         $rerunTaskIds = $this->processTaskRepository->getIdsToRerunAutomatically(
             $this->processConfiguration->getFailedMaxRetry()
         );
 
-        $taskIds = array_unique(array_merge($scheduledTaskIds, $rerunTaskIds));
+        $taskIds = array_unique(array_merge($scheduledTaskIds, $waitingTaskIds, $rerunTaskIds));
         if (count($taskIds) == 0) {
             $output->writeln('  => No task found');
             return false;
