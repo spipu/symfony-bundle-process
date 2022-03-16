@@ -68,7 +68,7 @@ class CreateTemporaryTable implements StepInterface
         try {
             $schema->dropTable($tablename);
         } catch (Exception $e) {
-            // Nothing here, if the table does not exist yet, it is not a pb
+            // Nothing here, if the table does not exist yet, it is not a pb.
         }
         $schema->createTable($table);
 

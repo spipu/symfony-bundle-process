@@ -87,7 +87,7 @@ class Process
      * Link the process parameters to each step parameters
      * @return void
      */
-    private function linkParameters()
+    private function linkParameters(): void
     {
         foreach ($this->steps as $step) {
             $step->getParameters()->setParentParameters($this->parameters);

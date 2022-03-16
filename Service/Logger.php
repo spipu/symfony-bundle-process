@@ -190,7 +190,7 @@ class Logger implements LoggerProcessInterface
      * @return void
      * @throws Exception
      */
-    private function saveModel()
+    private function saveModel(): void
     {
         if ($this->model === null) {
             throw new ProcessException('You must init the logger before using it!');

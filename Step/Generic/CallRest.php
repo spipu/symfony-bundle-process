@@ -234,10 +234,9 @@ class CallRest implements StepInterface
      * @param resource $curl
      * @param string   $method
      * @param string   $data
-     *
      * @return void
      */
-    private function applyMethodAndData($curl, string $method, string &$data)
+    private function applyMethodAndData($curl, string $method, string &$data): void
     {
         switch ($method) {
             // Read.
