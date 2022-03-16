@@ -64,8 +64,13 @@ class CreateTemporaryTable implements StepInterface
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(['row_id']);
 
-        $schema = $this->connection->getSchemaManager();
-        $schema->dropAndCreateTable($table);
+        $schema = $this->connection->createSchemaManager();
+        try {
+            $schema->dropTable($tablename);
+        } catch (Exception $e) {
+            // Nothing here, if the table does not exist yet, it is not a pb
+        }
+        $schema->createTable($table);
 
         return $tablename;
     }

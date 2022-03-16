@@ -52,7 +52,7 @@ class RemoveTemporaryTable implements StepInterface
         $logger->debug(sprintf('Table to delete: [%s]', $tablename));
 
         try {
-            $schema = $this->connection->getSchemaManager();
+            $schema = $this->connection->createSchemaManager();
             $schema->dropTable($tablename);
         } catch (Exception $e) {
             if (!$ifExists) {

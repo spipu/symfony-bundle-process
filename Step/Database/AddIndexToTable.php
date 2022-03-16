@@ -59,7 +59,7 @@ class AddIndexToTable implements StepInterface
         $indexName = md5($tablename . '_' . implode('_', $fields));
 
         // Look at if the index already exists.
-        $schema = $this->connection->getSchemaManager();
+        $schema = $this->connection->createSchemaManager();
         $list = $schema->listTableIndexes($tablename);
         if (array_key_exists($indexName, $list)) {
             $logger->warning(' => The index already exists');
@@ -79,7 +79,7 @@ class AddIndexToTable implements StepInterface
             implode(', ', $fields)
         );
         try {
-            $this->connection->getWrappedConnection()->exec($query);
+            $this->connection->executeQuery($query);
         } catch (Exception $e) {
             $logger->error(' => Error with the following query');
             $logger->error($query);

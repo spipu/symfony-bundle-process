@@ -240,7 +240,7 @@ abstract class AbstractRowReader implements RowReaderInterface
             $this->connection->quoteIdentifier($mapping['source']['field']),
             $this->connection->quoteIdentifier($mapping['source']['table'])
         );
-        $list = $this->connection->getWrappedConnection()->query($query)->fetchAllAssociative();
+        $list = $this->connection->executeQuery($query)->fetchAllAssociative();
         $mapping['values'] = [];
         foreach ($list as $row) {
             $mapping['values'][$row['code']] = $row['id'];

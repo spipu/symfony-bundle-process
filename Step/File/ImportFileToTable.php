@@ -257,7 +257,7 @@ class ImportFileToTable implements StepInterface
         );
 
         try {
-            $this->connection->getWrappedConnection()->exec($query);
+            $this->connection->executeQuery($query);
         } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
