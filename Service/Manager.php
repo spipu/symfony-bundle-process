@@ -526,7 +526,7 @@ class Manager
             if (!$step->isIgnoreInProgress()) {
                 $kSteps++;
             }
-            $logger->setCurrentStep(($kSteps > 0 ? $kSteps : 0), $step->isIgnoreInProgress());
+            $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
             $startTime = microtime(true);

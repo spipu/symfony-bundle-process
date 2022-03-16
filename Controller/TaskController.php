@@ -68,6 +68,7 @@ class TaskController extends AbstractController
      * TaskController constructor.
      * @param ModuleConfiguration $configuration
      * @param Status $status
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         ModuleConfiguration $configuration,
@@ -323,7 +324,7 @@ class TaskController extends AbstractController
 
         $processForm->setProcessCode($processCode);
         if ($this->getUser()) {
-            $processForm->setCurrentUserName((string) $this->getUser()->getUsername());
+            $processForm->setCurrentUserName($this->getUser()->getUsername());
         }
 
         $processDefinition = $processForm->getProcessDefinition();

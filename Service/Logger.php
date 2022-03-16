@@ -243,8 +243,6 @@ class Logger implements LoggerProcessInterface
     /**
      * Critical conditions.
      *
-     * Example: Application component unavailable, unexpected exception.
-     *
      * @param mixed $message
      * @param array $context
      *

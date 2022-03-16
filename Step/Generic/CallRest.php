@@ -298,7 +298,7 @@ class CallRest implements StepInterface
         }
 
         if (trim($header)) {
-            array_push($this->headers, trim($header));
+            $this->headers[] = trim($header);
         }
 
         return strlen($header);
