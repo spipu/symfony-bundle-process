@@ -11,10 +11,11 @@
     ],
     "version": "1.0",
     "require": {
-        "spipu/ui-bundle": "*",
-        "spipu/configuration-bundle": "*",
         "ext-pdo": "*",
-        "ext-posix": "*"
+        "ext-posix": "*",
+        "symfony/framework-bundle": "^5.4",
+        "spipu/ui-bundle": "*",
+        "spipu/configuration-bundle": "*"
     },
     "autoload": {
         "psr-4": {

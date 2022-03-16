@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Controller;
 
 use DateTimeInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
@@ -59,16 +60,23 @@ class TaskController extends AbstractController
     private $status;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * TaskController constructor.
      * @param ModuleConfiguration $configuration
      * @param Status $status
      */
     public function __construct(
         ModuleConfiguration $configuration,
-        Status $status
+        Status $status,
+        EntityManagerInterface $entityManager
     ) {
         $this->configuration = $configuration;
         $this->status = $status;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -212,9 +220,8 @@ class TaskController extends AbstractController
             ->setStatus($this->status::FAILED)
             ->incrementTry('Killed manually from BO', false);
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($resource);
-        $entityManager->flush();
+        $this->entityManager->persist($resource);
+        $this->entityManager->flush();
 
         $this->addFlashTrans('success', 'spipu.process.success.kill');
         return $redirect;
@@ -243,9 +250,8 @@ class TaskController extends AbstractController
         }
 
         try {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($resource);
-            $entityManager->flush();
+            $this->entityManager->remove($resource);
+            $this->entityManager->flush();
 
             $this->addFlashTrans('success', 'spipu.ui.success.deleted');
         } catch (Exception $e) {
