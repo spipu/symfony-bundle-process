@@ -102,6 +102,7 @@ spipu:
             start:   "Start refresh"
 
         error:
+            execute:  "Execution is disabled in module configuration"
             rerun:    "This task can not be rerun in this status"
             kill:     "This task can not be killed in this status"
             disable:  "This action has been disabled in the app configuration"

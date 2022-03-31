@@ -45,6 +45,12 @@ spipu_configuration:
         required: true
         default:  "0"
 
+    process.task.can_execute:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "1"
+
     process.task.automatic_rerun:
         type:     select
         options:  Spipu\UiBundle\Form\Options\ActiveStatus

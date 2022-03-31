@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Command;
 
 use Exception;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\LoggerOutput;
+use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Spipu\ProcessBundle\Service\Status as ProcessStatus;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 use Symfony\Component\Console\Command\Command;
@@ -45,23 +47,31 @@ class ProcessReRunCommand extends Command
     private $processStatus;
 
     /**
+     * @var ModuleConfiguration
+     */
+    private $processConfiguration;
+
+    /**
      * RunProcess constructor.
      * @param TaskRepository $processTaskRepository
      * @param ProcessManager $processManager
      * @param ProcessStatus $processStatus
+     * @param ModuleConfiguration $processConfiguration
      * @param null|string $name
      */
     public function __construct(
         TaskRepository $processTaskRepository,
         ProcessManager $processManager,
         ProcessStatus $processStatus,
+        ModuleConfiguration $processConfiguration,
         ?string $name = null
     ) {
+        parent::__construct($name);
+
         $this->processTaskRepository = $processTaskRepository;
         $this->processManager = $processManager;
-
-        parent::__construct($name);
         $this->processStatus = $processStatus;
+        $this->processConfiguration = $processConfiguration;
     }
 
     /**
@@ -118,6 +128,10 @@ class ProcessReRunCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+
         $taskId = (int) $input->getArgument(static::ARGUMENT_TASK);
 
         $output->writeln('Rerun task #' . $taskId);

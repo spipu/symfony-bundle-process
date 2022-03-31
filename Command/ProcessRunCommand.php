@@ -16,7 +16,9 @@ namespace Spipu\ProcessBundle\Command;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\LoggerOutput;
+use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,6 +28,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 
+/**
+ * @SuppressWarnings(PMD.CouplingBetweenObjects)
+ */
 class ProcessRunCommand extends Command
 {
     public const ARGUMENT_PROCESS = 'process';
@@ -38,6 +43,11 @@ class ProcessRunCommand extends Command
     private $processManager;
 
     /**
+     * @var ModuleConfiguration
+     */
+    private $processConfiguration;
+
+    /**
      * @var SymfonyStyle
      */
     private $symfonyStyle = null;
@@ -45,15 +55,18 @@ class ProcessRunCommand extends Command
     /**
      * RunProcess constructor.
      * @param ProcessManager $processManager
+     * @param ModuleConfiguration $processConfiguration
      * @param null|string $name
      */
     public function __construct(
         ProcessManager $processManager,
+        ModuleConfiguration $processConfiguration,
         ?string $name = null
     ) {
-        $this->processManager = $processManager;
-
         parent::__construct($name);
+
+        $this->processManager = $processManager;
+        $this->processConfiguration = $processConfiguration;
     }
 
     /**
@@ -123,6 +136,10 @@ class ProcessRunCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+
         // Init the new process.
         $processCode = $input->getArgument(static::ARGUMENT_PROCESS);
         $output->writeln('Execute process: ' . $processCode);

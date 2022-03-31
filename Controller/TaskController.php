@@ -94,6 +94,8 @@ class TaskController extends AbstractController
      */
     public function index(GridFactory $gridFactory, TaskGrid $taskGrid): Response
     {
+        $this->checkConfiguration();
+
         $manager = $gridFactory->create($taskGrid);
         $manager->setRoute('spipu_process_admin_task_list');
         $manager->validate();
@@ -124,6 +126,8 @@ class TaskController extends AbstractController
         LogGrid $logGrid,
         ConfigReader $configReader
     ): Response {
+        $this->checkConfiguration();
+
         $manager = $gridFactory->create($logGrid);
         $manager->setRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
 
@@ -168,6 +172,8 @@ class TaskController extends AbstractController
         ProcessManager $processManager,
         AsynchronousCommand $asynchronousCommand
     ): Response {
+        $this->checkConfiguration();
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $redirect = $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
@@ -275,6 +281,8 @@ class TaskController extends AbstractController
      */
     public function executeChoice(ConfigReader $configReader): Response
     {
+        $this->checkConfiguration();
+
         $processes = [];
         foreach (array_keys($configReader->getProcessList()) as $code) {
             $process = $configReader->getProcessDefinition($code);
@@ -350,6 +358,7 @@ class TaskController extends AbstractController
             }
         }
 
+        $this->checkConfiguration();
         $this->forceFormParameters($formManager, $request);
 
         return $this->render(
@@ -485,5 +494,15 @@ class TaskController extends AbstractController
         return parent::getSubscribedServices() + [
             'translator',
         ];
+    }
+
+    /**
+     * @return void
+     */
+    protected function checkConfiguration(): void
+    {
+        if (!$this->configuration->hasTaskCanExecute()) {
+            $this->addFlashTrans('danger', 'spipu.process.error.execute');
+        }
     }
 }

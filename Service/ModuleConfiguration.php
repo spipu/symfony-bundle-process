@@ -59,6 +59,14 @@ class ModuleConfiguration
     /**
      * @return bool
      */
+    public function hasTaskCanExecute(): bool
+    {
+        return ($this->getConfigurationValue('process.task.can_execute') == 1);
+    }
+
+    /**
+     * @return bool
+     */
     public function hasFailedSendEmail(): bool
     {
         return ($this->getConfigurationValue('process.failed.send_email') == 1);
