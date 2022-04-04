@@ -177,4 +177,22 @@ class TaskRepository extends ServiceEntityRepository
 
         return $list;
     }
+
+    /**
+     * @param string|null $status
+     * @return int
+     */
+    public function countTasks(?string $status = null): int
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
+        $queryBuilder->select('COUNT(t.id)');
+
+        if ($status !== null) {
+            $queryBuilder
+                ->where('t.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
 }
