@@ -209,7 +209,7 @@ class ProcessRunCommand extends Command
                 }
             }
 
-            if ($inputObject->isRequired() && $value !== '') {
+            if ($inputObject->isRequired() || ($value !== null && $value !== '')) {
                 $value = $this->validateInput($value, $type);
             }
             $process->getInputs()->set($key, $value);
