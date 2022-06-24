@@ -33,9 +33,14 @@ class RoleDefinition implements RoleDefinitionInterface
             ->setWeight(40)
             ->addChild('ROLE_ADMIN');
 
+        Item::load('ROLE_ADMIN_MANAGE_PROCESS_DOWNLOAD')
+            ->setLabel('spipu.process.role.admin_download')
+            ->setWeight(50)
+            ->addChild('ROLE_ADMIN');
+
         Item::load('ROLE_ADMIN_MANAGE_PROCESS_KILL')
             ->setLabel('spipu.process.role.admin_kill')
-            ->setWeight(50)
+            ->setWeight(60)
             ->addChild('ROLE_ADMIN');
 
         Item::load('ROLE_ADMIN_MANAGE_PROCESS')
@@ -44,6 +49,7 @@ class RoleDefinition implements RoleDefinitionInterface
             ->addChild('ROLE_ADMIN_MANAGE_PROCESS_SHOW')
             ->addChild('ROLE_ADMIN_MANAGE_PROCESS_RERUN')
             ->addChild('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')
+            ->addChild('ROLE_ADMIN_MANAGE_PROCESS_DOWNLOAD')
             ->addChild('ROLE_ADMIN_MANAGE_PROCESS_DELETE')
             ->addChild('ROLE_ADMIN_MANAGE_PROCESS_KILL');
 

@@ -116,9 +116,10 @@ spipu:
             kill:     "The task has been killed"
 
         role:
-            admin:          "Manage Processs"
-            admin_show:     "Manage Processs - Show Tasks and Logs"
-            admin_delete:   "Manage Processs - Delete Tasks and Logs"
-            admin_rerun:    "Manage Processs - Rerun Task"
-            admin_execute:  "Manage Processs - Execute Task"
-            admin_kill:     "Manage Processs - Kill Task"
+            admin:          "Manage Process"
+            admin_show:     "Manage Process - Show Tasks and Logs"
+            admin_delete:   "Manage Process - Delete Tasks and Logs"
+            admin_rerun:    "Manage Process - Rerun Task"
+            admin_execute:  "Manage Process - Execute Task"
+            admin_download: "Manage Process - Download Task File"
+            admin_kill:     "Manage Process - Kill Task"
