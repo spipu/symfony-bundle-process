@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Command;
 
 use Exception;
+use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
@@ -174,7 +175,6 @@ class ProcessRunCommand extends Command
      * @param OutputInterface $output
      * @return bool
      * @throws InputException
-     * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
     private function askInputs(Process $process, array $inputs, InputInterface $input, OutputInterface $output): bool
     {
@@ -193,29 +193,48 @@ class ProcessRunCommand extends Command
         }
 
         foreach ($inputObjects as $inputObject) {
-            $key = $inputObject->getName();
-            $type = $inputObject->getType();
-            $value = '';
-
-            if (array_key_exists($key, $values)) {
-                $value = $values[$key];
-            }
-
-            if (!array_key_exists($key, $values)) {
-                $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optional');
-                $value = $this->getSymfonyStyle($input, $output)->ask($title);
-                if ($value === null) {
-                    $value = '';
-                }
-            }
-
-            if ($inputObject->isRequired() || ($value !== null && $value !== '')) {
-                $value = $this->validateInput($value, $type);
-            }
-            $process->getInputs()->set($key, $value);
+            $this->askInput($inputObject, $values, $input, $output, $process);
         }
 
         return true;
+    }
+
+    /**
+     * @param Input $inputObject
+     * @param array $values
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param Process $process
+     * @return void
+     * @throws InputException
+     */
+    protected function askInput(
+        Input $inputObject,
+        array $values,
+        InputInterface $input,
+        OutputInterface $output,
+        Process $process
+    ): void {
+        $key = $inputObject->getName();
+        $type = $inputObject->getType();
+        $value = '';
+
+        if (array_key_exists($key, $values)) {
+            $value = $values[$key];
+        }
+
+        if (!array_key_exists($key, $values)) {
+            $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optional');
+            $value = $this->getSymfonyStyle($input, $output)->ask($title);
+            if ($value === null) {
+                $value = '';
+            }
+        }
+
+        if ($inputObject->isRequired() || ($value !== null && $value !== '')) {
+            $value = $this->validateInput($value, $type);
+        }
+        $process->getInputs()->set($key, $value);
     }
 
     /**
