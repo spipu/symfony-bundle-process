@@ -1,8 +1,19 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
+use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\RowReaderException;
 use Spipu\ProcessBundle\Exception\StepException;
@@ -56,11 +67,11 @@ class ImportFileToTable implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return array
      * @throws StepException
      * @throws RowReaderException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $filename  = $parameters->get('filename');
         $logger->debug(sprintf('File to import: [%s]', $filename));
@@ -145,14 +156,14 @@ class ImportFileToTable implements StepInterface
      */
     private function getNbLines(string $filename): int
     {
-        $cmd = 'wc -l '.escapeshellarg($filename);
+        $cmd = 'wc -l ' . escapeshellarg($filename);
         try {
             $output = shell_exec($cmd);
             $output = trim(explode("\n", $output)[0]);
             $output = trim(explode(" ", $output)[0]);
 
             return intval($output);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0;
         }
     }
@@ -235,19 +246,19 @@ class ImportFileToTable implements StepInterface
                     $value = 'NULL';
                 }
             }
-            $row = '('.implode(',', $row).')';
+            $row = '(' . implode(',', $row) . ')';
         }
 
         $query = sprintf(
             'INSERT INTO %s %s VALUES %s;',
             $this->connection->quoteIdentifier($tablename),
-            '('.implode(',', $columns).')',
+            '(' . implode(',', $columns) . ')',
             implode(', ', $rows)
         );
 
         try {
-            $this->connection->getWrappedConnection()->exec($query);
-        } catch (\Exception $e) {
+            $this->connection->executeQuery($query);
+        } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
     }

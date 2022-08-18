@@ -1,8 +1,20 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Spipu\UiBundle\Exception\GridException;
 use Spipu\UiBundle\Exception\UiException;
 use Spipu\UiBundle\Service\Ui\GridFactory;
@@ -19,6 +31,20 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class LogController extends AbstractController
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(
+        EntityManagerInterface $entityManager
+    ) {
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * @Route(
      *     "/",
@@ -105,12 +131,11 @@ class LogController extends AbstractController
         }
 
         try {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($resource);
-            $entityManager->flush();
+            $this->entityManager->remove($resource);
+            $this->entityManager->flush();
 
             $this->addFlashTrans('success', 'spipu.ui.success.deleted');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addFlash('danger', $e->getMessage());
         }
 

@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Generic;
 
@@ -18,7 +28,7 @@ class Sleep implements StepInterface
     {
         $seconds = (int) $parameters->get('seconds');
 
-        $logger->debug('Sleep for '.$seconds.' seconds');
+        $logger->debug('Sleep for ' . $seconds . ' seconds');
 
         sleep($seconds);
 

@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
@@ -8,6 +18,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Repository\LogRepository;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -69,7 +80,7 @@ class CronManager
         Manager $processManager,
         Status $processStatus,
         ModuleConfiguration $processConfiguration,
-        EntityManagerInterface  $entityManager,
+        EntityManagerInterface $entityManager,
         Logger $logger
     ) {
         $this->processTaskRepository = $processTaskRepository;
@@ -95,13 +106,16 @@ class CronManager
             return false;
         }
 
+        $waitingDate = $this->getLimitWaitingTaskDate();
+
         $scheduledTaskIds = $this->processTaskRepository->getScheduledIdsToRun();
+        $waitingTaskIds = $this->processTaskRepository->getWaitingIdsToRun($waitingDate);
 
         $rerunTaskIds = $this->processTaskRepository->getIdsToRerunAutomatically(
             $this->processConfiguration->getFailedMaxRetry()
         );
 
-        $taskIds = array_unique(array_merge($scheduledTaskIds, $rerunTaskIds));
+        $taskIds = array_unique(array_merge($scheduledTaskIds, $waitingTaskIds, $rerunTaskIds));
         if (count($taskIds) == 0) {
             $output->writeln('  => No task found');
             return false;
@@ -118,6 +132,17 @@ class CronManager
     }
 
     /**
+     * @return DateTime
+     */
+    private function getLimitWaitingTaskDate(): DateTime
+    {
+        $date = new DateTime();
+        $date->sub(new DateInterval('PT15M'));
+
+        return $date;
+    }
+
+    /**
      * @param OutputInterface $output
      * @param int $taskId
      * @return bool
@@ -127,7 +152,7 @@ class CronManager
         $task = $this->processTaskRepository->find($taskId);
         $this->entityManager->refresh($task);
 
-        $isScheduledTask = ($task->getScheduledAt() && $task->getStatus() === $this->processStatus->getCreatedStatus());
+        $isScheduledTask = $this->isScheduledTask($task);
 
         if (!$isScheduledTask) {
             if (!$task->getCanBeRerunAutomatically()) {
@@ -144,7 +169,7 @@ class CronManager
         }
 
         if ($isScheduledTask) {
-            if ($task->getScheduledAt() > (new DateTime())) {
+            if ($task->getScheduledAt() && $task->getScheduledAt() > (new DateTime())) {
                 return false;
             }
         }
@@ -154,7 +179,7 @@ class CronManager
             $this->processManager->execute($process);
         } catch (Exception $e) {
             // We do not need to log anything, all is already done in the process manager.
-            $output->writeln('  <error>Error</error> - Task #'.$task->getId().' - '.$e->getMessage());
+            $output->writeln('  <error>Error</error> - Task #' . $task->getId() . ' - ' . $e->getMessage());
             return false;
         }
 
@@ -177,7 +202,7 @@ class CronManager
         $limitDate = $this->prepareLimitDate($this->processConfiguration->getCleanupFinishedLogsAfter());
         $nbCleaned = $this->processLogRepository->deleteFinishedLogs($limitDate);
 
-        $output->writeln('  => Deleted Logs: '.$nbCleaned.'');
+        $output->writeln('  => Deleted Logs: ' . $nbCleaned);
 
         return true;
     }
@@ -198,7 +223,7 @@ class CronManager
         $limitDate = $this->prepareLimitDate($this->processConfiguration->getCleanupFinishedTasksAfter());
         $nbCleaned = $this->processTaskRepository->deleteFinishedTasks($limitDate);
 
-        $output->writeln('  => Deleted Tasks: '.$nbCleaned.'');
+        $output->writeln('  => Deleted Tasks: ' . $nbCleaned);
 
         return true;
     }
@@ -213,7 +238,7 @@ class CronManager
 
         $interval = 'PT1H';
         if ($nbDays > 0) {
-            $interval = 'P'.$nbDays.'DT1H';
+            $interval = 'P' . $nbDays . 'DT1H';
         }
 
         $date->sub(new DateInterval($interval));
@@ -256,7 +281,7 @@ class CronManager
     {
         $task = $this->processTaskRepository->find($taskId);
 
-        $output->writeln('   - Task #'.$task->getId());
+        $output->writeln('   - Task #' . $task->getId());
 
         if ($task->getStatus() !== $this->processStatus->getRunningStatus()) {
             $output->writeln('     => <comment>Wrong Status</comment>');
@@ -294,5 +319,19 @@ class CronManager
         $this->entityManager->flush();
 
         return true;
+    }
+
+    /**
+     * @param Task $task
+     * @return bool
+     */
+    private function isScheduledTask(Task $task): bool
+    {
+        $waitingDate = $this->getLimitWaitingTaskDate();
+
+        return (
+            ($task->getStatus() === $this->processStatus->getCreatedStatus())
+            && ($task->getScheduledAt() || ($task->getCreatedAt() < $waitingDate))
+        );
     }
 }

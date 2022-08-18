@@ -1,6 +1,17 @@
 <?php
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Spipu\ProcessBundle\Tests;
 
+use Closure;
 use PHPUnit\Framework\TestCase;
 use Spipu\ConfigurationBundle\Tests\SpipuConfigurationMock;
 use Spipu\CoreBundle\Tests\SymfonyMock;
@@ -14,8 +25,8 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class SpipuProcessMock extends TestCase
 {
-    const COUNT_CLASSNAME = StepCountMock::class;
-    const ERROR_CLASSNAME = StepErrorMock::class;
+    public const COUNT_CLASSNAME = StepCountMock::class;
+    public const ERROR_CLASSNAME = StepErrorMock::class;
 
     /**
      * @param int|null $id
@@ -26,7 +37,7 @@ class SpipuProcessMock extends TestCase
         $entity = new Log();
 
         if ($id !== null) {
-            $setId = \Closure::bind(
+            $setId = Closure::bind(
                 function ($value) {
                     $this->id = $value;
                 },
@@ -48,7 +59,7 @@ class SpipuProcessMock extends TestCase
         $entity = new Task();
 
         if ($id !== null) {
-            $setId = \Closure::bind(
+            $setId = Closure::bind(
                 function ($value) {
                     $this->id = $value;
                 },

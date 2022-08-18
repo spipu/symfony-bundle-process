@@ -1,11 +1,23 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
 use Exception;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\LoggerOutput;
+use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Spipu\ProcessBundle\Service\Status as ProcessStatus;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 use Symfony\Component\Console\Command\Command;
@@ -16,8 +28,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessReRunCommand extends Command
 {
-    const ARGUMENT_TASK = 'task-id';
-    const OPTION_DEBUG = 'debug';
+    public const ARGUMENT_TASK = 'task-id';
+    public const OPTION_DEBUG = 'debug';
 
     /**
      * @var TaskRepository
@@ -35,23 +47,31 @@ class ProcessReRunCommand extends Command
     private $processStatus;
 
     /**
+     * @var ModuleConfiguration
+     */
+    private $processConfiguration;
+
+    /**
      * RunProcess constructor.
      * @param TaskRepository $processTaskRepository
      * @param ProcessManager $processManager
      * @param ProcessStatus $processStatus
+     * @param ModuleConfiguration $processConfiguration
      * @param null|string $name
      */
     public function __construct(
         TaskRepository $processTaskRepository,
         ProcessManager $processManager,
         ProcessStatus $processStatus,
+        ModuleConfiguration $processConfiguration,
         ?string $name = null
     ) {
+        parent::__construct($name);
+
         $this->processTaskRepository = $processTaskRepository;
         $this->processManager = $processManager;
-
-        parent::__construct($name);
         $this->processStatus = $processStatus;
+        $this->processConfiguration = $processConfiguration;
     }
 
     /**
@@ -108,9 +128,13 @@ class ProcessReRunCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+
         $taskId = (int) $input->getArgument(static::ARGUMENT_TASK);
 
-        $output->writeln('Rerun task #'.$taskId);
+        $output->writeln('Rerun task #' . $taskId);
 
         $task = $this->processTaskRepository->find($taskId);
         if (!$task) {
@@ -126,8 +150,8 @@ class ProcessReRunCommand extends Command
             );
         }
 
-        $output->writeln(' - Process: '.$task->getCode());
-        $output->writeln(' - Status: '.$task->getStatus());
+        $output->writeln(' - Process: ' . $task->getCode());
+        $output->writeln(' - Status: ' . $task->getStatus());
 
         // Debug mode or not.
         $loggerOutput = null;
@@ -143,6 +167,6 @@ class ProcessReRunCommand extends Command
         $output->writeln(' => Result:');
         $output->writeln($result);
 
-        return 0;
+        return self::SUCCESS;
     }
 }

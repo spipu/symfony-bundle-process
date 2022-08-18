@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
@@ -19,9 +29,9 @@ class RemoveFolder implements StepInterface
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
      * @return true
-     * @throws \Exception
+     * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $folder  = $parameters->get('folder');
 
@@ -43,7 +53,7 @@ class RemoveFolder implements StepInterface
         $items = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($items as $item) {
-            $item = $dir.'/'.$item;
+            $item = $dir . '/' . $item;
 
             is_dir($item) ? $this->removeDir($item) : unlink($item);
         }

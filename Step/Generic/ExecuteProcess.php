@@ -1,8 +1,19 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Generic;
 
+use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\StepException;
@@ -71,7 +82,7 @@ class ExecuteProcess implements StepInterface
 
         try {
             $result = $this->manager->execute($process, [$this, 'addLogUrl']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new StepException(
                 'An error occurs during the execution of ' . $code .
                 ': "' . $e->getMessage() . '", Look at the corresponding log for more details'
@@ -87,7 +98,7 @@ class ExecuteProcess implements StepInterface
      */
     public function addLogUrl(Process $process): void
     {
-        $url = $this->url->getAdminProcessLogUrl($process->getLogId());
+        $url = $this->url->getLogUrl($process->getLogId());
         $this->logger->debug(sprintf(' Log: [%s]', $url));
     }
 }

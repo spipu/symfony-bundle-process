@@ -1,9 +1,20 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Controller;
 
 use DateTimeInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
@@ -49,16 +60,24 @@ class TaskController extends AbstractController
     private $status;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * TaskController constructor.
      * @param ModuleConfiguration $configuration
      * @param Status $status
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         ModuleConfiguration $configuration,
-        Status $status
+        Status $status,
+        EntityManagerInterface $entityManager
     ) {
         $this->configuration = $configuration;
         $this->status = $status;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -75,6 +94,8 @@ class TaskController extends AbstractController
      */
     public function index(GridFactory $gridFactory, TaskGrid $taskGrid): Response
     {
+        $this->checkConfiguration();
+
         $manager = $gridFactory->create($taskGrid);
         $manager->setRoute('spipu_process_admin_task_list');
         $manager->validate();
@@ -105,12 +126,14 @@ class TaskController extends AbstractController
         LogGrid $logGrid,
         ConfigReader $configReader
     ): Response {
+        $this->checkConfiguration();
+
         $manager = $gridFactory->create($logGrid);
         $manager->setRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
 
         /** @var Doctrine $dataProvider */
         $dataProvider = $manager->getDataProvider();
-        $dataProvider->addCondition('main.task = '.(int) $resource->getId());
+        $dataProvider->addCondition('main.task = ' . (int) $resource->getId());
 
         $manager->validate();
 
@@ -149,6 +172,8 @@ class TaskController extends AbstractController
         ProcessManager $processManager,
         AsynchronousCommand $asynchronousCommand
     ): Response {
+        $this->checkConfiguration();
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $redirect = $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
@@ -202,9 +227,8 @@ class TaskController extends AbstractController
             ->setStatus($this->status::FAILED)
             ->incrementTry('Killed manually from BO', false);
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($resource);
-        $entityManager->flush();
+        $this->entityManager->persist($resource);
+        $this->entityManager->flush();
 
         $this->addFlashTrans('success', 'spipu.process.success.kill');
         return $redirect;
@@ -233,9 +257,8 @@ class TaskController extends AbstractController
         }
 
         try {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($resource);
-            $entityManager->flush();
+            $this->entityManager->remove($resource);
+            $this->entityManager->flush();
 
             $this->addFlashTrans('success', 'spipu.ui.success.deleted');
         } catch (Exception $e) {
@@ -258,6 +281,8 @@ class TaskController extends AbstractController
      */
     public function executeChoice(ConfigReader $configReader): Response
     {
+        $this->checkConfiguration();
+
         $processes = [];
         foreach (array_keys($configReader->getProcessList()) as $code) {
             $process = $configReader->getProcessDefinition($code);
@@ -307,7 +332,7 @@ class TaskController extends AbstractController
 
         $processForm->setProcessCode($processCode);
         if ($this->getUser()) {
-            $processForm->setCurrentUserName((string) $this->getUser()->getUsername());
+            $processForm->setCurrentUserName($this->getUser()->getUsername());
         }
 
         $processDefinition = $processForm->getProcessDefinition();
@@ -328,11 +353,12 @@ class TaskController extends AbstractController
                     ]
                 );
             } catch (Exception $e) {
-                $this->container->get('session')->getFlashBag()->clear();
+                $this->container->get('request_stack')->getSession()->getFlashBag()->clear();
                 $this->addFlash('danger', $e->getMessage());
             }
         }
 
+        $this->checkConfiguration();
         $this->forceFormParameters($formManager, $request);
 
         return $this->render(
@@ -468,5 +494,15 @@ class TaskController extends AbstractController
         return parent::getSubscribedServices() + [
             'translator',
         ];
+    }
+
+    /**
+     * @return void
+     */
+    protected function checkConfiguration(): void
+    {
+        if (!$this->configuration->hasTaskCanExecute()) {
+            $this->addFlashTrans('danger', 'spipu.process.error.execute');
+        }
     }
 }

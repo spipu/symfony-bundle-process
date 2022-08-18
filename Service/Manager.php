@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
@@ -148,7 +158,7 @@ class Manager
 
             $inputsData = json_decode($task->getInputs(), true);
             if (!is_array($inputsData)) {
-                throw new InputException('Invalid Inputs Data from Task #'.$task->getId());
+                throw new InputException('Invalid Inputs Data from Task #' . $task->getId());
             }
             foreach ($inputsData as $key => $value) {
                 $process->getInputs()->set($key, $value);
@@ -283,7 +293,6 @@ class Manager
             call_user_func($initCallback, $process);
         }
 
-        $result = null;
         try {
             $this->executePrepareOptions($process, $logger);
             $this->executePrepareInputs($process, $logger);
@@ -485,7 +494,7 @@ class Manager
                     (is_array($value) ? json_encode($value) : $value)
                 )
             );
-            $process->getParameters()->set('input.'.$name, $value);
+            $process->getParameters()->set('input.' . $name, $value);
         }
     }
 
@@ -517,15 +526,15 @@ class Manager
             if (!$step->isIgnoreInProgress()) {
                 $kSteps++;
             }
-            $logger->setCurrentStep(($kSteps > 0 ? $kSteps : 0), $step->isIgnoreInProgress());
+            $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
             $startTime = microtime(true);
 
             $result = $step->getProcessor()->execute($step->getParameters(), $logger);
 
-            $process->getParameters()->set('time.'.$step->getCode(), microtime(true) - $startTime);
-            $process->getParameters()->set('result.'.$step->getCode(), $result);
+            $process->getParameters()->set('time.' . $step->getCode(), microtime(true) - $startTime);
+            $process->getParameters()->set('result.' . $step->getCode(), $result);
         }
         $kSteps++;
         $logger->setCurrentStep($kSteps, false);

@@ -1,12 +1,25 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
 use Exception;
+use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\LoggerOutput;
+use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,16 +29,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 
+/**
+ * @SuppressWarnings(PMD.CouplingBetweenObjects)
+ */
 class ProcessRunCommand extends Command
 {
-    const ARGUMENT_PROCESS = 'process';
-    const OPTION_INPUT = 'inputs';
-    const OPTION_DEBUG = 'debug';
+    public const ARGUMENT_PROCESS = 'process';
+    public const OPTION_INPUT = 'inputs';
+    public const OPTION_DEBUG = 'debug';
 
     /**
      * @var ProcessManager
      */
     private $processManager;
+
+    /**
+     * @var ModuleConfiguration
+     */
+    private $processConfiguration;
 
     /**
      * @var SymfonyStyle
@@ -35,15 +56,18 @@ class ProcessRunCommand extends Command
     /**
      * RunProcess constructor.
      * @param ProcessManager $processManager
+     * @param ModuleConfiguration $processConfiguration
      * @param null|string $name
      */
     public function __construct(
         ProcessManager $processManager,
+        ModuleConfiguration $processConfiguration,
         ?string $name = null
     ) {
-        $this->processManager = $processManager;
-
         parent::__construct($name);
+
+        $this->processManager = $processManager;
+        $this->processConfiguration = $processConfiguration;
     }
 
     /**
@@ -88,10 +112,10 @@ class ProcessRunCommand extends Command
     {
         if (!$input->getArgument(static::ARGUMENT_PROCESS)) {
             $output->writeln('');
-            $output->writeln('Available processs:');
-            $processs = $this->processManager->getConfigReader()->getProcessList();
+            $output->writeln('Available process:');
+            $process = $this->processManager->getConfigReader()->getProcessList();
             $list = [];
-            foreach ($processs as $code => $name) {
+            foreach ($process as $code => $name) {
                 $list[] = ['code' => $code, 'name' => $name];
             }
             $table = new Table($output);
@@ -113,9 +137,13 @@ class ProcessRunCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+
         // Init the new process.
         $processCode = $input->getArgument(static::ARGUMENT_PROCESS);
-        $output->writeln('Execute process: '.$processCode);
+        $output->writeln('Execute process: ' . $processCode);
         $process = $this->processManager->load($processCode);
 
         // Init the inputs.
@@ -137,7 +165,7 @@ class ProcessRunCommand extends Command
         $output->writeln(' => Result:');
         $output->writeln($result);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -147,7 +175,6 @@ class ProcessRunCommand extends Command
      * @param OutputInterface $output
      * @return bool
      * @throws InputException
-     * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
     private function askInputs(Process $process, array $inputs, InputInterface $input, OutputInterface $output): bool
     {
@@ -166,29 +193,48 @@ class ProcessRunCommand extends Command
         }
 
         foreach ($inputObjects as $inputObject) {
-            $key = $inputObject->getName();
-            $type = $inputObject->getType();
-            $value = '';
-
-            if (array_key_exists($key, $values)) {
-                $value = $values[$key];
-            }
-
-            if (!array_key_exists($key, $values)) {
-                $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optionnal');
-                $value = $this->getSymfonyStyle($input, $output)->ask($title);
-                if ($value === null) {
-                    $value = '';
-                }
-            }
-
-            if ($inputObject->isRequired() && $value !== '') {
-                $value = $this->validateInput($value, $type);
-            }
-            $process->getInputs()->set($key, $value);
+            $this->askInput($inputObject, $values, $input, $output, $process);
         }
 
         return true;
+    }
+
+    /**
+     * @param Input $inputObject
+     * @param array $values
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param Process $process
+     * @return void
+     * @throws InputException
+     */
+    protected function askInput(
+        Input $inputObject,
+        array $values,
+        InputInterface $input,
+        OutputInterface $output,
+        Process $process
+    ): void {
+        $key = $inputObject->getName();
+        $type = $inputObject->getType();
+        $value = '';
+
+        if (array_key_exists($key, $values)) {
+            $value = $values[$key];
+        }
+
+        if (!array_key_exists($key, $values)) {
+            $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optional');
+            $value = $this->getSymfonyStyle($input, $output)->ask($title);
+            if ($value === null) {
+                $value = '';
+            }
+        }
+
+        if ($inputObject->isRequired() || ($value !== null && $value !== '')) {
+            $value = $this->validateInput($value, $type);
+        }
+        $process->getInputs()->set($key, $value);
     }
 
     /**
@@ -217,10 +263,9 @@ class ProcessRunCommand extends Command
     {
         switch ($type) {
             case 'string':
-                return (string) $value;
+                return $value;
 
             case 'file':
-                $value = (string) $value;
                 if (!is_file($value) || !is_readable($value)) {
                     throw new InputException('This is not a existing or readable file');
                 }

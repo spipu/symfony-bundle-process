@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
@@ -13,10 +23,10 @@ class GetLocalFile implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return string
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $folder = $parameters->get('folder');
         $filePattern = $parameters->get('file_pattern');
@@ -29,7 +39,7 @@ class GetLocalFile implements StepInterface
 
         $files = $this->getFiles($folder, $filePattern);
         if (count($files) > 1) {
-            throw new StepException('More than 1 file is available for this pattern: '.implode(', ', $files));
+            throw new StepException('More than 1 file is available for this pattern: ' . implode(', ', $files));
         }
         if (count($files) === 0) {
             throw new StepException('No file found for this pattern');
@@ -37,7 +47,7 @@ class GetLocalFile implements StepInterface
         $file = $files[0];
         $logger->debug(sprintf('File found: %s', $file));
 
-        return $folder.$file;
+        return $folder . $file;
     }
 
     /**
@@ -56,11 +66,11 @@ class GetLocalFile implements StepInterface
 
         $list = [];
         foreach ($fileList as $file) {
-            if (!is_file($folder.'/'.$file)) {
+            if (!is_file($folder . '/' . $file)) {
                 continue;
             }
 
-            if (!preg_match('/^'.$filePattern.'$/', $file)) {
+            if (!preg_match('/^' . $filePattern . '$/', $file)) {
                 continue;
             }
 

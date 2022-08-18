@@ -1,14 +1,24 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
 class Status
 {
-    const CREATED  = 'created';
-    const RUNNING  = 'running';
-    const FINISHED = 'finished';
-    const FAILED   = 'failed';
+    public const CREATED  = 'created';
+    public const RUNNING  = 'running';
+    public const FINISHED = 'finished';
+    public const FAILED   = 'failed';
 
     /**
      * List of available statuses

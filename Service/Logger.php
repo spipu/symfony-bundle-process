@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
@@ -180,7 +190,7 @@ class Logger implements LoggerProcessInterface
      * @return void
      * @throws Exception
      */
-    private function saveModel()
+    private function saveModel(): void
     {
         if ($this->model === null) {
             throw new ProcessException('You must init the logger before using it!');
@@ -232,8 +242,6 @@ class Logger implements LoggerProcessInterface
 
     /**
      * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
      *
      * @param mixed $message
      * @param array $context

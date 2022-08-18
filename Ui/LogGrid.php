@@ -1,8 +1,19 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use Spipu\UiBundle\Exception\GridException;
 use Spipu\UiBundle\Service\Ui\Definition\GridDefinitionInterface;
 use Spipu\UiBundle\Entity\Grid;
 use Spipu\ProcessBundle\Form\Options\Process as OptionsProcess;
@@ -44,7 +55,7 @@ class LogGrid implements GridDefinitionInterface
 
     /**
      * @return Grid\Grid
-     * @throws \Spipu\UiBundle\Exception\GridException
+     * @throws GridException
      */
     public function getDefinition(): Grid\Grid
     {
@@ -57,7 +68,7 @@ class LogGrid implements GridDefinitionInterface
 
     /**
      * @return void
-     * @throws \Spipu\UiBundle\Exception\GridException
+     * @throws GridException
      */
     private function prepareGrid(): void
     {

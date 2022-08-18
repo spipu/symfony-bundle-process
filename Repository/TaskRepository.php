@@ -1,10 +1,21 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Repository;
 
 use DateInterval;
 use DateTime;
+use DateTimeInterface;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -89,10 +100,10 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \DateTimeInterface $limitDate
+     * @param DateTimeInterface $limitDate
      * @return int
      */
-    public function deleteFinishedTasks(\DateTimeInterface $limitDate): int
+    public function deleteFinishedTasks(DateTimeInterface $limitDate): int
     {
         $query = $this
             ->createQueryBuilder('t')
@@ -139,5 +150,49 @@ class TaskRepository extends ServiceEntityRepository
         }
 
         return $list;
+    }
+
+    /**
+     * @param DateTime $waitingDate
+     * @return int[]
+     */
+    public function getWaitingIdsToRun(DateTime $waitingDate): array
+    {
+        $query = $this
+            ->createQueryBuilder('t')
+            ->select('t.id')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.scheduledAt is null')
+            ->andWhere('t.createdAt <= :waitingDate')
+            ->setParameter('status', $this->status->getCreatedStatus())
+            ->setParameter('waitingDate', $waitingDate)
+            ->getQuery();
+
+        $rows = $query->getArrayResult();
+
+        $list = [];
+        foreach ($rows as $row) {
+            $list[] = (int) $row['id'];
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param string|null $status
+     * @return int
+     */
+    public function countTasks(?string $status = null): int
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
+        $queryBuilder->select('COUNT(t.id)');
+
+        if ($status !== null) {
+            $queryBuilder
+                ->where('t.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }

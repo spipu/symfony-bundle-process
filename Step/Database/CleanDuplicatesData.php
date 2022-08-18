@@ -1,13 +1,23 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Database;
 
+use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -35,10 +45,10 @@ class CleanDuplicatesData implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
-     * @throws StepException|DBALException
+     * @return array
+     * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $tablename = $parameters->get('tablename');
         $fields = $parameters->get('fields');
@@ -72,8 +82,8 @@ class CleanDuplicatesData implements StepInterface
         );
 
         try {
-            $nbDuplicatedEntries = $this->connection->fetchArray($query)[0];
-        } catch (\Exception $e) {
+            $nbDuplicatedEntries = $this->connection->fetchNumeric($query)[0];
+        } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
 
@@ -106,8 +116,8 @@ class CleanDuplicatesData implements StepInterface
         );
 
         try {
-            $nbPurgedLines = $this->connection->exec($query);
-        } catch (\Exception $e) {
+            $nbPurgedLines = $this->connection->executeQuery($query);
+        } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
 
@@ -126,19 +136,19 @@ class CleanDuplicatesData implements StepInterface
 
     /**
      * @param string[] $fields
-     * @param string $idx1
-     * @param string $idx2
+     * @param string $alias1
+     * @param string $alias2
      * @return string
      */
-    private function getCondition(array $fields, string $idx1, string $idx2)
+    private function getCondition(array $fields, string $alias1, string $alias2): string
     {
         $condition = array();
         foreach ($fields as $field) {
             /**@var array condition*/
             $condition[] = sprintf(
                 '%1$s.%3$s = %2$s.%3$s',
-                $idx1,
-                $idx2,
+                $alias1,
+                $alias2,
                 $this->connection->quoteIdentifier($field)
             );
         }

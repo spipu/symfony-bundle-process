@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Entity\Process;
 
@@ -8,7 +18,7 @@ use Spipu\UiBundle\Form\Options\AbstractOptions;
 
 class Input
 {
-    const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file'];
+    public const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file'];
 
     /**
      * @var string
@@ -128,7 +138,7 @@ class Input
             return;
         }
 
-        if (!call_user_func('is_'.$this->type, $value)) {
+        if (!call_user_func('is_' . $this->type, $value)) {
             throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
         }
 

@@ -1,10 +1,22 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
 use Exception;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\CronManager;
+use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,12 +25,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessCronManagerCommand extends Command
 {
-    const ARGUMENT_ACTION = 'cron_action';
+    public const ARGUMENT_ACTION = 'cron_action';
 
     /**
      * @var CronManager
      */
     private $cronManager;
+
+    /**
+     * @var ModuleConfiguration
+     */
+    private $processConfiguration;
 
     /**
      * @var array
@@ -32,15 +49,18 @@ class ProcessCronManagerCommand extends Command
     /**
      * RunProcess constructor.
      * @param CronManager $cronManager
+     * @param ModuleConfiguration $processConfiguration
      * @param null|string $name
      */
     public function __construct(
         CronManager $cronManager,
+        ModuleConfiguration $processConfiguration,
         ?string $name = null
     ) {
         parent::__construct($name);
 
         $this->cronManager = $cronManager;
+        $this->processConfiguration = $processConfiguration;
     }
 
     /**
@@ -57,7 +77,7 @@ class ProcessCronManagerCommand extends Command
             ->addArgument(
                 static::ARGUMENT_ACTION,
                 InputArgument::REQUIRED,
-                'The code of the cron action to execute : ['.implode('|', array_keys($this->availableActions)).']'
+                'The code of the cron action to execute : [' . implode('|', array_keys($this->availableActions)) . ']'
             )
         ;
     }
@@ -73,6 +93,10 @@ class ProcessCronManagerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+
         $action = $input->getArgument(static::ARGUMENT_ACTION);
         if (!array_key_exists($action, $this->availableActions)) {
             throw new InvalidArgumentException('The asked action is not allowed');
@@ -80,7 +104,7 @@ class ProcessCronManagerCommand extends Command
 
         $this->{$this->availableActions[$action]}($output);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

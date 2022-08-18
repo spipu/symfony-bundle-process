@@ -1,8 +1,19 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Database;
 
+use Doctrine\DBAL\Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
@@ -30,7 +41,7 @@ class CreateTemporaryTable implements StepInterface
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
      * @return mixed
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws Exception
      */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger)
     {
@@ -53,8 +64,13 @@ class CreateTemporaryTable implements StepInterface
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(['row_id']);
 
-        $schema = $this->connection->getSchemaManager();
-        $schema->dropAndCreateTable($table);
+        $schema = $this->connection->createSchemaManager();
+        try {
+            $schema->dropTable($tablename);
+        } catch (Exception $e) {
+            // Nothing here, if the table does not exist yet, it is not a pb.
+        }
+        $schema->createTable($table);
 
         return $tablename;
     }

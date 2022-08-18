@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
@@ -32,7 +42,7 @@ class Url
     }
 
     /**
-     * Get an process log url
+     * Get a process log url
      *
      * @param int $processLogId
      * @return string
@@ -40,12 +50,12 @@ class Url
     public function getLogUrl(int $processLogId): string
     {
         return
-            $this->configurationManager->get('app.website.url').
+            $this->configurationManager->get('app.website.url') .
             $this->router->generate('spipu_process_admin_log_show', ['id' => $processLogId]);
     }
 
     /**
-     * Get an process task url
+     * Get a process task url
      *
      * @param int $processTaskId
      * @return string
@@ -53,7 +63,7 @@ class Url
     public function getTaskUrl(int $processTaskId): string
     {
         return
-            $this->configurationManager->get('app.website.url').
+            $this->configurationManager->get('app.website.url') .
             $this->router->generate('spipu_process_admin_task_show', ['id' => $processTaskId]);
     }
 }

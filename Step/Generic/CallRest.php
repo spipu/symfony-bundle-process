@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Generic;
 
@@ -30,11 +40,11 @@ class CallRest implements StepInterface
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
-     * @return mixed
+     * @return array
      * @throws CallRestException
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $url     = $parameters->get('url');
         $method  = $this->getMethod($parameters);
@@ -61,7 +71,7 @@ class CallRest implements StepInterface
         $error = null;
         if (curl_errno($curl)) {
             $error = [
-                'code'    => (int) curl_errno($curl),
+                'code'    => curl_errno($curl),
                 'message' => curl_error($curl),
             ];
         }
@@ -141,7 +151,7 @@ class CallRest implements StepInterface
         $method = strtoupper($method);
 
         if (!in_array($method, array('GET', 'POST', 'PUT', 'PATCH', 'DELETE'))) {
-            throw new StepException('The method ['.$method.'] is not allowed');
+            throw new StepException('The method [' . $method . '] is not allowed');
         }
 
         return $method;
@@ -184,7 +194,7 @@ class CallRest implements StepInterface
         // Manage HTTP authentication.
         if (!empty($options['login']) && !empty($options['password'])) {
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($curl, CURLOPT_USERPWD, $options['login'].':'.$options['password']);
+            curl_setopt($curl, CURLOPT_USERPWD, $options['login'] . ':' . $options['password']);
             unset($options['login']);
             unset($options['password']);
         }
@@ -224,10 +234,9 @@ class CallRest implements StepInterface
      * @param resource $curl
      * @param string   $method
      * @param string   $data
-     *
      * @return void
      */
-    private function applyMethodAndData($curl, string $method, string &$data)
+    private function applyMethodAndData($curl, string $method, string &$data): void
     {
         switch ($method) {
             // Read.
@@ -269,13 +278,13 @@ class CallRest implements StepInterface
      * @return int
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    public function readHeader($resURL, string $header)
+    public function readHeader($resURL, string $header): int
     {
         // Analyse the headers without status message.
         if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+)$/', trim($header), $match)) {
             $this->status = array(
                 'code' => $match[1],
-                'message' => 'http status '.$match[1],
+                'message' => 'http status ' . $match[1],
             );
         }
 
@@ -288,7 +297,7 @@ class CallRest implements StepInterface
         }
 
         if (trim($header)) {
-            array_push($this->headers, trim($header));
+            $this->headers[] = trim($header);
         }
 
         return strlen($header);

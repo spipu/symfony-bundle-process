@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Form\Options;
 
@@ -32,7 +42,7 @@ class Status extends AbstractOptions
         $list = [];
 
         foreach ($this->service->getStatuses() as $code) {
-            $list[$code] = 'spipu.process.status.'.$code;
+            $list[$code] = 'spipu.process.status.' . $code;
         }
 
         return $list;

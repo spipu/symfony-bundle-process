@@ -1,5 +1,15 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File\RowReader\Action;
 
@@ -31,7 +41,7 @@ class ToInteger implements ActionInterface
         if ($value !== null) {
             $value = preg_replace('/^[\+]?[0]*([0-9]+)$/', '$1', $value);
             if (!preg_match('/^[0-9]+$/', $value)) {
-                throw new RowReaderException('Invalid Integer Value: ['.$value.']');
+                throw new RowReaderException('Invalid Integer Value: [' . $value . ']');
             }
         }
 

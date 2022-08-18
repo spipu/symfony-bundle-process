@@ -1,8 +1,19 @@
 <?php
-declare(strict_types = 1);
+
+/**
+ * This file is part of a Spipu Bundle
+ *
+ * (c) Laurent Minguet
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
+use Exception;
 use Spipu\ConfigurationBundle\Exception\ConfigurationException;
 use Spipu\ConfigurationBundle\Service\Manager as ConfigurationManager;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
@@ -37,7 +48,7 @@ class MainParameters implements ParametersInterface
     /**
      * @param ParametersInterface $parentParameters
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
     public function setParentParameters(ParametersInterface $parentParameters): void
@@ -64,7 +75,7 @@ class MainParameters implements ParametersInterface
      * @param string $code
      * @param mixed $value
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
     public function set(string $code, $value): void
@@ -77,7 +88,7 @@ class MainParameters implements ParametersInterface
      * @param string $code
      * @param mixed $value
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
     public function setDefaultValue(string $code, $value): void
