@@ -113,6 +113,7 @@ class SpipuProcessMock extends TestCase
                 'options' => [
                     'can_be_put_in_queue' => false,
                     'can_be_rerun_automatically' => false,
+                    'process_lock_on_failed' => true,
                     'process_lock' => [],
                 ],
                 'inputs' => [
@@ -151,6 +152,7 @@ class SpipuProcessMock extends TestCase
                 'options' => [
                     'can_be_put_in_queue' => true,
                     'can_be_rerun_automatically' => true,
+                    'process_lock_on_failed' => true,
                     'process_lock' => []
                 ],
                 'inputs' => [

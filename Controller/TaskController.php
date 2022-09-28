@@ -292,6 +292,7 @@ class TaskController extends AbstractController
                     'name' => $process['name'],
                     'need_inputs' => (count($process['inputs']) > 0),
                     'locks' => $process['options']['process_lock'],
+                    'lock_on_failed' => $process['options']['process_lock_on_failed'],
                 ];
             }
         }

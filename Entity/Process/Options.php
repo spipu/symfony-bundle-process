@@ -43,6 +43,7 @@ class Options
         $booleanKeys = [
             'can_be_put_in_queue',
             'can_be_rerun_automatically',
+            'process_lock_on_failed',
         ];
         foreach ($booleanKeys as $booleanKey) {
             $this->options[$booleanKey] = (bool) ($this->options[$booleanKey]);
@@ -85,6 +86,16 @@ class Options
     public function canBeRerunAutomatically(): bool
     {
         return (bool) $this->options['can_be_rerun_automatically'];
+    }
+
+    /**
+     * Can the process be lock on failed ?
+     *
+     * @return bool
+     */
+    public function canProcessLockOnFailed(): bool
+    {
+        return (bool) $this->options['process_lock_on_failed'];
     }
 
     /**

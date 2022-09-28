@@ -34,6 +34,8 @@ spipu:
                 inputs:                   "Inputs"
                 options:                  "Options"
                 steps:                    "Steps"
+                lock_on_failed:           "Lock on failed: %value"
+                locked_by:                "Locked by <span class=\"text-danger\">%nb tasks</span>"
                 locks:                    "Locks"
 
             task:

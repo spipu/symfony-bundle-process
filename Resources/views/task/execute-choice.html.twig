@@ -32,11 +32,19 @@
                         <td class="text-left">{{ process.name }}</td>
                         <td class="text-center">{% if process.need_inputs%}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td>
                         <td class="text-left">
-                            {% for lock in process.locks %}
-                                {{ lock }}<br />
+                            {% if process.locks|length > 0 %}
+                                {{ 'spipu.process.field.process.lock_on_failed'|trans({'%value': (process.lock_on_failed ? 'spipu.ui.options.value_yes' : 'spipu.ui.options.value_no')|trans }) }}
+                                <div class="dropdown">
+                                    <span class="dropdown-toggle pr-2" role="button" data-toggle="dropdown" aria-expanded="false">
+                                        <u>{{ 'spipu.process.field.process.locked_by'|trans({'%nb': process.locks|length })|raw }}</u>
+                                    </span>
+                                    <div class="dropdown-menu p-2">
+                                        {% for lock in process.locks %}{{ lock }}<br />{% endfor %}
+                                    </div>
+                                </div>
                             {% else %}
                                 -
-                            {% endfor %}
+                            {% endif %}
                         </td>
                         <td class="text-right">
                             {{ buttons.defaultLink(path('spipu_process_admin_task_execute', {'processCode': process.code}), 'spipu.process.action.execute', 'success  btn-sm', 'play-circle') }}

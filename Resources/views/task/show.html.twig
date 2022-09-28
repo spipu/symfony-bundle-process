@@ -115,6 +115,9 @@
             <div class="card mb-3">
                 <div class="card-header font-weight-bold">{{ 'spipu.process.field.process.locks'|trans }}</div>
                 <table class="table table-sm mb-0">
+                    <tr class="alert-secondary"><td>
+                        {{ 'spipu.process.field.process.lock_on_failed'|trans({'%value': (processConfig.options.process_lock_on_failed ? 'spipu.ui.options.value_yes' : 'spipu.ui.options.value_no')|trans }) }}
+                    </td></tr>
                     {% for lock in processConfig.options.process_lock %}
                         <tr><td>{{ lock }}</td></tr>
                     {% endfor %}

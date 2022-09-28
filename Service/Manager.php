@@ -412,7 +412,8 @@ class Manager
 
         $query = $this->buildLockQuery(
             $processLocks,
-            $process->getTask() ? $process->getTask()->getId() : null
+            $process->getOptions()->canProcessLockOnFailed(),
+            ($process->getTask() ? $process->getTask()->getId() : null)
         );
 
         try {
@@ -425,16 +426,21 @@ class Manager
 
     /**
      * @param array $processLocks
+     * @param bool $lockOnFailed
      * @param int|null $taskId
      * @return string
+     * @SuppressWarnings(PMD.BooleanArgumentFlag)
      */
-    private function buildLockQuery(array $processLocks, ?int $taskId): string
+    private function buildLockQuery(array $processLocks, bool $lockOnFailed, ?int $taskId): string
     {
         foreach ($processLocks as &$processLock) {
             $processLock = $this->entityManager->getConnection()->quote($processLock);
         }
 
-        $statuses = [Status::CREATED, Status::RUNNING, Status::FAILED];
+        $statuses = [Status::CREATED, Status::RUNNING];
+        if ($lockOnFailed) {
+            $statuses[] = Status::FAILED;
+        }
         foreach ($statuses as &$status) {
             $status = $this->entityManager->getConnection()->quote($status);
         }

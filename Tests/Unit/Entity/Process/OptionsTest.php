@@ -21,32 +21,42 @@ class OptionsTest extends TestCase
 
     public function testConvert()
     {
-        $options = self::getOptions($this, ['can_be_put_in_queue' => 1, 'can_be_rerun_automatically' => 0, 'process_lock' => []]);
+        $options = self::getOptions($this, ['can_be_put_in_queue' => 1, 'can_be_rerun_automatically' => 0, 'process_lock_on_failed' => 0, 'process_lock' => []]);
         $this->assertSame(true, $options->getOptions()['can_be_put_in_queue']);
         $this->assertSame(false, $options->getOptions()['can_be_rerun_automatically']);
+        $this->assertSame(false, $options->getOptions()['process_lock_on_failed']);
     }
 
     public function testOptionsOk()
     {
-        $options = self::getOptions($this, ['can_be_put_in_queue' => false, 'can_be_rerun_automatically' => false, 'process_lock' => []]);
+        $options = self::getOptions($this, ['can_be_put_in_queue' => false, 'can_be_rerun_automatically' => false, 'process_lock_on_failed' => true, 'process_lock' => []]);
         $this->assertSame(false, $options->canBePutInQueue());
         $this->assertSame(false, $options->canBeRerunAutomatically());
         $this->assertSame([], $options->getProcessLocks());
+        $this->assertTrue($options->canProcessLockOnFailed());
 
-        $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => false, 'process_lock' => 'foo']);
+        $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => false, 'process_lock_on_failed' => true, 'process_lock' => 'foo']);
         $this->assertSame(true, $options->canBePutInQueue());
         $this->assertSame(false, $options->canBeRerunAutomatically());
         $this->assertSame(['foo'], $options->getProcessLocks());
+        $this->assertTrue($options->canProcessLockOnFailed());
 
-        $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => true, 'process_lock' => ['foo', 'bar']]);
+        $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => true, 'process_lock_on_failed' => true, 'process_lock' => ['foo', 'bar']]);
         $this->assertSame(true, $options->canBePutInQueue());
         $this->assertSame(true, $options->canBeRerunAutomatically());
         $this->assertSame(['foo', 'bar'], $options->getProcessLocks());
+        $this->assertTrue($options->canProcessLockOnFailed());
+
+        $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => true, 'process_lock_on_failed' => false, 'process_lock' => ['foo', 'bar']]);
+        $this->assertSame(true, $options->canBePutInQueue());
+        $this->assertSame(true, $options->canBeRerunAutomatically());
+        $this->assertSame(['foo', 'bar'], $options->getProcessLocks());
+        $this->assertFalse($options->canProcessLockOnFailed());
     }
 
     public function testOptionsKo()
     {
         $this->expectException(OptionException::class);
-        self::getOptions($this, ['can_be_put_in_queue' => false, 'can_be_rerun_automatically' => true, 'process_lock' => []]);
+        self::getOptions($this, ['can_be_put_in_queue' => false, 'can_be_rerun_automatically' => true, 'process_lock_on_failed' => true, 'process_lock' => []]);
     }
 }
