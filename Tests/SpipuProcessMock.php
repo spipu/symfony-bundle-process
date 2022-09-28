@@ -115,6 +115,7 @@ class SpipuProcessMock extends TestCase
                     'can_be_rerun_automatically' => false,
                     'process_lock_on_failed' => true,
                     'process_lock' => [],
+                    'needed_role' => null,
                 ],
                 'inputs' => [
                     'input1' => ['type' => 'string', 'required' => true, 'allowed_mime_types' => []],
@@ -153,7 +154,8 @@ class SpipuProcessMock extends TestCase
                     'can_be_put_in_queue' => true,
                     'can_be_rerun_automatically' => true,
                     'process_lock_on_failed' => true,
-                    'process_lock' => []
+                    'process_lock' => [],
+                    'needed_role' => null,
                 ],
                 'inputs' => [
                     'generic_exception' => ['type' => 'bool',   'required' => true, 'allowed_mime_types' => []],

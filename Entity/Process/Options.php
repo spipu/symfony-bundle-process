@@ -58,6 +58,13 @@ class Options
                 'Invalid process options. can_be_put_in_queue is required when using can_be_rerun_automatically'
             );
         }
+
+        if (!is_null($this->options['needed_role'])) {
+            $this->options['needed_role'] = trim($this->options['needed_role']);
+            if ($this->options['needed_role'] === '') {
+                $this->options['needed_role'] = null;
+            }
+        }
     }
 
     /**
@@ -104,5 +111,13 @@ class Options
     public function getProcessLocks(): array
     {
         return (array) $this->options['process_lock'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNeededRole(): ?string
+    {
+        return $this->options['needed_role'];
     }
 }

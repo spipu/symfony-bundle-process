@@ -12,7 +12,7 @@ class ProcessTest extends TestCase
         $process = new Process(
             'test',
             'Test',
-            OptionsTest::getOptions($testCase, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => false, 'process_lock_on_failed' => true, 'process_lock' => []]),
+            OptionsTest::getOptions($testCase, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => false, 'process_lock_on_failed' => true, 'process_lock' => [], 'needed_role' => null]),
             InputsTest::getInputs($testCase, ['name' => ['type' => 'string']]),
             ParametersTest::getParameters($testCase, ['Foo' => '{{ input.name }}']),
             [

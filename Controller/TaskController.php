@@ -286,15 +286,21 @@ class TaskController extends AbstractController
         $processes = [];
         foreach (array_keys($configReader->getProcessList()) as $code) {
             $process = $configReader->getProcessDefinition($code);
-            if ($process['options']['can_be_put_in_queue']) {
-                $processes[$process['code']] = [
-                    'code' => $process['code'],
-                    'name' => $process['name'],
-                    'need_inputs' => (count($process['inputs']) > 0),
-                    'locks' => $process['options']['process_lock'],
-                    'lock_on_failed' => $process['options']['process_lock_on_failed'],
-                ];
+            if (!$process['options']['can_be_put_in_queue']) {
+                continue;
             }
+
+            if ($process['options']['needed_role'] !== null && !$this->isGranted($process['options']['needed_role'])) {
+                continue;
+            }
+
+            $processes[$process['code']] = [
+                'code' => $process['code'],
+                'name' => $process['name'],
+                'need_inputs' => (count($process['inputs']) > 0),
+                'locks' => $process['options']['process_lock'],
+                'lock_on_failed' => $process['options']['process_lock_on_failed'],
+            ];
         }
 
         ksort($processes);
@@ -337,6 +343,14 @@ class TaskController extends AbstractController
         }
 
         $processDefinition = $processForm->getProcessDefinition();
+
+        if (
+            $processDefinition['options']['needed_role'] !== null
+            && !$this->isGranted($processDefinition['options']['needed_role'])
+        ) {
+            $this->addFlashTrans('danger', 'spipu.process.error.needed_role');
+            return $this->redirectToRoute('spipu_process_admin_task_execute_choice');
+        }
 
         $formManager = $formFactory->create($processForm);
         $formManager->setSubmitButton('spipu.process.action.execute', 'play-circle');

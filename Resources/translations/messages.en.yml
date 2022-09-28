@@ -111,6 +111,7 @@ spipu:
             required: "This field is required"
             generic:  "There is an error on this form"
             locked:   "This process can not be executed, because it is locked by another one"
+            needed_role: "This process can not be executed, because you have not the good role"
         help:
             json:     "Must be a valid Json format"
 
