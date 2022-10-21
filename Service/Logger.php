@@ -19,6 +19,7 @@ use Exception;
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Spipu\ProcessBundle\Entity\Task as ProcessTask;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Throwable;
 
 /**
  * @SuppressWarnings(PMD.TooManyPublicMethods)
@@ -64,6 +65,11 @@ class Logger implements LoggerProcessInterface
      * @var LoggerOutputInterface|null
      */
     private $loggerOutput;
+
+    /**
+     * @var Throwable|null
+     */
+    private $lastException = null;
 
     /**
      * Logger constructor.
@@ -164,6 +170,15 @@ class Logger implements LoggerProcessInterface
     }
 
     /**
+     * @param Throwable|null $lastException
+     * @return void
+     */
+    public function setLastException(?Throwable $lastException): void
+    {
+        $this->lastException = $lastException;
+    }
+
+    /**
      * Finish the logger for the current process
      * @param string $status
      * @return void
@@ -175,7 +190,7 @@ class Logger implements LoggerProcessInterface
         if (($status == Status::FAILED) && ($this->mailer !== null)) {
             $this->warning('A technical alert email will been sent');
             try {
-                $this->mailer->sendAlert($this->getModel());
+                $this->mailer->sendAlert($this->getModel(), $this->lastException);
             } catch (Exception $e) {
                 $this->critical(' => ERROR when sending the email');
                 $this->critical((string) $e);

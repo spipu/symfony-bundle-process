@@ -280,6 +280,7 @@ class Manager
         $this->executeUpdateTask($process, Status::RUNNING);
 
         $logger = clone $this->logger;
+        $logger->setLastException(null);
 
         if ($this->loggerOutput) {
             $logger->setLoggerOutput($this->loggerOutput);
@@ -314,6 +315,7 @@ class Manager
                     ($rerun ? 'Yes' : 'No')
                 )
             );
+            $logger->setLastException($e);
             $logger->finish(Status::FAILED);
 
             $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), $rerun);
@@ -326,6 +328,7 @@ class Manager
                     'No'
                 )
             );
+            $logger->setLastException($e);
             $logger->finish(Status::FAILED);
 
             $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), false);

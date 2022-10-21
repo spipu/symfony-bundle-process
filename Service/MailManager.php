@@ -17,6 +17,7 @@ use Spipu\CoreBundle\Service\MailManager as BaseMailManager;
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Spipu\ProcessBundle\Event\LogFailedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Throwable;
 
 class MailManager
 {
@@ -60,13 +61,14 @@ class MailManager
 
     /**
      * @param ProcessLog $processLog
+     * @param Throwable|null $exception
      * @return bool
      */
-    public function sendAlert(ProcessLog $processLog): bool
+    public function sendAlert(ProcessLog $processLog, ?Throwable $exception = null): bool
     {
         $logUrl = $this->url->getLogUrl($processLog->getId());
 
-        $event = new LogFailedEvent($processLog, $logUrl);
+        $event = new LogFailedEvent($processLog, $logUrl, $exception);
         $this->eventDispatcher->dispatch($event, $event->getEventCode());
 
         if (!$this->configuration->hasFailedSendEmail()) {

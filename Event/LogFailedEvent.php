@@ -15,9 +15,10 @@ namespace Spipu\ProcessBundle\Event;
 
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Symfony\Contracts\EventDispatcher\Event;
+use Throwable;
 
 /**
- * Grid Event
+ * Log Failed Event
  */
 class LogFailedEvent extends Event
 {
@@ -32,14 +33,21 @@ class LogFailedEvent extends Event
     private $processLogUrl;
 
     /**
+     * @var Throwable|null
+     */
+    private $exception;
+
+    /**
      * GridEvent constructor.
      * @param ProcessLog $processLog
      * @param string $processLogUrl
+     * @param Throwable|null $exception
      */
-    public function __construct(ProcessLog $processLog, string $processLogUrl)
+    public function __construct(ProcessLog $processLog, string $processLogUrl, ?Throwable $exception = null)
     {
         $this->processLog = $processLog;
         $this->processLogUrl = $processLogUrl;
+        $this->exception = $exception;
     }
 
     /**
@@ -64,5 +72,13 @@ class LogFailedEvent extends Event
     public function getProcessLogUrl(): string
     {
         return $this->processLogUrl;
+    }
+
+    /**
+     * @return Throwable|null
+     */
+    public function getException(): ?Throwable
+    {
+        return $this->exception;
     }
 }
