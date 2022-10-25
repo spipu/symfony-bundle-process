@@ -15,7 +15,7 @@ namespace Spipu\ProcessBundle\Service;
 
 use Exception;
 use Spipu\ConfigurationBundle\Exception\ConfigurationException;
-use Spipu\ConfigurationBundle\Service\Manager as ConfigurationManager;
+use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Symfony\Component\DependencyInjection\ContainerInterface;

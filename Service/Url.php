@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
-use Spipu\ConfigurationBundle\Service\Manager as ConfigurationManager;
+use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Url

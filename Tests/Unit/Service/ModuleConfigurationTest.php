@@ -2,7 +2,6 @@
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
-use Spipu\ConfigurationBundle\Service\Manager;
 use Spipu\ConfigurationBundle\Tests\SpipuConfigurationMock;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 

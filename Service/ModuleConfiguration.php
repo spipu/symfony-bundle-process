@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
-use Spipu\ConfigurationBundle\Service\Manager;
+use Spipu\ConfigurationBundle\Service\ConfigurationManager as Manager;
 
 class ModuleConfiguration
 {
