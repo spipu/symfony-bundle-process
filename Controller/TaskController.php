@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
+use Spipu\ProcessBundle\Service\TaskManager;
 use Spipu\ProcessBundle\Ui\ProcessForm;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
@@ -42,6 +43,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 /**
  * @Route("/process/task")
@@ -204,34 +206,28 @@ class TaskController extends AbstractController
      * )
      * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_KILL')")
      * @param Task $resource
+     * @param TaskManager $taskManager
      * @return Response
      */
     public function kill(
-        Task $resource
+        Task $resource,
+        TaskManager $taskManager
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $redirect = $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
+        try {
+            if (!$this->configuration->hasTaskCanKill()) {
+                throw new ProcessException('spipu.process.error.disable');
+            }
 
-        if (!$this->status->canKill($resource->getStatus())) {
-            $this->addFlashTrans('danger', 'spipu.process.error.kill');
-            return $redirect;
+            $taskManager->kill($resource, 'Killed manually from BO by ' . $this->getUser()->getUserIdentifier());
+
+            $this->addFlashTrans('success', 'spipu.process.success.kill');
+        } catch (Throwable $e) {
+            $this->addFlashTrans('danger', $e->getMessage());
         }
 
-        if (!$this->configuration->hasTaskCanKill()) {
-            $this->addFlashTrans('danger', 'spipu.process.error.disable');
-            return $redirect;
-        }
-
-        $resource
-            ->setStatus($this->status::FAILED)
-            ->incrementTry('Killed manually from BO', false);
-
-        $this->entityManager->persist($resource);
-        $this->entityManager->flush();
-
-        $this->addFlashTrans('success', 'spipu.process.success.kill');
-        return $redirect;
+        return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
     }
 
     /**

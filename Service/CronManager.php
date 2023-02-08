@@ -65,7 +65,11 @@ class CronManager
     private $logger;
 
     /**
-     * CronManager constructor.
+     * @var TaskManager
+     */
+    private $taskManager;
+
+    /**
      * @param TaskRepository $processTaskRepository
      * @param LogRepository $processLogRepository
      * @param Manager $processManager
@@ -73,6 +77,7 @@ class CronManager
      * @param ModuleConfiguration $processConfiguration
      * @param EntityManagerInterface $entityManager
      * @param Logger $logger
+     * @param TaskManager $taskManager
      */
     public function __construct(
         TaskRepository $processTaskRepository,
@@ -81,7 +86,8 @@ class CronManager
         Status $processStatus,
         ModuleConfiguration $processConfiguration,
         EntityManagerInterface $entityManager,
-        Logger $logger
+        Logger $logger,
+        TaskManager $taskManager
     ) {
         $this->processTaskRepository = $processTaskRepository;
         $this->processLogRepository = $processLogRepository;
@@ -90,6 +96,7 @@ class CronManager
         $this->processConfiguration = $processConfiguration;
         $this->entityManager = $entityManager;
         $this->logger = $logger;
+        $this->taskManager = $taskManager;
     }
 
     /**
@@ -274,10 +281,9 @@ class CronManager
     /**
      * @param OutputInterface $output
      * @param int $taskId
-     * @return bool
-     * @SuppressWarnings(PMD.ErrorControlOperator)
+     * @return void
      */
-    private function checkRunningTaskPid(OutputInterface $output, int $taskId): bool
+    private function checkRunningTaskPid(OutputInterface $output, int $taskId): void
     {
         $task = $this->processTaskRepository->find($taskId);
 
@@ -285,18 +291,15 @@ class CronManager
 
         if ($task->getStatus() !== $this->processStatus->getRunningStatus()) {
             $output->writeln('     => <comment>Wrong Status</comment>');
-            return false;
+            return;
         }
 
         if ($task->getPidValue() === null || $task->getPidValue() < 1) {
             $output->writeln('     => <comment>No PID</comment>');
-            return false;
+            return;
         }
 
-        $pid = $task->getPidValue();
-        $sid = @posix_getsid($pid);
-
-        if (!$sid) {
+        if (!$this->taskManager->isPidRunning($task)) {
             $errorMessage = 'Process not found';
             $output->writeln("     => <error>$errorMessage</error>");
 
@@ -311,14 +314,12 @@ class CronManager
             $task->setStatus(Status::FAILED);
             $this->entityManager->flush();
 
-            return false;
+            return;
         }
 
         $output->writeln('     => <info>Process found</info>');
         $task->setPidLastSeen(new DateTime());
         $this->entityManager->flush();
-
-        return true;
     }
 
     /**
