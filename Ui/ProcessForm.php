@@ -75,6 +75,11 @@ class ProcessForm implements EntityDefinitionInterface
     private $currentUserName = null;
 
     /**
+     * @var string|null
+     */
+    private $currentUserEmail = null;
+
+    /**
      * @var DateTimeInterface|null;
      */
     private $scheduledAt = null;
@@ -116,6 +121,17 @@ class ProcessForm implements EntityDefinitionInterface
     public function setCurrentUserName(?string $currentUserName): self
     {
         $this->currentUserName = $currentUserName;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $currentUserEmail
+     * @return self
+     */
+    public function setCurrentUserEmail(?string $currentUserEmail): self
+    {
+        $this->currentUserEmail = $currentUserEmail;
 
         return $this;
     }
@@ -339,6 +355,10 @@ class ProcessForm implements EntityDefinitionInterface
 
         if ($input->getName() === 'current_user_name' && $this->currentUserName !== null) {
             $field->setValue($this->currentUserName);
+        }
+
+        if ($input->getName() === 'current_user_email' && $this->currentUserEmail !== null) {
+            $field->setValue($this->currentUserEmail);
         }
 
         return $field;

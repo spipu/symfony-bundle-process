@@ -37,6 +37,7 @@ use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Ui\LogGrid;
 use Spipu\ProcessBundle\Ui\TaskGrid;
+use Spipu\UserBundle\Entity\UserInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -334,8 +335,10 @@ class TaskController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $processForm->setProcessCode($processCode);
-        if ($this->getUser()) {
-            $processForm->setCurrentUserName($this->getUser()->getUsername());
+        $currentUser = $this->getUser();
+        if ($currentUser instanceof UserInterface) {
+            $processForm->setCurrentUserName($currentUser->getUserIdentifier());
+            $processForm->setCurrentUserEmail($currentUser->getEmail());
         }
 
         $processDefinition = $processForm->getProcessDefinition();
