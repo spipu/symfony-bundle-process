@@ -16,6 +16,8 @@ namespace Spipu\ProcessBundle\Controller;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Service\TaskManager;
@@ -37,13 +39,13 @@ use Spipu\ProcessBundle\Service\Manager as ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Ui\LogGrid;
 use Spipu\ProcessBundle\Ui\TaskGrid;
-use Spipu\UserBundle\Entity\UserInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Throwable;
 
 /**
@@ -324,6 +326,8 @@ class TaskController extends AbstractController
      * @return Response
      * @throws ProcessException
      * @throws UiException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function execute(
         string $processCode,
@@ -338,7 +342,9 @@ class TaskController extends AbstractController
         $currentUser = $this->getUser();
         if ($currentUser instanceof UserInterface) {
             $processForm->setCurrentUserName($currentUser->getUserIdentifier());
-            $processForm->setCurrentUserEmail($currentUser->getEmail());
+            if (method_exists($currentUser, 'getEmail')) {
+                $processForm->setCurrentUserEmail($currentUser->getEmail());
+            }
         }
 
         $processDefinition = $processForm->getProcessDefinition();
