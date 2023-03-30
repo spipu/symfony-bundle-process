@@ -18,46 +18,14 @@ use Spipu\ProcessBundle\Exception\RowReaderException;
 
 abstract class AbstractRowReader implements RowReaderInterface
 {
-    /**
-     * @var array
-     */
-    protected $fields = [];
+    protected Connection $connection;
+    protected ActionList $actionList;
+    protected array $fields = [];
+    protected int $currentReadLine = 0;
+    protected int $currentAcceptedLine = 0;
+    protected array $globalActions = [];
+    protected array $parameters = [];
 
-    /**
-     * @var int
-     */
-    protected $currentReadLine = 0;
-
-    /**
-     * @var int
-     */
-    protected $currentAcceptedLine = 0;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var ActionList
-     */
-    protected $actionList;
-
-    /**
-     * @var array
-     */
-    protected $globalActions;
-
-    /**
-     * @var array
-     */
-    protected $parameters;
-
-    /**
-     * FixedWidth constructor.
-     * @param Connection $connection
-     * @param ActionList $actionList
-     */
     public function __construct(
         Connection $connection,
         ActionList $actionList
@@ -66,9 +34,6 @@ abstract class AbstractRowReader implements RowReaderInterface
         $this->actionList = $actionList;
     }
 
-    /**
-     * @return void
-     */
     public function init(): void
     {
         $this->parameters = [];
@@ -78,12 +43,6 @@ abstract class AbstractRowReader implements RowReaderInterface
         $this->currentAcceptedLine = 0;
     }
 
-    /**
-     * Set the parameters
-     * @param array $parameters
-     * @return void
-     * @throws RowReaderException
-     */
     public function setParameters(array $parameters): void
     {
         $this->validateParameters($parameters);
@@ -105,11 +64,6 @@ abstract class AbstractRowReader implements RowReaderInterface
         return false;
     }
 
-    /**
-     * @param array $definitions
-     * @return void
-     * @throws RowReaderException
-     */
     public function setFields(array $definitions): void
     {
         foreach ($definitions as $code => $definition) {
@@ -117,10 +71,6 @@ abstract class AbstractRowReader implements RowReaderInterface
         }
     }
 
-    /**
-     * @param array $actions
-     * @return void
-     */
     public function setGlobalActions(array $actions): void
     {
         $this->globalActions = $actions;
@@ -128,13 +78,6 @@ abstract class AbstractRowReader implements RowReaderInterface
         $this->prepareActions($this->globalActions);
     }
 
-
-    /**
-     * @param string $code
-     * @param array $definition
-     * @return void
-     * @throws RowReaderException
-     */
     private function addField(string $code, array $definition): void
     {
         if (array_key_exists($code, $this->fields)) {
@@ -159,18 +102,9 @@ abstract class AbstractRowReader implements RowReaderInterface
         $this->fields[$code] = $field;
     }
 
-    /**
-     * Prepare the field definition
-     * @param array $definition
-     * @return array
-     */
     abstract protected function prepareField(array $definition): array;
 
-    /**
-     * @param mixed $actions
-     * @return bool
-     */
-    private function prepareActions(&$actions): bool
+    private function prepareActions(mixed &$actions): bool
     {
         if (
             $actions === false
@@ -257,19 +191,11 @@ abstract class AbstractRowReader implements RowReaderInterface
      */
     abstract public function read($fileHandler): ?array;
 
-    /**
-     * Get the number of read lines
-     * @return int
-     */
     public function getNbReadLines(): int
     {
         return $this->currentReadLine;
     }
 
-    /**
-     * Get the number of accepted lines
-     * @return int
-     */
     public function getNbAcceptedLines(): int
     {
         return $this->currentAcceptedLine;

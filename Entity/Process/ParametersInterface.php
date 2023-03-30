@@ -15,32 +15,11 @@ namespace Spipu\ProcessBundle\Entity\Process;
 
 interface ParametersInterface
 {
-    /**
-     * @param ParametersInterface $parentParameters
-     * @return void
-     */
     public function setParentParameters(ParametersInterface $parentParameters): void;
 
-    /**
-     * Get a value
-     * @param string $code
-     * @return mixed
-     */
-    public function get(string $code);
+    public function get(string $code): mixed;
 
-    /**
-     * Set a value
-     * @param string $code
-     * @param mixed $value
-     * @return void
-     */
-    public function set(string $code, $value): void;
+    public function set(string $code, mixed $value): void;
 
-    /**
-     * Set a default value
-     * @param string $code
-     * @param mixed $value
-     * @return void
-     */
-    public function setDefaultValue(string $code, $value): void;
+    public function setDefaultValue(string $code, mixed $value): void;
 }
