@@ -104,6 +104,9 @@ class TaskController extends AbstractController
         $manager = $gridFactory->create($taskGrid);
         $manager->setRoute('spipu_process_admin_task_list');
         $manager->validate();
+        if ($manager->needRefresh()) {
+            return $this->redirectToRoute('spipu_process_admin_task_list');
+        }
 
         return $this->render('@SpipuProcess/task/index.html.twig', ['manager' => $manager]);
     }
@@ -141,6 +144,9 @@ class TaskController extends AbstractController
         $dataProvider->addCondition('main.task = ' . (int) $resource->getId());
 
         $manager->validate();
+        if ($manager->needRefresh()) {
+            return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
+        }
 
         $processConfig = $configReader->getProcessDefinition($resource->getCode());
         $canKill  = $this->status->canKill($resource->getStatus()) && $this->configuration->hasTaskCanKill();

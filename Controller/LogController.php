@@ -63,6 +63,9 @@ class LogController extends AbstractController
         $manager = $gridFactory->create($logGrid);
         $manager->setRoute('spipu_process_admin_log_list');
         $manager->validate();
+        if ($manager->needRefresh()) {
+            return $this->redirectToRoute('spipu_process_admin_log_list');
+        }
 
         return $this->render('@SpipuProcess/log/index.html.twig', ['manager' => $manager]);
     }
