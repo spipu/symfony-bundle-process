@@ -103,8 +103,7 @@ class TaskController extends AbstractController
 
         $manager = $gridFactory->create($taskGrid);
         $manager->setRoute('spipu_process_admin_task_list');
-        $manager->validate();
-        if ($manager->needRefresh()) {
+        if ($manager->validate()) {
             return $this->redirectToRoute('spipu_process_admin_task_list');
         }
 
@@ -143,8 +142,7 @@ class TaskController extends AbstractController
         $dataProvider = $manager->getDataProvider();
         $dataProvider->addCondition('main.task = ' . (int) $resource->getId());
 
-        $manager->validate();
-        if ($manager->needRefresh()) {
+        if ($manager->validate()) {
             return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
         }
 
