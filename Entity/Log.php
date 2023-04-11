@@ -45,7 +45,7 @@ class Log implements EntityInterface, TimestampableInterface
      * @var string
      * @ORM\Column(type="text")
      */
-    private $content;
+    private $content = '';
 
     /**
      * @var string

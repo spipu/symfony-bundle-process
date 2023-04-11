@@ -1,6 +1,7 @@
 <?php
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use Doctrine\DBAL\Exception AS DbalException;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Spipu\CoreBundle\Tests\SymfonyMock;
@@ -38,6 +39,66 @@ class LoggerTest extends TestCase
 
         $this->expectException(ProcessException::class);
         $logger->debug('test');
+    }
+
+    public function testErrorOnFlush(): void
+    {
+        $expectedException = new DbalException('Fake DBAL Exception');
+
+        $entityManager = SymfonyMock::getEntityManager($this);
+        $entityManager
+            ->method('persist')
+            ->willReturnCallback(
+                function ($model) {
+                    $refObject = new ReflectionObject($model);
+                    $refProperty = $refObject->getProperty('id');
+                    $refProperty->setAccessible(true);
+                    $refProperty->setValue($model, 1);
+                }
+            );
+
+        $entityManager
+            ->method('flush')
+            ->willThrowException($expectedException);
+
+        $logger = new Logger($entityManager, null);
+
+
+        $foundException = null;
+        try {
+            ob_start();
+            $logger->init('test', 1, null);
+        } catch (Throwable $e) {
+            $foundException = $e;
+        } finally {
+            $foundResult = explode("\n", trim(ob_get_clean()));
+        }
+
+        $expectedResult = [
+            'FATAL ERROR DURING ENTITY MANAGER FLUSH!!!',
+            'Log Content',
+            '============================',
+            'Array',
+            '(',
+            '    [0] => Array',
+            '        (',
+            '            [date] => xxxx',
+            '            [memory] => xxxx',
+            '            [memory_peak] => xxxx',
+            '            [level] => info',
+            '            [message] => Process Started [test]',
+            '        )',
+            '',
+            ')',
+            '============================',
+        ];
+        $this->assertSame($expectedException, $foundException);
+        $this->assertSame(count($expectedResult), count($foundResult));
+
+        unset($expectedResult[7], $expectedResult[8], $expectedResult[9]);
+        unset($foundResult[7], $foundResult[8], $foundResult[9]);
+
+        $this->assertSame($expectedResult, $foundResult);
     }
 
     public function testOk(): void
@@ -124,7 +185,6 @@ class LoggerTest extends TestCase
         $this->assertSame(99, $task->getProgress());
     }
 
-
     public function testFinishWithFailed(): void
     {
         $lastException = new ProcessException('My foo exception');
@@ -166,7 +226,6 @@ class LoggerTest extends TestCase
 
     public function testOutput()
     {
-
         $output = SymfonyMock::getConsoleOutput($this);
         $loggerOutput = new LoggerOutput($output);
 
@@ -194,5 +253,38 @@ class LoggerTest extends TestCase
             ],
             $outputMessages
         );
+    }
+
+    public function testInitFromLog()
+    {
+        $logger = static::getService($this);
+
+        $log = new ProcessLog();
+        $logger->initFromExistingLog($log);
+        $this->assertSame([], $logger->getMessages());
+        $this->assertSame($log, $logger->getModel());
+
+        $log = new ProcessLog();
+        $log->setContent(json_encode([]));
+        $logger->initFromExistingLog($log);
+        $this->assertSame([], $logger->getMessages());
+        $this->assertSame($log, $logger->getModel());
+
+        $log = new ProcessLog();
+        $log->setContent(json_encode('string'));
+        $logger->initFromExistingLog($log);
+        $this->assertSame([], $logger->getMessages());
+
+        $log = new ProcessLog();
+        $log->setContent('bad json');
+        $logger->initFromExistingLog($log);
+        $this->assertSame([], $logger->getMessages());
+
+
+        $messages = ['my foo', 'my bar'];
+        $log = new ProcessLog();
+        $log->setContent(json_encode($messages));
+        $logger->initFromExistingLog($log);
+        $this->assertSame($messages, $logger->getMessages());
     }
 }

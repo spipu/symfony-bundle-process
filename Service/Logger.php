@@ -216,11 +216,11 @@ class Logger implements LoggerProcessInterface
         try {
             $this->entityManager->flush();
         } catch (Exception $e) {
-            echo "FATAL ERROR DURING ENTITY MANAGER FLUSH!!!";
-            echo "Log Content";
-            echo "============================";
+            echo "FATAL ERROR DURING ENTITY MANAGER FLUSH!!!\n";
+            echo "Log Content\n";
+            echo "============================\n";
             print_r($this->messages);
-            echo "============================";
+            echo "============================\n";
 
             throw $e;
         }
@@ -386,12 +386,20 @@ class Logger implements LoggerProcessInterface
         $this->nbSteps = 1;
 
         try {
-            $this->messages = json_decode($log->getContent(), true);
+            $this->messages = json_decode($log->getContent(), true, 512,  JSON_THROW_ON_ERROR);
             if (!is_array($this->messages)) {
                 $this->messages = [];
             }
         } catch (Exception $e) {
             $this->messages = [];
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
     }
 }
