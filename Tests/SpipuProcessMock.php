@@ -12,6 +12,7 @@
 namespace Spipu\ProcessBundle\Tests;
 
 use Closure;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Spipu\ConfigurationBundle\Tests\SpipuConfigurationMock;
 use Spipu\CoreBundle\Tests\SymfonyMock;
@@ -22,6 +23,7 @@ use Spipu\ProcessBundle\Exception\CallRestException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Service\MainParameters;
 use Spipu\ProcessBundle\Step\StepInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SpipuProcessMock extends TestCase
 {
@@ -86,7 +88,7 @@ class SpipuProcessMock extends TestCase
 
     /**
      * @param TestCase $testCase
-     * @return \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\DependencyInjection\ContainerInterface
+     * @return MockObject|ContainerInterface
      */
     public static function getContainer(TestCase $testCase)
     {
@@ -165,6 +167,30 @@ class SpipuProcessMock extends TestCase
                     'error' => [
                         'class' => self::ERROR_CLASSNAME,
                         'parameters' => [],
+                        'ignore_in_progress' => false,
+                    ],
+                ],
+            ],
+            'lock' => [
+                'name' => 'Lock',
+                'options' => [
+                    'can_be_put_in_queue' => true,
+                    'can_be_rerun_automatically' => true,
+                    'process_lock_on_failed' => true,
+                    'process_lock' => [
+                        'lock',
+                        'other',
+                    ],
+                    'needed_role' => null,
+                ],
+                'inputs' => [],
+                'parameters' => [],
+                'steps' => [
+                    'count' => [
+                        'class' => self::COUNT_CLASSNAME,
+                        'parameters' => [
+                            'array'  => [1, 2, 3]
+                        ],
                         'ignore_in_progress' => false,
                     ],
                 ],

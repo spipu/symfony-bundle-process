@@ -1,6 +1,9 @@
 <?php
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use DateTime;
+use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Result as DbalResult;
 use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\CoreBundle\Tests\SymfonyMock;
@@ -9,6 +12,7 @@ use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\Logger;
+use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
@@ -20,8 +24,6 @@ class ProcessManagerTest extends TestCase
     {
         $configReader = ConfigReaderTest::getService($testCase);
         $mainParameters = MainParametersTest::getMainParameters($testCase);
-
-        $logger = $testCase->createMock(Logger::class);
 
         $entityManager = SymfonyMock::getEntityManager($testCase);
         $entityManager
@@ -50,7 +52,7 @@ class ProcessManagerTest extends TestCase
         return new ProcessManager(
             $configReader,
             $mainParameters,
-            $logger,
+            LoggerTest::getService($testCase),
             $entityManager,
             $asynchronousCommand,
             InputsFactoryTest::getService($testCase)
@@ -273,7 +275,7 @@ class ProcessManagerTest extends TestCase
 
         $this->expectException(ProcessException::class);
         $this->expectExceptionMessage('This process can not be scheduled, because it can not be put in queue');
-        $manager->scheduleExecution($process, new \DateTime());
+        $manager->scheduleExecution($process, new DateTime());
     }
 
     public function testScheduleExecutionAuthorized()
@@ -283,8 +285,146 @@ class ProcessManagerTest extends TestCase
         $process = $manager->load('other');
         $process->getInputs()->set('generic_exception', true);
 
-        $taskId = $manager->scheduleExecution($process, new \DateTime());
+        $expectedDate = new DateTime();
+        $taskId = $manager->scheduleExecution($process, $expectedDate);
 
         $this->assertSame(1, $taskId);
+        $this->assertSame(1, $process->getTask()->getId());
+        $this->assertSame('created', $process->getTask()->getStatus());
+        $this->assertSame($expectedDate, $process->getTask()->getScheduledAt());
+    }
+
+    public function testProcessLockWithoutTask()
+    {
+        $manager = static::getService($this);
+
+        $refObject = new \ReflectionObject($manager);
+        $refProperty = $refObject->getProperty('entityManager');
+        $refProperty->setAccessible(true);
+        $entityManager = $refProperty->getValue($manager);
+        $connection = $entityManager->getConnection();
+
+        $expectedQuery = "SELECT `id` FROM `spipu_process_task` WHERE `code` IN ('lock','other') AND `status` IN ('created','running','failed') ORDER BY `id` ASC LIMIT 1";
+        $fakeResult = $this->createMock(DbalResult::class);
+        $fakeResult
+            ->expects($this->once())
+            ->method('fetchOne')
+            ->willReturn(1);
+
+        $connection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with($expectedQuery)
+            ->willReturn($fakeResult);
+
+        $process = $manager->load('lock');
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('This process can not be executed, because it is locked by another one');
+        $manager->execute($process);
+    }
+
+    public function testProcessLockWithTask()
+    {
+        $manager = static::getService($this);
+
+        $refObject = new \ReflectionObject($manager);
+        $refProperty = $refObject->getProperty('entityManager');
+        $refProperty->setAccessible(true);
+        $entityManager = $refProperty->getValue($manager);
+        $connection = $entityManager->getConnection();
+
+        $expectedQuery = "SELECT `id` FROM `spipu_process_task` WHERE `code` IN ('lock','other') AND `status` IN ('created','running','failed') AND id < 42 ORDER BY `id` ASC LIMIT 1";
+        $fakeResult = $this->createMock(DbalResult::class);
+        $fakeResult
+            ->expects($this->once())
+            ->method('fetchOne')
+            ->willReturn(1);
+
+        $connection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with($expectedQuery)
+            ->willReturn($fakeResult);
+
+        $task = new Task();
+        $task->setCode('lock');
+        $task->setInputs(json_encode([]));
+        $refObject = new \ReflectionObject($task);
+        $refProperty = $refObject->getProperty('id');
+        $refProperty->setAccessible(true);
+        $refProperty->setValue($task, 42);
+
+        $process = $manager->loadFromTask($task);
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('This process can not be executed, because it is locked by another one');
+        $manager->execute($process);
+    }
+
+    public function testProcessAsynchronousLock()
+    {
+        $manager = static::getService($this);
+
+        $refObject = new \ReflectionObject($manager);
+        $refProperty = $refObject->getProperty('entityManager');
+        $refProperty->setAccessible(true);
+        $entityManager = $refProperty->getValue($manager);
+        $connection = $entityManager->getConnection();
+
+        $expectedQuery = "SELECT `id` FROM `spipu_process_task` WHERE `code` IN ('lock','other') AND `status` IN ('created','running','failed') ORDER BY `id` ASC LIMIT 1";
+        $fakeResult = $this->createMock(DbalResult::class);
+        $fakeResult
+            ->expects($this->once())
+            ->method('fetchOne')
+            ->willReturn(1);
+
+        $connection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with($expectedQuery)
+            ->willReturn($fakeResult);
+
+        $process = $manager->load('lock');
+        $taskId = $manager->executeAsynchronously($process);
+        $this->assertSame(1, $taskId);
+        $this->assertSame(1, $process->getTask()->getId());
+        $this->assertSame('created', $process->getTask()->getStatus());
+        $this->assertNotNull($process->getTask()->getScheduledAt());
+    }
+
+    public function testProcessLockWithoutTaskWithErrorOnQuery()
+    {
+        $manager = static::getService($this);
+
+        $refObject = new \ReflectionObject($manager);
+        $refProperty = $refObject->getProperty('entityManager');
+        $refProperty->setAccessible(true);
+        $entityManager = $refProperty->getValue($manager);
+        $connection = $entityManager->getConnection();
+
+        $connection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->willThrowException(new DbalException('Fake exception'));
+
+        $process = $manager->load('lock');
+        $this->assertSame(3, $manager->execute($process));
+        $this->assertSame(3, $process->getParameters()->get('result.count'));
+    }
+
+    public function testProcessWithOutput()
+    {
+        $output = SymfonyMock::getConsoleOutput($this);
+        $loggerOutput = new LoggerOutput($output);
+
+        $manager = static::getService($this);
+        $manager->setLoggerOutput($loggerOutput);
+
+        $process = $manager->load('lock');
+        $manager->execute($process);
+        $this->assertSame(3, $manager->execute($process));
+        $this->assertSame(3, $process->getParameters()->get('result.count'));
+
+        $consoleOutputResult = SymfonyMock::getConsoleOutputResult();
+        $this->assertSame(16, count($consoleOutputResult));
     }
 }
