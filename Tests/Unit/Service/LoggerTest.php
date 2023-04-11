@@ -2,23 +2,27 @@
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 use Spipu\CoreBundle\Tests\SymfonyMock;
+use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\Logger;
+use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\MailManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
+use Throwable;
 
 class LoggerTest extends TestCase
 {
-    public static function getService(TestCase $testCase, ?MailManager $mailManager = null)
+    public static function getService(TestCase $testCase, ?MailManager $mailManager = null): Logger
     {
         $entityManager = SymfonyMock::getEntityManager($testCase);
         $entityManager
             ->method('persist')
             ->willReturnCallback(
                 function ($model) {
-                    $refObject = new \ReflectionObject($model);
+                    $refObject = new ReflectionObject($model);
                     $refProperty = $refObject->getProperty('id');
                     $refProperty->setAccessible(true);
                     $refProperty->setValue($model, 1);
@@ -28,7 +32,7 @@ class LoggerTest extends TestCase
         return new Logger($entityManager, $mailManager);
     }
 
-    public function testNotInit()
+    public function testNotInit(): void
     {
         $logger = static::getService($this);
 
@@ -36,7 +40,7 @@ class LoggerTest extends TestCase
         $logger->debug('test');
     }
 
-    public function testOk()
+    public function testOk(): void
     {
         $logger = static::getService($this);
 
@@ -79,13 +83,21 @@ class LoggerTest extends TestCase
         $this->assertNull((clone $logger)->getModel());
     }
 
-    public function testProgress()
+    public function testProgress(): void
     {
         $logger = static::getService($this);
 
         $task = SpipuProcessMock::getTaskEntity(42);
         $logger->init('test', 2, $task);
         $this->assertSame($task, $logger->getModel()->getTask());
+
+        $logger->setCurrentStep(0, true);
+        $this->assertSame(0, $logger->getModel()->getProgress());
+        $this->assertSame(0, $task->getProgress());
+
+        $logger->setProgress(50);
+        $this->assertSame(00, $logger->getModel()->getProgress());
+        $this->assertSame(00, $task->getProgress());
 
         $logger->setCurrentStep(0, false);
         $this->assertSame(0, $logger->getModel()->getProgress());
@@ -113,17 +125,27 @@ class LoggerTest extends TestCase
     }
 
 
-    public function testFinishWithFailed()
+    public function testFinishWithFailed(): void
     {
+        $lastException = new ProcessException('My foo exception');
+
         $mailManager = $this->createMock(MailManager::class);
         $mailManager
             ->expects($this->once())
             ->method('sendAlert')
-            ->willThrowException(new ProcessException('mock error'));
+            ->willReturnCallback(
+                function (ProcessLog $processLog, ?Throwable $exception = null) use ($lastException) {
+                    $this->assertInstanceOf(ProcessException::class, $exception);
+                    $this->assertSame($lastException, $exception);
+
+                    throw new ProcessException('mock error');
+                }
+            );
 
         /** @var MailManager $mailManager */
         $logger = static::getService($this, $mailManager);
         $logger->init('test', 1, null);
+        $logger->setLastException($lastException);
         $logger->finish(Status::FAILED);
 
         $model = $logger->getModel();
@@ -140,5 +162,37 @@ class LoggerTest extends TestCase
         $this->assertSame('A technical alert email will been sent', $messages[1]['message']);
         $this->assertSame(' => ERROR when sending the email', $messages[2]['message']);
         $this->assertStringContainsString('mock error', $messages[3]['message']);
+    }
+
+    public function testOutput()
+    {
+
+        $output = SymfonyMock::getConsoleOutput($this);
+        $loggerOutput = new LoggerOutput($output);
+
+        $logger = static::getService($this);
+        $logger->setLoggerOutput($loggerOutput);
+
+        $logger->init('test', 1, null);
+        $logger->debug('test of output');
+        $logger->debug('end of test');
+
+        $outputMessages = [];
+        $outputRegexp = '/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}]\[[ 0-9.]+ Mo]\[[ 0-9.]+ Mo](.*)$/';
+        foreach (SymfonyMock::getConsoleOutputResult() as $outputMessage) {
+            if (preg_match($outputRegexp, $outputMessage, $match)) {
+                $outputMessages[] = $match[1];
+            }
+            $this->assertMatchesRegularExpression($outputRegexp, $outputMessage);
+        }
+
+        $this->assertSame(
+            [
+                "[info___] Process Started [test]",
+                "[debug__] test of output",
+                "[debug__] end of test",
+            ],
+            $outputMessages
+        );
     }
 }
