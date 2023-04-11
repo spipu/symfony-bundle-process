@@ -55,6 +55,13 @@ class OptionsTest extends TestCase
         $this->assertFalse($options->canProcessLockOnFailed());
         $this->assertNull($options->getNeededRole());
 
+        $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => true, 'process_lock_on_failed' => false, 'process_lock' => ['foo', 'bar'], 'needed_role' => '']);
+        $this->assertSame(true, $options->canBePutInQueue());
+        $this->assertSame(true, $options->canBeRerunAutomatically());
+        $this->assertSame(['foo', 'bar'], $options->getProcessLocks());
+        $this->assertFalse($options->canProcessLockOnFailed());
+        $this->assertNull($options->getNeededRole());
+
         $options = self::getOptions($this, ['can_be_put_in_queue' => true, 'can_be_rerun_automatically' => true, 'process_lock_on_failed' => true, 'process_lock' => ['foo', 'bar'], 'needed_role' => 'ROLE_FOO']);
         $this->assertSame(true, $options->canBePutInQueue());
         $this->assertSame(true, $options->canBeRerunAutomatically());

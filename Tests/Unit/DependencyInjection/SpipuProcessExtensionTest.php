@@ -7,7 +7,9 @@ use Spipu\CoreBundle\Service\RoleDefinitionInterface;
 use Spipu\CoreBundle\Tests\SymfonyMock;
 use Spipu\ProcessBundle\DependencyInjection\SpipuProcessConfiguration;
 use Spipu\ProcessBundle\DependencyInjection\SpipuProcessExtension;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
+use Spipu\UiBundle\Form\Options\YesNo;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
@@ -35,7 +37,7 @@ class SpipuProcessExtensionTest extends TestCase
         $this->assertSame([], $builder->getParameter('spipu_process'));
     }
 
-    public function testLoad()
+    public function testLoadOk()
     {
         $configs = [0 => SpipuProcessMock::getConfigurationSampleData()];
         $workflows = SpipuProcessMock::getConfigurationSampleDataBuilt();
@@ -46,6 +48,96 @@ class SpipuProcessExtensionTest extends TestCase
             ->expects($this->once())
             ->method('setParameter')
             ->with('spipu_process', $workflows);
+
+        $extension = new SpipuProcessExtension();
+        $extension->load($configs, $containerBuilder);
+    }
+
+    public function testLoadKoMimeTypeWithoutFile()
+    {
+        $configs = [
+            0 => [
+                'test' => [
+                    'name' => 'Test KO 1',
+                    'options' => [
+                        'can_be_put_in_queue' => false,
+                        'can_be_rerun_automatically' => false,
+                        'process_lock_on_failed' => true,
+                        'process_lock' => [],
+                        'needed_role' => null,
+                    ],
+                    'inputs' => [
+                        'good_input' => ['type' => 'string', 'required' => true],
+                        'bad_input' => ['type' => 'string', 'allowed_mime_types' => ['csv']],
+                    ],
+                    'parameters' => [],
+                    'steps' => [
+                        'first' => [
+                            'class' => SpipuProcessMock::COUNT_CLASSNAME,
+                            'parameters' => [
+                                'string' => '{{ good_input }} first',
+                                'array'  => [1],
+                            ],
+                            'ignore_in_progress' => false,
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+        $containerBuilder = SymfonyMock::getContainerBuilder($this);
+
+        $containerBuilder
+            ->expects($this->never())
+            ->method('setParameter');
+
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('Config Error - allowed_mime_types can be used only with file type');
+
+        $extension = new SpipuProcessExtension();
+        $extension->load($configs, $containerBuilder);
+    }
+
+    public function testLoadKoOptionWithFile()
+    {
+        $configs = [
+            0 => [
+                'test' => [
+                    'name' => 'Test KO 2',
+                    'options' => [
+                        'can_be_put_in_queue' => false,
+                        'can_be_rerun_automatically' => false,
+                        'process_lock_on_failed' => true,
+                        'process_lock' => [],
+                        'needed_role' => null,
+                    ],
+                    'inputs' => [
+                        'good_input' => ['type' => 'string', 'required' => true],
+                        'bad_input' => ['type' => 'file', 'options' => YesNo::class],
+                    ],
+                    'parameters' => [],
+                    'steps' => [
+                        'first' => [
+                            'class' => SpipuProcessMock::COUNT_CLASSNAME,
+                            'parameters' => [
+                                'string' => '{{ good_input }} first',
+                                'array'  => [1],
+                            ],
+                            'ignore_in_progress' => false,
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+        $containerBuilder = SymfonyMock::getContainerBuilder($this);
+
+        $containerBuilder
+            ->expects($this->never())
+            ->method('setParameter');
+
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('Config Error - options can not be used with file type');
 
         $extension = new SpipuProcessExtension();
         $extension->load($configs, $containerBuilder);

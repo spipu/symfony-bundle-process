@@ -50,6 +50,7 @@ class ModuleConfigurationTest extends TestCase
             'process.failed.send_email'            => 0,
             'process.task.automatic_rerun'         => 0,
             'process.task.can_kill'                => 0,
+            'process.task.can_execute'             => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -58,6 +59,7 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
 
         $values = [
             'process.cleanup.finished_logs'        => 1,
@@ -65,6 +67,7 @@ class ModuleConfigurationTest extends TestCase
             'process.failed.send_email'            => 0,
             'process.task.automatic_rerun'         => 0,
             'process.task.can_kill'                => 0,
+            'process.task.can_execute'             => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -73,6 +76,7 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
 
         $values = [
             'process.cleanup.finished_logs'        => 0,
@@ -80,6 +84,7 @@ class ModuleConfigurationTest extends TestCase
             'process.failed.send_email'            => 0,
             'process.task.automatic_rerun'         => 0,
             'process.task.can_kill'                => 0,
+            'process.task.can_execute'             => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -88,6 +93,7 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
 
         $values = [
             'process.cleanup.finished_logs'        => 0,
@@ -95,6 +101,7 @@ class ModuleConfigurationTest extends TestCase
             'process.failed.send_email'            => 1,
             'process.task.automatic_rerun'         => 0,
             'process.task.can_kill'                => 0,
+            'process.task.can_execute'             => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -103,6 +110,7 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(true, $moduleConfiguration->hasFailedSendEmail());
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
 
         $values = [
             'process.cleanup.finished_logs'        => 0,
@@ -110,6 +118,7 @@ class ModuleConfigurationTest extends TestCase
             'process.failed.send_email'            => 0,
             'process.task.automatic_rerun'         => 1,
             'process.task.can_kill'                => 0,
+            'process.task.can_execute'             => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -118,6 +127,7 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
         $this->assertSame(true, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
 
         $values = [
             'process.cleanup.finished_logs'        => 0,
@@ -125,6 +135,7 @@ class ModuleConfigurationTest extends TestCase
             'process.failed.send_email'            => 0,
             'process.task.automatic_rerun'         => 0,
             'process.task.can_kill'                => 1,
+            'process.task.can_execute'             => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -133,6 +144,24 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(true, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+
+        $values = [
+            'process.cleanup.finished_logs'        => 0,
+            'process.cleanup.finished_tasks'       => 0,
+            'process.failed.send_email'            => 0,
+            'process.task.automatic_rerun'         => 0,
+            'process.task.can_kill'                => 0,
+            'process.task.can_execute'             => 1,
+        ];
+        $moduleConfiguration = self::getService($this, $values);
+
+        $this->assertSame(false, $moduleConfiguration->hasCleanupFinishedLogs());
+        $this->assertSame(false, $moduleConfiguration->hasCleanupFinishedTasks());
+        $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
+        $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(true,  $moduleConfiguration->hasTaskCanExecute());
 
         $values = [
             'process.cleanup.finished_logs_after'  => 42,
