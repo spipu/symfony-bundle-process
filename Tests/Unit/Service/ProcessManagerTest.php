@@ -9,12 +9,12 @@ use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\Logger;
-use Spipu\ProcessBundle\Service\Manager;
+use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 use Spipu\ProcessBundle\Tests\Unit\Entity\Process\ProcessTest;
 
-class ManagerTest extends TestCase
+class ProcessManagerTest extends TestCase
 {
     public static function getService(TestCase $testCase, bool $toExecuteAsynchronously = false)
     {
@@ -47,7 +47,7 @@ class ManagerTest extends TestCase
         /** @var Logger $logger */
         /** @var AsynchronousCommand $asynchronousCommand */
 
-        return new Manager(
+        return new ProcessManager(
             $configReader,
             $mainParameters,
             $logger,
