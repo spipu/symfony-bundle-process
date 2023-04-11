@@ -10,11 +10,9 @@ class StatusTest extends TestCase
      * @param TestCase $testCase
      * @return Status
      */
-    static public function getService(TestCase $testCase)
+    static public function getService(TestCase $testCase): Status
     {
-        $service = new Status();
-
-        return $service;
+        return new Status();
     }
 
     public function testService()
