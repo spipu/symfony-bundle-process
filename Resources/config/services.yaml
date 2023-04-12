@@ -49,6 +49,5 @@ services:
         tags: ['spipu.user.role']
 
     Spipu\ProcessBundle\Form\Options\Status:
-        arguments:
-            - '@Spipu\ProcessBundle\Service\Status'
         public: true
+        autowire: true
