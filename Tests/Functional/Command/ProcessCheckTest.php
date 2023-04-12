@@ -12,12 +12,12 @@
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use DateTime;
-use Spipu\CoreBundle\Tests\WebTestCase;
 use Spipu\ProcessBundle\Command\ProcessCheckCommand;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ProcessManager;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
 
-class ProcessCheckTest extends WebTestCase
+class ProcessCheckTest extends AbstractFunctionalTest
 {
     public function testExecuteWithoutStatus()
     {

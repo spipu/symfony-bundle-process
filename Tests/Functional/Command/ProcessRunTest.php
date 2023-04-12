@@ -12,40 +12,13 @@
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
-use Spipu\CoreBundle\Tests\EntityManagerTestCaseTrait;
-use Spipu\CoreBundle\Tests\WebTestCase;
 use Spipu\ProcessBundle\Command\ProcessRunCommand;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
 
-class ProcessRunTest extends WebTestCase
+class ProcessRunTest extends AbstractFunctionalTest
 {
-    use EntityManagerTestCaseTrait;
-
-    protected function resetDatabase(): void
-    {
-        $queries = [
-            'delete from spipu_process_log',
-            'delete from spipu_process_task',
-        ];
-
-        /** @var \PDO $pdo */
-        $pdo = $this->getEntityManager()->getConnection()->getNativeConnection();
-        foreach ($queries as $query) {
-            $statement = $pdo->query($query);
-            if ($statement === false) {
-                throw new \Exception(implode(' - ', $pdo->errorInfo()));
-            }
-            $statement->execute();
-        }
-    }
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->resetDatabase();
-    }
-
     public function testExecuteMissingProcess()
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
