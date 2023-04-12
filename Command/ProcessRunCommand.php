@@ -189,7 +189,7 @@ class ProcessRunCommand extends Command
             if (count($value) !== 2) {
                 throw new InputException('The inputs format is invalid. It must be --inputs key:value');
             }
-            $values[$value[0]] = $value[1];
+            $values[(string) $value[0]] = (string) $value[1];
         }
 
         foreach ($inputObjects as $inputObject) {
@@ -201,7 +201,7 @@ class ProcessRunCommand extends Command
 
     /**
      * @param Input $inputObject
-     * @param array $values
+     * @param string[] $values
      * @param InputInterface $input
      * @param OutputInterface $output
      * @param Process $process
@@ -225,13 +225,10 @@ class ProcessRunCommand extends Command
 
         if (!array_key_exists($key, $values)) {
             $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optional');
-            $value = $this->getSymfonyStyle($input, $output)->ask($title);
-            if ($value === null) {
-                $value = '';
-            }
+            $value = (string) $this->getSymfonyStyle($input, $output)->ask($title, '');
         }
 
-        if ($inputObject->isRequired() || ($value !== null && $value !== '')) {
+        if ($inputObject->isRequired() || ($value !== '')) {
             $value = $this->validateInput($value, $type);
         }
         $process->getInputs()->set($key, $value);
