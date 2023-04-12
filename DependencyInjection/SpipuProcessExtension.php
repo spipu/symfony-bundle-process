@@ -47,6 +47,12 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchyExt
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
 
+        if ($container->hasParameter('kernel.environment')) {
+            if ($container->getParameter('kernel.environment') === 'test') {
+                $loader->load('services_test.yaml');
+            }
+        }
+
         $configuration = $this->getConfiguration($configs, $container);
         $configs = $this->processConfiguration($configuration, $configs);
 

@@ -1,0 +1,4 @@
+services:
+    Spipu\ProcessBundle\Service\ProcessManager:
+        autowire: true
+        public: true
