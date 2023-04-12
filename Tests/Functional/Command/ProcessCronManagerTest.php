@@ -11,7 +11,9 @@
 
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
+use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Command\ProcessCronManagerCommand;
+use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
 use Throwable;
 
@@ -35,5 +37,24 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $this->expectExceptionMessage('The asked action is not allowed');
 
         $commandTester->execute(['cron_action' => 'foo']);
+    }
+
+    public function testExecuteDisable()
+    {
+        $configurationManager = self::getContainer()->get(ConfigurationManager::class);
+        $configurationManager->set('process.task.can_execute', 0);
+        $configurationManager->clearCache();
+
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('Execution is disabled in module configuration');
+
+        try {
+            $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+            $commandTester->execute(['cron_action' => 'foo']);
+        } finally {
+            $configurationManager = self::getContainer()->get(ConfigurationManager::class);
+            $configurationManager->set('process.task.can_execute', 1);
+            $configurationManager->clearCache();
+        }
     }
 }
