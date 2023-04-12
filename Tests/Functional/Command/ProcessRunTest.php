@@ -11,11 +11,11 @@
 
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\CoreBundle\Tests\EntityManagerTestCaseTrait;
 use Spipu\CoreBundle\Tests\WebTestCase;
 use Spipu\ProcessBundle\Command\ProcessRunCommand;
+use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
 
 class ProcessRunTest extends WebTestCase
@@ -169,5 +169,115 @@ class ProcessRunTest extends WebTestCase
         $output = trim($commandTester->getDisplay());
         $this->assertStringContainsString('Execute process: test_simple', $output);
         $this->assertStringContainsString('Hello World Bar from Foo', $output);
+    }
+
+    public function testExecuteWithAllInputsBadArray()
+    {
+        $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
+
+        $this->expectException(InputException::class);
+        $this->expectExceptionMessage('json format must be used for array type');
+
+        $commandTester->execute(
+            [
+                'process' => 'test_input',
+                '--debug' => 1,
+                '--inputs' => [
+                    'firstname:Foo',
+                    'lastname:Bar',
+                    'current_user_name:admin',
+                    'current_user_email:admin@admin.fr',
+                    'test_bool:y',
+                    'test_int:2',
+                    'test_float:3.4',
+                    'test_array:[5,6]',
+                    'test_optional_string:',
+                    'test_option:created',
+                    'test_optional_option:',
+                    'test_multi_option:created,finished',
+                    'test_optional_multi_option:',
+                    'test_file:',
+                ]
+            ]
+        );
+    }
+
+
+    public function testExecuteWithAllInputsBadFile()
+    {
+        $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
+
+        $this->expectException(InputException::class);
+        $this->expectExceptionMessage('This is not a existing or readable file');
+
+        $commandTester->execute(
+            [
+                'process' => 'test_input',
+                '--debug' => 1,
+                '--inputs' => [
+                    'firstname:Foo',
+                    'lastname:Bar',
+                    'current_user_name:admin',
+                    'current_user_email:admin@admin.fr',
+                    'test_bool:y',
+                    'test_int:2',
+                    'test_float:3.4',
+                    'test_array:[5,6]',
+                    'test_optional_string:',
+                    'test_option:created',
+                    'test_optional_option:',
+                    'test_multi_option:' . json_encode(['created','finished']),
+                    'test_optional_multi_option:',
+                    'test_file:bad_file.csv',
+                ]
+            ]
+        );
+    }
+
+    public function testExecuteWithAllInputsOk()
+    {
+        $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
+
+        $commandTester->execute(
+            [
+                'process' => 'test_input',
+                '--debug' => 1,
+                '--inputs' => [
+                    'firstname:Foo',
+                    'lastname:Bar',
+                    'current_user_name:admin',
+                    'current_user_email:admin@admin.fr',
+                    'test_bool:y',
+                    'test_int:2',
+                    'test_float:3.4',
+                    'test_array:[5,6]',
+                    'test_optional_string:',
+                    'test_option:created',
+                    'test_optional_option:',
+                    'test_multi_option:' . json_encode(['created','finished']),
+                    'test_optional_multi_option:',
+                    'test_file:' . __FILE__,
+                ]
+            ]
+        );
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Execute process: test_input', $output);
+        $this->assertStringContainsString('[info___] Process Started [test_input]', $output);
+        $this->assertStringContainsString('[debug__] Input [firstname] (string): Foo', $output);
+        $this->assertStringContainsString('[debug__] Input [lastname] (string): Bar', $output);
+        $this->assertStringContainsString('[debug__] Input [current_user_name] (string): admin', $output);
+        $this->assertStringContainsString('[debug__] Input [current_user_email] (string): admin@admin.fr', $output);
+        $this->assertStringContainsString('[debug__] Input [test_int] (int): 2', $output);
+        $this->assertStringContainsString('[debug__] Input [test_float] (float): 3.4', $output);
+        $this->assertStringContainsString('[debug__] Input [test_bool] (bool): 1', $output);
+        $this->assertStringContainsString('[debug__] Input [test_array] (array): [5,6]', $output);
+        $this->assertStringContainsString('[debug__] Input [test_optional_string] (string): ', $output);
+        $this->assertStringContainsString('[debug__] Input [test_option] (string): created', $output);
+        $this->assertStringContainsString('[debug__] Input [test_optional_option] (string): ', $output);
+        $this->assertStringContainsString('[debug__] Input [test_multi_option] (array): ["created","finished"]', $output);
+        $this->assertStringContainsString('[debug__] Input [test_optional_multi_option] (array): []', $output);
+        $this->assertStringContainsString('[debug__] Input [test_file] (file): ' . __FILE__, $output);
+        $this->assertStringContainsString('Hello World Foo Bar from Foo Bar', $output);
     }
 }

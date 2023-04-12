@@ -259,9 +259,6 @@ class ProcessRunCommand extends Command
     private function validateInput(string $value, string $type)
     {
         switch ($type) {
-            case 'string':
-                return $value;
-
             case 'file':
                 if (!is_file($value) || !is_readable($value)) {
                     throw new InputException('This is not a existing or readable file');
@@ -283,8 +280,10 @@ class ProcessRunCommand extends Command
                     throw new InputException('json format must be used for array type');
                 }
                 return $value;
-        }
 
-        throw new InputException('The type is not authorized');
+            case 'string':
+            default:
+                return $value;
+        }
     }
 }
