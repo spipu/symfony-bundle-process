@@ -138,10 +138,10 @@ class ProcessReRunCommand extends Command
 
         $task = $this->processTaskRepository->find($taskId);
         if (!$task) {
-            throw new Exception('The asked task does not exist');
+            throw new ProcessException('The asked task does not exist');
         }
         if (!$this->processStatus->canRerun($task->getStatus())) {
-            throw new Exception(
+            throw new ProcessException(
                 sprintf(
                     'The asked task [%s] with the status [%s] can not be rerun',
                     $taskId,

@@ -46,7 +46,7 @@ class ProcessRunTest extends WebTestCase
         $this->resetDatabase();
     }
 
-    public function testExecuteUnknownProcess()
+    public function testExecuteMissingProcess()
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
         $foundException = null;

@@ -51,7 +51,6 @@ class ProcessCheckTest extends WebTestCase
 
     public function testExecuteGoodCount()
     {
-        $manager = self::getContainer()->get(ProcessManager::class);
         $commandTester = self::loadCommand(ProcessCheckCommand::class, 'spipu:process:check');
 
         $commandTester->execute(['--direct' => 1]);
@@ -63,6 +62,7 @@ class ProcessCheckTest extends WebTestCase
         $commandTester->execute(['--status' => 'finished', '--direct' => 1]);
         $this->assertSame('0', trim($commandTester->getDisplay()));
 
+        $manager = self::getContainer()->get(ProcessManager::class);
         $process = $manager->load('test_sleep');
         $manager->scheduleExecution($process, new DateTime());
 
