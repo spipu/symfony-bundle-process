@@ -386,7 +386,7 @@ class Logger implements LoggerProcessInterface
         $this->nbSteps = 1;
 
         try {
-            $this->messages = json_decode($log->getContent(), true, 512,  JSON_THROW_ON_ERROR);
+            $this->messages = json_decode($log->getContent(), true, 512, JSON_THROW_ON_ERROR);
             if (!is_array($this->messages)) {
                 $this->messages = [];
             }
