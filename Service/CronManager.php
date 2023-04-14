@@ -163,6 +163,8 @@ class CronManager
      */
     private function rerunWaitingTask(OutputInterface $output, int $taskId): bool
     {
+        $output->writeln(sprintf('Run task #%d', $taskId));
+
         $task = $this->processTaskRepository->find($taskId);
         $this->entityManager->refresh($task);
 
