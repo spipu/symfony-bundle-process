@@ -65,6 +65,20 @@ class ModuleConfiguration
     }
 
     /**
+     * @return int
+     */
+    public function getTaskLimitPerRerun(): int
+    {
+        $value = (int) $this->getConfigurationValue('process.task.limit_per_rerun');
+
+        if ($value < 1) {
+            $value = 1;
+        }
+
+        return $value;
+    }
+
+    /**
      * @return bool
      */
     public function hasFailedSendEmail(): bool

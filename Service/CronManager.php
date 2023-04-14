@@ -131,7 +131,7 @@ class CronManager
         $output->writeln(sprintf('  => %d task(s) found', count($taskIds)));
 
         sort($taskIds);
-        $limitPerRun = 1000;
+        $limitPerRun = $this->processConfiguration->getTaskLimitPerRerun();
         if (count($taskIds) > $limitPerRun) {
             $output->writeln(sprintf('  => Limit to %d tasks', $limitPerRun));
             $taskIds = array_splice($taskIds, 0, $limitPerRun);

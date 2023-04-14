@@ -18,6 +18,7 @@ class ModuleConfigurationTest extends TestCase
         $defaultValues = [
             'process.task.automatic_rerun'         => 1,
             'process.task.can_kill'                => 1,
+            'process.task.limit_per_rerun'         => 1000,
             'process.failed.send_email'            => 1,
             'process.failed.email'                 => 'to@mock.fr',
             $mailSenderConfig                      => 'from@mock.fr',
@@ -190,5 +191,19 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(0, $moduleConfiguration->getCleanupFinishedLogsAfter());
         $this->assertSame(0, $moduleConfiguration->getCleanupFinishedTasksAfter());
         $this->assertSame(0, $moduleConfiguration->getFailedMaxRetry());
+
+
+        $moduleConfiguration = self::getService($this);
+        $this->assertSame(1000, $moduleConfiguration->getTaskLimitPerRerun());
+
+        $moduleConfiguration = self::getService($this, ['process.task.limit_per_rerun' => 50]);
+        $this->assertSame(50, $moduleConfiguration->getTaskLimitPerRerun());
+
+
+        $moduleConfiguration = self::getService($this, ['process.task.limit_per_rerun' => 0]);
+        $this->assertSame(1, $moduleConfiguration->getTaskLimitPerRerun());
+
+        $moduleConfiguration = self::getService($this, ['process.task.limit_per_rerun' => -10]);
+        $this->assertSame(1, $moduleConfiguration->getTaskLimitPerRerun());
     }
 }
