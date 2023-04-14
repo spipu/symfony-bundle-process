@@ -130,6 +130,13 @@ class CronManager
 
         $output->writeln(sprintf('  => %d task(s) found', count($taskIds)));
 
+        sort($taskIds);
+        $limitPerRun = 1000;
+        if (count($taskIds) > $limitPerRun) {
+            $output->writeln(sprintf('  => Limit to %d tasks', $limitPerRun));
+            $taskIds = array_splice($taskIds, 0, $limitPerRun);
+        }
+
         // We are using ids because a task can take some time to execute, we must reload it just before the execution.
         foreach ($taskIds as $taskId) {
             $this->rerunWaitingTask($output, $taskId);
