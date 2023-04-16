@@ -15,6 +15,7 @@ use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Command\ProcessCronManagerCommand;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use Symfony\Component\Console\Command\Command;
 use Throwable;
 
 class ProcessCronManagerTest extends AbstractFunctionalTest
@@ -56,5 +57,52 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
             $configurationManager->set('process.task.can_execute', 1);
             $configurationManager->clearCache();
         }
+    }
+
+    public function testExecuteActionRerun()
+    {
+        $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+
+        $result = $commandTester->execute(['cron_action' => 'rerun']);
+
+        $this->assertSame(Command::SUCCESS, $result);
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Process Cron Manager - Rerun - Begin', $output);
+        $this->assertStringContainsString('Search tasks to execute automatically', $output);
+        $this->assertStringContainsString('=> No task found', $output);
+        $this->assertStringContainsString('Process Cron Manager - Rerun - End', $output);
+    }
+
+    public function testExecuteActionCleanup()
+    {
+        $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+
+        $result = $commandTester->execute(['cron_action' => 'cleanup']);
+
+        $this->assertSame(Command::SUCCESS, $result);
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Process Cron Manager - CleanUp - Begin', $output);
+        $this->assertStringContainsString('Search finished tasks to clean', $output);
+        $this->assertStringContainsString('=> Deleted Tasks: 0', $output);
+        $this->assertStringContainsString('Search finished logs to clean', $output);
+        $this->assertStringContainsString('> Deleted Logs: 0', $output);
+        $this->assertStringContainsString('Process Cron Manager - CleanUp - End', $output);
+    }
+
+    public function testExecuteActionCheckPid()
+    {
+        $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+
+        $result = $commandTester->execute(['cron_action' => 'check-pid']);
+
+        $this->assertSame(Command::SUCCESS, $result);
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Process Cron Manager - Check Running Tasks - Begin', $output);
+        $this->assertStringContainsString('Search running tasks', $output);
+        $this->assertStringContainsString('=> No task found', $output);
+        $this->assertStringContainsString('Process Cron Manager - Check Running Tasks - End', $output);
     }
 }
