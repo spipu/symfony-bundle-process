@@ -24,6 +24,12 @@ class InputsTest extends TestCase
             if (!array_key_exists('required', $config)) {
                 $config['required'] = true;
             }
+            if (!array_key_exists('regexp', $config)) {
+                $config['regexp'] = null;
+            }
+            if (!array_key_exists('help', $config)) {
+                $config['help'] = null;
+            }
         }
 
         $services = [

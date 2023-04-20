@@ -69,7 +69,9 @@ class InputsFactory
             $definition['type'],
             $definition['required'],
             $options,
-            $definition['allowed_mime_types']
+            $definition['allowed_mime_types'],
+            $definition['regexp'],
+            $definition['help']
         );
     }
 }

@@ -98,6 +98,51 @@ class SpipuProcessExtensionTest extends TestCase
         $extension->load($configs, $containerBuilder);
     }
 
+    public function testLoadKoRegexpWithoutString()
+    {
+        $configs = [
+            0 => [
+                'test' => [
+                    'name' => 'Test KO 1',
+                    'options' => [
+                        'can_be_put_in_queue' => false,
+                        'can_be_rerun_automatically' => false,
+                        'process_lock_on_failed' => true,
+                        'process_lock' => [],
+                        'needed_role' => null,
+                    ],
+                    'inputs' => [
+                        'good_input' => ['type' => 'string', 'required' => true],
+                        'bad_input' => ['type' => 'file', 'regexp' => 'foo'],
+                    ],
+                    'parameters' => [],
+                    'steps' => [
+                        'first' => [
+                            'class' => SpipuProcessMock::COUNT_CLASSNAME,
+                            'parameters' => [
+                                'string' => '{{ good_input }} first',
+                                'array'  => [1],
+                            ],
+                            'ignore_in_progress' => false,
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+        $containerBuilder = SymfonyMock::getContainerBuilder($this);
+
+        $containerBuilder
+            ->expects($this->never())
+            ->method('setParameter');
+
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('Config Error - regexp can be used only with string type');
+
+        $extension = new SpipuProcessExtension();
+        $extension->load($configs, $containerBuilder);
+    }
+
     public function testLoadKoOptionWithFile()
     {
         $configs = [

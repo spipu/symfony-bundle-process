@@ -120,12 +120,12 @@ class SpipuProcessMock extends TestCase
                     'needed_role' => null,
                 ],
                 'inputs' => [
-                    'input1' => ['type' => 'string', 'required' => true, 'allowed_mime_types' => []],
-                    'input2' => ['type' => 'int',    'required' => true, 'allowed_mime_types' => []],
-                    'input3' => ['type' => 'float',  'required' => true, 'allowed_mime_types' => []],
-                    'input4' => ['type' => 'bool',   'required' => true, 'allowed_mime_types' => []],
-                    'input5' => ['type' => 'array',  'required' => true, 'allowed_mime_types' => []],
-                    'input6' => ['type' => 'file',   'required' => true, 'allowed_mime_types' => ['csv']],
+                    'input1' => ['type' => 'string', 'required' => true, 'allowed_mime_types' => [], 'regexp' => null, 'help' => null],
+                    'input2' => ['type' => 'int',    'required' => true, 'allowed_mime_types' => [], 'regexp' => null, 'help' => null],
+                    'input3' => ['type' => 'float',  'required' => true, 'allowed_mime_types' => [], 'regexp' => null, 'help' => null],
+                    'input4' => ['type' => 'bool',   'required' => true, 'allowed_mime_types' => [], 'regexp' => null, 'help' => null],
+                    'input5' => ['type' => 'array',  'required' => true, 'allowed_mime_types' => [], 'regexp' => null, 'help' => null],
+                    'input6' => ['type' => 'file',   'required' => true, 'allowed_mime_types' => ['csv'], 'regexp' => null, 'help' => null],
                 ],
                 'parameters' => [
                     'param1' => 'Foo',
@@ -160,7 +160,7 @@ class SpipuProcessMock extends TestCase
                     'needed_role' => null,
                 ],
                 'inputs' => [
-                    'generic_exception' => ['type' => 'bool',   'required' => true, 'allowed_mime_types' => []],
+                    'generic_exception' => ['type' => 'bool',   'required' => true, 'allowed_mime_types' => [], 'regexp' => null, 'help' => null],
                 ],
                 'parameters' => [],
                 'steps' => [
@@ -215,6 +215,12 @@ class SpipuProcessMock extends TestCase
 
                 if (!array_key_exists('required', $input)) {
                     $input['required'] = true;
+                }
+                if (!array_key_exists('regexp', $input)) {
+                    $input['regexp'] = null;
+                }
+                if (!array_key_exists('help', $input)) {
+                    $input['help'] = null;
                 }
             }
 

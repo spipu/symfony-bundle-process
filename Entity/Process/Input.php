@@ -46,6 +46,16 @@ class Input
     private $allowedMimeTypes;
 
     /**
+     * @var string|null
+     */
+    private $regexp;
+
+    /**
+     * @var string|null
+     */
+    private $help;
+
+    /**
      * @var mixed
      */
     private $value;
@@ -57,14 +67,18 @@ class Input
      * @param bool $required
      * @param AbstractOptions|null $options
      * @param array $allowedMimeTypes
+     * @param string|null $regexp
+     * @param string|null $help
      * @throws InputException
      */
     public function __construct(
         string $name,
         string $type,
         bool $required,
-        AbstractOptions $options = null,
-        array $allowedMimeTypes = []
+        ?AbstractOptions $options = null,
+        array $allowedMimeTypes = [],
+        ?string $regexp = null,
+        ?string $help = null
     ) {
         if (!in_array($type, static::AVAILABLE_TYPES)) {
             throw new InputException(
@@ -77,6 +91,8 @@ class Input
         $this->required = $required;
         $this->options = $options;
         $this->allowedMimeTypes = $allowedMimeTypes;
+        $this->regexp = $regexp;
+        $this->help = $help;
     }
 
     /**
@@ -197,5 +213,21 @@ class Input
         }
 
         return true;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRegexp(): ?string
+    {
+        return $this->regexp;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getHelp(): ?string
+    {
+        return $this->help;
     }
 }

@@ -221,6 +221,22 @@ class ProcessForm implements EntityDefinitionInterface
      */
     private function createField(Input $input): Field
     {
+        $field = $this->createFieldBase($input);
+
+        if ($input->getHelp() !== null) {
+            $field->addOption('help', $input->getHelp());
+        }
+
+        return $field;
+    }
+
+    /**
+     * @param Input $input
+     * @return Field
+     * @throws FormException
+     */
+    private function createFieldBase(Input $input): Field
+    {
         if ($input->getOptions()) {
             return $this->createFieldWithOption($input);
         }

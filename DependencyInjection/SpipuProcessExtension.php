@@ -103,6 +103,10 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchyExt
         if (!empty($input['options']) && $input['type'] === 'file') {
             throw new ProcessException('Config Error - options can not be used with file type');
         }
+
+        if (!empty($input['regexp']) && $input['type'] !== 'string') {
+            throw new ProcessException('Config Error - regexp can be used only with string type');
+        }
     }
 
     /**
