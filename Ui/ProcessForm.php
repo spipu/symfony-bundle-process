@@ -37,6 +37,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Process Input Form
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PMD.ExcessiveClassComplexity)
  */
 class ProcessForm implements EntityDefinitionInterface
 {
@@ -272,7 +273,7 @@ class ProcessForm implements EntityDefinitionInterface
      */
     private function createFieldWithoutOption(Input $input): Field
     {
-        switch ($input->getType()) {
+        switch ($input->getRealType()) {
             case 'int':
                 return $this->createFieldInt($input);
 
@@ -288,6 +289,12 @@ class ProcessForm implements EntityDefinitionInterface
             case 'file':
                 return $this->createFieldFile($input);
 
+            case 'datetime':
+                return $this->createFieldDateTime($input);
+
+            case 'date':
+                return $this->createFieldDate($input);
+
             case 'string':
                 return $this->createFieldString($input);
         }
@@ -295,7 +302,7 @@ class ProcessForm implements EntityDefinitionInterface
         throw new FormException(
             sprintf(
                 'Unknown input type [%s] for field [%s]',
-                $input->getType(),
+                $input->getRealType(),
                 $input->getName()
             )
         );
@@ -366,6 +373,39 @@ class ProcessForm implements EntityDefinitionInterface
      * @return Field
      * @throws FormException
      */
+    private function createFieldDateTime(Input $input): Field
+    {
+        $input = $this->createFieldInput($input, Type\DateTimeType::class);
+        $input
+            ->addOption('widget', 'single_text')
+            ->addOption('input', 'string')
+            ->addOption('with_seconds', true)
+        ;
+
+        return $input;
+    }
+
+    /**
+     * @param Input $input
+     * @return Field
+     * @throws FormException
+     */
+    private function createFieldDate(Input $input): Field
+    {
+        $input = $this->createFieldInput($input, Type\DateType::class);
+        $input
+            ->addOption('widget', 'single_text')
+            ->addOption('input', 'string')
+        ;
+
+        return $input;
+    }
+
+    /**
+     * @param Input $input
+     * @return Field
+     * @throws FormException
+     */
     private function createFieldString(Input $input): Field
     {
         $field = $this->createFieldInput($input, Type\TextType::class);
@@ -385,7 +425,6 @@ class ProcessForm implements EntityDefinitionInterface
 
         return $field;
     }
-
 
     /**
      * @param Input $input

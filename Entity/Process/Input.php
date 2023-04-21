@@ -18,7 +18,7 @@ use Spipu\UiBundle\Form\Options\AbstractOptions;
 
 class Input
 {
-    public const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file'];
+    public const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file', 'date', 'datetime' ];
 
     /**
      * @var string
@@ -26,9 +26,14 @@ class Input
     private $name;
 
     /**
-     * @var array
+     * @var string
      */
     private $type;
+
+    /**
+     * @var string
+     */
+    private $realType;
 
     /**
      * @var bool
@@ -87,12 +92,53 @@ class Input
         }
 
         $this->name = $name;
-        $this->type = $type;
+
+        $this->saveProperties($type, $required, $options, $allowedMimeTypes, $regexp, $help);
+    }
+
+    /**
+     * @param string $type
+     * @param bool $required
+     * @param AbstractOptions|null $options
+     * @param array $allowedMimeTypes
+     * @param string|null $regexp
+     * @param string|null $help
+     * @return void
+     */
+    private function saveProperties(
+        string $type,
+        bool $required,
+        ?AbstractOptions $options,
+        array $allowedMimeTypes,
+        ?string $regexp,
+        ?string $help
+    ): void {
+        $this->realType = $type;
         $this->required = $required;
-        $this->options = $options;
-        $this->allowedMimeTypes = $allowedMimeTypes;
-        $this->regexp = $regexp;
         $this->help = $help;
+
+        switch ($type) {
+            case 'date':
+                $this->type = 'string';
+                $this->regexp = '/^\d{4}-\d{2}-\d{2}$/';
+                $this->options = null;
+                $this->allowedMimeTypes = [];
+                break;
+
+            case 'datetime':
+                $this->type = 'string';
+                $this->regexp = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/';
+                $this->options = null;
+                $this->allowedMimeTypes = [];
+                break;
+
+            default:
+                $this->type = $type;
+                $this->regexp = $regexp;
+                $this->options = $options;
+                $this->allowedMimeTypes = $allowedMimeTypes;
+                break;
+        }
     }
 
     /**
@@ -109,6 +155,14 @@ class Input
     public function getType(): string
     {
         return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRealType(): string
+    {
+        return $this->realType;
     }
 
     /**
