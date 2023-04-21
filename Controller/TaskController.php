@@ -463,11 +463,15 @@ class TaskController extends AbstractController
     /**
      * @param Process $process
      * @param Input $input
-     * @param UploadedFile $file
-     * @return string
+     * @param UploadedFile|null $file
+     * @return string|null
      */
-    private function manageInputFile(Process $process, Input $input, UploadedFile $file): string
+    private function manageInputFile(Process $process, Input $input, ?UploadedFile $file): ?string
     {
+        if ($file === null) {
+            return null;
+        }
+
         $processCode = str_replace(['\\', '/', '.'], '', mb_strtolower($process->getCode()));
         $inputCode = str_replace(['\\', '/', '.'], '', mb_strtolower($input->getName()));
 

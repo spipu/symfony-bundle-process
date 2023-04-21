@@ -154,18 +154,9 @@ class Input
             return;
         }
 
-        if (!call_user_func('is_' . $this->type, $value)) {
-            throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
-        }
-
-        if ($this->options !== null) {
-            $list = is_array($value) ? $value : [$value];
-            foreach ($list as $key) {
-                if (!$this->options->hasKey($key)) {
-                    throw new InputException(sprintf('[%s] This value is not authorized', $this->name));
-                }
-            }
-        }
+        $this->validateValueType($value);
+        $this->validateValueOptions($value);
+        $this->validateValueRegexp($value);
 
         $this->value = $value;
     }
@@ -229,5 +220,46 @@ class Input
     public function getHelp(): ?string
     {
         return $this->help;
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     * @throws InputException
+     */
+    private function validateValueType($value): void
+    {
+        if (!call_user_func('is_' . $this->type, $value)) {
+            throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     * @throws InputException
+     */
+    private function validateValueOptions($value): void
+    {
+        if ($this->options !== null) {
+            $list = is_array($value) ? $value : [$value];
+            foreach ($list as $key) {
+                if (!$this->options->hasKey($key)) {
+                    throw new InputException(sprintf('[%s] This value is not authorized', $this->name));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     * @throws InputException
+     */
+    private function validateValueRegexp($value): void
+    {
+        if ($this->regexp !== null && is_string($value) && !preg_match($this->regexp, $value)) {
+            throw new InputException(sprintf('[%s] This value is not validated by the regexp', $this->name));
+        }
     }
 }

@@ -31,6 +31,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Json;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -375,6 +376,11 @@ class ProcessForm implements EntityDefinitionInterface
 
         if ($input->getName() === 'current_user_email' && $this->currentUserEmail !== null) {
             $field->setValue($this->currentUserEmail);
+        }
+
+        if ($input->getRegexp()) {
+            $field->addOption('constraints', [new Regex($input->getRegexp())]);
+            $field->addOption('help', 'Regexp constraint: ' . $input->getRegexp());
         }
 
         return $field;

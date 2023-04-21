@@ -224,7 +224,14 @@ class ProcessRunCommand extends Command
         }
 
         if (!array_key_exists($key, $values)) {
-            $title = "$key ($type) " . ($inputObject->isRequired() ? 'required' : 'optional');
+            $typeTitle = $type;
+            if ($inputObject->getRegexp()) {
+                $typeTitle .= ' - ' . $inputObject->getRegexp();
+            }
+            $title = "$key ($typeTitle) " . ($inputObject->isRequired() ? 'required' : 'optional');
+            if ($inputObject->getHelp()) {
+                $title .= ' (' . $inputObject->getHelp() . ')';
+            }
             $value = (string) $this->getSymfonyStyle($input, $output)->ask($title, '');
         }
 
