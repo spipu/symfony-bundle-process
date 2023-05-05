@@ -187,32 +187,19 @@ class Input
         return $this->regexp;
     }
 
-    /**
-     * @return string|null
-     */
     public function getHelp(): ?string
     {
         return $this->help;
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    private function validateValueType($value): void
+    private function validateValueType(mixed $value): void
     {
         if (!call_user_func('is_' . $this->type, $value)) {
             throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
         }
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    private function validateValueOptions($value): void
+    private function validateValueOptions(mixed $value): void
     {
         if ($this->options !== null) {
             $list = is_array($value) ? $value : [$value];
@@ -224,12 +211,7 @@ class Input
         }
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    private function validateValueRegexp($value): void
+    private function validateValueRegexp(mixed $value): void
     {
         if ($this->regexp !== null && is_string($value) && !preg_match($this->regexp, $value)) {
             throw new InputException(sprintf('[%s] This value is not validated by the regexp', $this->name));
