@@ -17,7 +17,7 @@ use Exception;
 use Spipu\CoreBundle\DependencyInjection\RolesHierarchyExtensionExtensionInterface;
 use Spipu\CoreBundle\Service\RoleDefinitionInterface;
 use Spipu\ProcessBundle\Exception\ProcessException;
-use Spipu\ProcessBundle\Service\ProcessManager;
+use Spipu\ProcessBundle\Service\ReportManager;
 use Spipu\ProcessBundle\Service\RoleDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -79,8 +79,12 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchyExt
         $process['code'] = $processCode;
 
         if ($process['options']['automatic_report']) {
+            if (!$process['options']['can_be_put_in_queue']) {
+                throw new ProcessException('Option Error - automatic_report can be used only with can_be_put_in_queue');
+            }
+
             $process['inputs'] = [
-                    ProcessManager::AUTOMATIC_REPORT_EMAIL_FIELD => [
+                    ReportManager::AUTOMATIC_REPORT_EMAIL_FIELD => [
                         'type' => 'string',
                         'required' => true,
                         'allowed_mime_types' => [],

@@ -19,7 +19,7 @@ use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\ProcessBundle\Service\InputsFactory;
-use Spipu\ProcessBundle\Service\ProcessManager;
+use Spipu\ProcessBundle\Service\ReportManager;
 use Spipu\UiBundle\Entity\EntityInterface;
 use Spipu\UiBundle\Entity\Form\Field;
 use Spipu\UiBundle\Entity\Form\FieldSet;
@@ -43,49 +43,49 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProcessForm implements EntityDefinitionInterface
 {
     /**
-     * @var Form
-     */
-    private $definition;
-
-    /**
      * @var ConfigReader
      */
-    private $configReader;
+    private ConfigReader $configReader;
 
     /**
      * @var InputsFactory
      */
-    private $inputsFactory;
+    private InputsFactory $inputsFactory;
 
     /**
      * @var YesNo
      */
-    private $yesNoOptions;
+    private YesNo $yesNoOptions;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    private TranslatorInterface $translator;
+
+    /**
+     * @var Form|null
+     */
+    private ?Form $definition = null;
 
     /**
      * @var string
      */
-    private $processCode;
+    private string $processCode = '';
 
     /**
      * @var string|null
      */
-    private $currentUserName = null;
+    private ?string $currentUserName = null;
 
     /**
      * @var string|null
      */
-    private $currentUserEmail = null;
+    private ?string $currentUserEmail = null;
 
     /**
      * @var DateTimeInterface|null;
      */
-    private $scheduledAt = null;
+    private ?DateTimeInterface $scheduledAt = null;
 
     /**
      * ConfigurationForm constructor.
@@ -146,7 +146,7 @@ class ProcessForm implements EntityDefinitionInterface
      */
     public function getDefinition(): Form
     {
-        if (!$this->definition) {
+        if ($this->definition === null) {
             $this->prepareForm();
         }
 
@@ -415,7 +415,7 @@ class ProcessForm implements EntityDefinitionInterface
             $field->setValue($this->currentUserName);
         }
 
-        $emailFields = [ProcessManager::AUTOMATIC_REPORT_EMAIL_FIELD, 'current_user_email'];
+        $emailFields = [ReportManager::AUTOMATIC_REPORT_EMAIL_FIELD, 'current_user_email'];
         if (in_array($input->getName(), $emailFields) && $this->currentUserEmail !== null) {
             $field->setValue($this->currentUserEmail);
         }

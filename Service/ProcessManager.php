@@ -24,7 +24,6 @@ use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\OptionException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Exception\ProcessException;
-use Spipu\ProcessBundle\Step\StepReportInterface;
 use Throwable;
 
 /**
@@ -34,8 +33,6 @@ use Throwable;
  */
 class ProcessManager
 {
-    public const AUTOMATIC_REPORT_EMAIL_FIELD = 'automatic_report_email';
-
     /**
      * @var ConfigReader
      */
@@ -67,6 +64,11 @@ class ProcessManager
     private InputsFactory $inputsFactory;
 
     /**
+     * @var ReportManager
+     */
+    private ReportManager $reportManager;
+
+    /**
      * @var LoggerOutputInterface|null
      */
     private ?LoggerOutputInterface $loggerOutput = null;
@@ -79,6 +81,7 @@ class ProcessManager
      * @param EntityManagerInterface $entityManager
      * @param AsynchronousCommand $asynchronousCommand
      * @param InputsFactory $inputsFactory
+     * @param ReportManager $reportManager
      */
     public function __construct(
         ConfigReader $configReader,
@@ -86,7 +89,8 @@ class ProcessManager
         LoggerProcessInterface $logger,
         EntityManagerInterface $entityManager,
         AsynchronousCommand $asynchronousCommand,
-        InputsFactory $inputsFactory
+        InputsFactory $inputsFactory,
+        ReportManager $reportManager
     ) {
         $this->configReader = $configReader;
         $this->mainParameters = $mainParameters;
@@ -94,6 +98,7 @@ class ProcessManager
         $this->entityManager = $entityManager;
         $this->asynchronousCommand = $asynchronousCommand;
         $this->inputsFactory = $inputsFactory;
+        $this->reportManager = $reportManager;
     }
 
     /**
@@ -506,28 +511,6 @@ class ProcessManager
     /**
      * @param Process\Process $process
      * @param LoggerProcessInterface $logger
-     * @return void
-     * @throws InputException
-     */
-    private function executePrepareReport(Process\Process $process, LoggerProcessInterface $logger): void
-    {
-        if (!$process->getOptions()->hasAutomaticReport()) {
-            return;
-        }
-
-        $email = $process->getInputs()->get(self::AUTOMATIC_REPORT_EMAIL_FIELD);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new InputException('The automatic report email is invalid: ' . $email);
-        }
-
-        $report = new Process\Report($process->getInputs()->get(self::AUTOMATIC_REPORT_EMAIL_FIELD));
-        $process->setReport($report);
-        $logger->debug(sprintf('Automatic report will be sent to [%s]', $email));
-    }
-
-    /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
      * @return mixed|null
      * @throws StepException
      */
@@ -542,26 +525,19 @@ class ProcessManager
             $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
-
             $stepProcessor = $step->getProcessor();
 
-            if ($process->getReport()) {
-                $process->getReport()->addMessage('Step [' . $step->getCode() . ']');
-                if ($stepProcessor instanceof StepReportInterface) {
-                    $stepProcessor->setReport($process->getReport());
-                }
-            }
+            $message = 'Step [' . $step->getCode() . ']';
+            $this->reportManager->addProcessReportWarning($process, $message);
+            $this->reportManager->addReportToStep($stepProcessor, $process->getReport());
 
             $startTime = microtime(true);
             $result = $stepProcessor->execute($step->getParameters(), $logger);
             $deltaTime = microtime(true) - $startTime;
 
-            if ($process->getReport()) {
-                $process->getReport()->addMessage('Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms');
-                if ($stepProcessor instanceof StepReportInterface) {
-                    $stepProcessor->setReport(null);
-                }
-            }
+            $message = 'Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms';
+            $this->reportManager->addProcessReportMessage($process, $message);
+            $this->reportManager->addReportToStep($stepProcessor, null);
 
             $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
             $process->getParameters()->set('result.' . $step->getCode(), $result);
@@ -610,8 +586,9 @@ class ProcessManager
     {
         $this->executePrepareOptions($process, $logger);
         $this->executePrepareInputs($process, $logger);
-        $this->executePrepareReport($process, $logger);
         $this->executeUpdateTask($process, Status::RUNNING);
+
+        $this->reportManager->prepareReport($process, $logger);
 
         $result = $this->executeSteps($process, $logger);
 
@@ -622,10 +599,8 @@ class ProcessManager
 
         $this->executeUpdateTask($process, Status::FINISHED);
 
-        if ($process->getReport()) {
-            $process->getReport()->addMessage($message);
-            $this->sendReport($process);
-        }
+        $this->reportManager->addProcessReportWarning($process, $message);
+        $this->reportManager->sendReport($process);
 
         return $result;
     }
@@ -656,17 +631,8 @@ class ProcessManager
 
         $this->executeUpdateTask($process, Status::FAILED, $exception->getMessage(), $rerun);
 
-        if ($process->getReport()) {
-            $process->getReport()->addError($exception->getMessage());
-            $this->sendReport($process);
-        }
-    }
-
-    /**
-     * @param Process\Process $process
-     * @return void
-     */
-    private function sendReport(Process\Process $process): void
-    {
+        $this->reportManager->addProcessReportError($process, 'ERROR DURING TASK EXECUTION');
+        $this->reportManager->addProcessReportError($process, $exception->getMessage());
+        $this->reportManager->sendReport($process);
     }
 }
