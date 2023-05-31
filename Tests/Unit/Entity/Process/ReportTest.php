@@ -10,9 +10,11 @@ class ReportTest extends TestCase
     {
         $report = new Report('foo@bar.fr');
         $this->assertSame('foo@bar.fr', $report->getEmail());
+        $this->assertSame(0, $report->getNbSteps());
         $this->assertSame([], $this->convertReportToArray($report));
 
         $report->addMessage('foo message');
+        $this->assertSame(1, $report->getNbSteps());
         $this->assertSame(
             [
                 ['level' => 'message', 'message' => 'foo message', 'link' => null,],
@@ -21,6 +23,7 @@ class ReportTest extends TestCase
         );
 
         $report->addWarning('foo warning');
+        $this->assertSame(2, $report->getNbSteps());
         $this->assertSame(
             [
                 ['level' => 'message', 'message' => 'foo message', 'link' => null,],
@@ -30,6 +33,7 @@ class ReportTest extends TestCase
         );
 
         $report->addError('foo error');
+        $this->assertSame(3, $report->getNbSteps());
         $this->assertSame(
             [
                 ['level' => 'message', 'message' => 'foo message', 'link' => null,],
@@ -40,6 +44,7 @@ class ReportTest extends TestCase
         );
 
         $report->addMessage('bar message');
+        $this->assertSame(4, $report->getNbSteps());
         $this->assertSame(
             [
                 ['level' => 'message', 'message' => 'foo message', 'link' => null,],

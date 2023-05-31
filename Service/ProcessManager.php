@@ -39,37 +39,37 @@ class ProcessManager
     /**
      * @var ConfigReader
      */
-    private $configReader;
+    private ConfigReader $configReader;
 
     /**
      * @var MainParameters
      */
-    private $mainParameters;
+    private MainParameters $mainParameters;
 
     /**
      * @var LoggerProcessInterface
      */
-    private $logger;
+    private LoggerProcessInterface $logger;
 
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /**
      * @var AsynchronousCommand
      */
-    private $asynchronousCommand;
+    private AsynchronousCommand $asynchronousCommand;
 
     /**
      * @var InputsFactory
      */
-    private $inputsFactory;
+    private InputsFactory $inputsFactory;
 
     /**
      * @var LoggerOutputInterface|null
      */
-    private $loggerOutput;
+    private ?LoggerOutputInterface $loggerOutput = null;
 
     /**
      * Manager constructor.
@@ -298,48 +298,26 @@ class ProcessManager
         }
 
         try {
-            $this->executePrepareOptions($process, $logger);
-            $this->executePrepareInputs($process, $logger);
-            $this->executePrepareReport($process, $logger);
-            $this->executeUpdateTask($process, Status::RUNNING);
-
-            $result = $this->executeSteps($process, $logger);
-
-            $logger->info(sprintf('Process Finished [%s]', $process->getCode()));
-            $logger->finish(Status::FINISHED);
-
-            $this->executeUpdateTask($process, Status::FINISHED);
+            return $this->manageExecute($process, $logger);
         } catch (StepException $e) {
-            $rerun = ($e->canBeRerunAutomatically() && $process->getOptions()->canBeRerunAutomatically());
-
-            $logger->critical((string) $e);
-            $logger->warning(
-                sprintf(
-                    'Can we rerun the process automatically after this error: [%s]',
-                    ($rerun ? 'Yes' : 'No')
-                )
+            $this->manageExecuteError(
+                $process,
+                $logger,
+                $e,
+                ($e->canBeRerunAutomatically() && $process->getOptions()->canBeRerunAutomatically())
             );
-            $logger->setLastException($e);
-            $logger->finish(Status::FAILED);
 
-            $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), $rerun);
             throw $e;
         } catch (Exception $e) {
-            $logger->critical((string) $e);
-            $logger->warning(
-                sprintf(
-                    'Can we rerun the process automatically after this error: [%s]',
-                    'No'
-                )
+            $this->manageExecuteError(
+                $process,
+                $logger,
+                $e,
+                false
             );
-            $logger->setLastException($e);
-            $logger->finish(Status::FAILED);
 
-            $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), false);
             throw $e;
         }
-
-        return $result;
     }
 
     /**
@@ -619,5 +597,76 @@ class ProcessManager
             $this->entityManager->persist($task);
             $this->entityManager->flush();
         }
+    }
+
+    /**
+     * @param Process\Process $process
+     * @param LoggerProcessInterface $logger
+     * @return mixed
+     * @throws InputException
+     * @throws StepException
+     */
+    public function manageExecute(Process\Process $process, LoggerProcessInterface $logger)
+    {
+        $this->executePrepareOptions($process, $logger);
+        $this->executePrepareInputs($process, $logger);
+        $this->executePrepareReport($process, $logger);
+        $this->executeUpdateTask($process, Status::RUNNING);
+
+        $result = $this->executeSteps($process, $logger);
+
+        $message = sprintf('Process Finished [%s]', $process->getCode());
+
+        $logger->info($message);
+        $logger->finish(Status::FINISHED);
+
+        $this->executeUpdateTask($process, Status::FINISHED);
+
+        if ($process->getReport()) {
+            $process->getReport()->addMessage($message);
+            $this->sendReport($process);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Process\Process $process
+     * @param LoggerProcessInterface $logger
+     * @param Throwable $exception
+     * @param bool $rerun
+     * @return void
+     */
+    public function manageExecuteError(
+        Process\Process $process,
+        LoggerProcessInterface $logger,
+        Throwable $exception,
+        bool $rerun
+    ): void {
+        $logger->critical((string) $exception);
+
+        $logger->warning(
+            sprintf(
+                'Can we rerun the process automatically after this error: [%s]',
+                ($rerun ? 'Yes' : 'No')
+            )
+        );
+        $logger->setLastException($exception);
+        $logger->finish(Status::FAILED);
+
+        $this->executeUpdateTask($process, Status::FAILED, $exception->getMessage(), $rerun);
+
+        if ($process->getReport()) {
+            $process->getReport()->addError($exception->getMessage());
+            $this->sendReport($process);
+        }
+    }
+
+    /**
+     * @param Process\Process $process
+     * @return void
+     */
+    private function sendReport(Process\Process $process): void
+    {
     }
 }
