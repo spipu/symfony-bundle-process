@@ -24,7 +24,7 @@ class InputsFactory
     /**
      * @var ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * InputsFactory constructor.

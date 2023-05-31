@@ -44,6 +44,7 @@ class Options
             'can_be_put_in_queue',
             'can_be_rerun_automatically',
             'process_lock_on_failed',
+            'automatic_report',
         ];
         foreach ($booleanKeys as $booleanKey) {
             $this->options[$booleanKey] = (bool) ($this->options[$booleanKey]);
@@ -119,5 +120,15 @@ class Options
     public function getNeededRole(): ?string
     {
         return $this->options['needed_role'];
+    }
+
+    /**
+     * Do we have automatic report
+     *
+     * @return bool
+     */
+    public function hasAutomaticReport(): bool
+    {
+        return (bool) $this->options['automatic_report'];
     }
 }

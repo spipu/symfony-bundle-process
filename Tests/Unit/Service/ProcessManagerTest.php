@@ -14,6 +14,7 @@ use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\Logger;
 use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ProcessManager;
+use Spipu\ProcessBundle\Service\ReportManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 use Spipu\ProcessBundle\Tests\Unit\Entity\Process\ProcessTest;
@@ -46,8 +47,11 @@ class ProcessManagerTest extends TestCase
                 ->willReturn(true);
         }
 
+        $reportManager = $testCase->createMock(ReportManager::class);
+
         /** @var Logger $logger */
         /** @var AsynchronousCommand $asynchronousCommand */
+        /** @var ReportManager $reportManager */
 
         return new ProcessManager(
             $configReader,
@@ -55,7 +59,8 @@ class ProcessManagerTest extends TestCase
             LoggerTest::getService($testCase),
             $entityManager,
             $asynchronousCommand,
-            InputsFactoryTest::getService($testCase)
+            InputsFactoryTest::getService($testCase),
+            $reportManager
         );
     }
 
@@ -425,6 +430,6 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(3, $process->getParameters()->get('result.count'));
 
         $consoleOutputResult = SymfonyMock::getConsoleOutputResult();
-        $this->assertSame(16, count($consoleOutputResult));
+        $this->assertSame(18, count($consoleOutputResult));
     }
 }

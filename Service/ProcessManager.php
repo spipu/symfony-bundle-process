@@ -36,37 +36,42 @@ class ProcessManager
     /**
      * @var ConfigReader
      */
-    private $configReader;
+    private ConfigReader $configReader;
 
     /**
      * @var MainParameters
      */
-    private $mainParameters;
+    private MainParameters $mainParameters;
 
     /**
      * @var LoggerProcessInterface
      */
-    private $logger;
+    private LoggerProcessInterface $logger;
 
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /**
      * @var AsynchronousCommand
      */
-    private $asynchronousCommand;
+    private AsynchronousCommand $asynchronousCommand;
 
     /**
      * @var InputsFactory
      */
-    private $inputsFactory;
+    private InputsFactory $inputsFactory;
+
+    /**
+     * @var ReportManager
+     */
+    private ReportManager $reportManager;
 
     /**
      * @var LoggerOutputInterface|null
      */
-    private $loggerOutput;
+    private ?LoggerOutputInterface $loggerOutput = null;
 
     /**
      * Manager constructor.
@@ -76,6 +81,7 @@ class ProcessManager
      * @param EntityManagerInterface $entityManager
      * @param AsynchronousCommand $asynchronousCommand
      * @param InputsFactory $inputsFactory
+     * @param ReportManager $reportManager
      */
     public function __construct(
         ConfigReader $configReader,
@@ -83,7 +89,8 @@ class ProcessManager
         LoggerProcessInterface $logger,
         EntityManagerInterface $entityManager,
         AsynchronousCommand $asynchronousCommand,
-        InputsFactory $inputsFactory
+        InputsFactory $inputsFactory,
+        ReportManager $reportManager
     ) {
         $this->configReader = $configReader;
         $this->mainParameters = $mainParameters;
@@ -91,6 +98,7 @@ class ProcessManager
         $this->entityManager = $entityManager;
         $this->asynchronousCommand = $asynchronousCommand;
         $this->inputsFactory = $inputsFactory;
+        $this->reportManager = $reportManager;
     }
 
     /**
@@ -295,47 +303,26 @@ class ProcessManager
         }
 
         try {
-            $this->executePrepareOptions($process, $logger);
-            $this->executePrepareInputs($process, $logger);
-            $this->executeUpdateTask($process, Status::RUNNING);
-
-            $result = $this->executeSteps($process, $logger);
-
-            $logger->info(sprintf('Process Finished [%s]', $process->getCode()));
-            $logger->finish(Status::FINISHED);
-
-            $this->executeUpdateTask($process, Status::FINISHED);
+            return $this->manageExecute($process, $logger);
         } catch (StepException $e) {
-            $rerun = ($e->canBeRerunAutomatically() && $process->getOptions()->canBeRerunAutomatically());
-
-            $logger->critical((string) $e);
-            $logger->warning(
-                sprintf(
-                    'Can we rerun the process automatically after this error: [%s]',
-                    ($rerun ? 'Yes' : 'No')
-                )
+            $this->manageExecuteError(
+                $process,
+                $logger,
+                $e,
+                ($e->canBeRerunAutomatically() && $process->getOptions()->canBeRerunAutomatically())
             );
-            $logger->setLastException($e);
-            $logger->finish(Status::FAILED);
 
-            $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), $rerun);
             throw $e;
         } catch (Exception $e) {
-            $logger->critical((string) $e);
-            $logger->warning(
-                sprintf(
-                    'Can we rerun the process automatically after this error: [%s]',
-                    'No'
-                )
+            $this->manageExecuteError(
+                $process,
+                $logger,
+                $e,
+                false
             );
-            $logger->setLastException($e);
-            $logger->finish(Status::FAILED);
 
-            $this->executeUpdateTask($process, Status::FAILED, $e->getMessage(), false);
             throw $e;
         }
-
-        return $result;
     }
 
     /**
@@ -538,11 +525,21 @@ class ProcessManager
             $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
+            $stepProcessor = $step->getProcessor();
+
+            $message = 'Step [' . $step->getCode() . ']';
+            $this->reportManager->addProcessReportWarning($process, $message);
+            $this->reportManager->addReportToStep($stepProcessor, $process->getReport());
+
             $startTime = microtime(true);
+            $result = $stepProcessor->execute($step->getParameters(), $logger);
+            $deltaTime = microtime(true) - $startTime;
 
-            $result = $step->getProcessor()->execute($step->getParameters(), $logger);
+            $message = 'Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms';
+            $this->reportManager->addProcessReportMessage($process, $message);
+            $this->reportManager->addReportToStep($stepProcessor, null);
 
-            $process->getParameters()->set('time.' . $step->getCode(), microtime(true) - $startTime);
+            $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
             $process->getParameters()->set('result.' . $step->getCode(), $result);
         }
         $kSteps++;
@@ -576,5 +573,66 @@ class ProcessManager
             $this->entityManager->persist($task);
             $this->entityManager->flush();
         }
+    }
+
+    /**
+     * @param Process\Process $process
+     * @param LoggerProcessInterface $logger
+     * @return mixed
+     * @throws InputException
+     * @throws StepException
+     */
+    public function manageExecute(Process\Process $process, LoggerProcessInterface $logger)
+    {
+        $this->executePrepareOptions($process, $logger);
+        $this->executePrepareInputs($process, $logger);
+        $this->executeUpdateTask($process, Status::RUNNING);
+
+        $this->reportManager->prepareReport($process, $logger);
+
+        $result = $this->executeSteps($process, $logger);
+
+        $message = sprintf('Process Finished [%s]', $process->getCode());
+
+        $logger->info($message);
+        $logger->finish(Status::FINISHED);
+
+        $this->executeUpdateTask($process, Status::FINISHED);
+
+        $this->reportManager->addProcessReportWarning($process, $message);
+        $this->reportManager->sendReport($process);
+
+        return $result;
+    }
+
+    /**
+     * @param Process\Process $process
+     * @param LoggerProcessInterface $logger
+     * @param Throwable $exception
+     * @param bool $rerun
+     * @return void
+     */
+    public function manageExecuteError(
+        Process\Process $process,
+        LoggerProcessInterface $logger,
+        Throwable $exception,
+        bool $rerun
+    ): void {
+        $logger->critical((string) $exception);
+
+        $logger->warning(
+            sprintf(
+                'Can we rerun the process automatically after this error: [%s]',
+                ($rerun ? 'Yes' : 'No')
+            )
+        );
+        $logger->setLastException($exception);
+        $logger->finish(Status::FAILED);
+
+        $this->executeUpdateTask($process, Status::FAILED, $exception->getMessage(), $rerun);
+
+        $this->reportManager->addProcessReportError($process, 'ERROR DURING TASK EXECUTION');
+        $this->reportManager->addProcessReportError($process, $exception->getMessage());
+        $this->reportManager->sendReport($process);
     }
 }

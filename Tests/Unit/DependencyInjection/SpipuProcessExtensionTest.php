@@ -65,6 +65,7 @@ class SpipuProcessExtensionTest extends TestCase
                         'process_lock_on_failed' => true,
                         'process_lock' => [],
                         'needed_role' => null,
+                        'automatic_report' => false,
                     ],
                     'inputs' => [
                         'good_input' => ['type' => 'string', 'required' => true],
@@ -110,6 +111,7 @@ class SpipuProcessExtensionTest extends TestCase
                         'process_lock_on_failed' => true,
                         'process_lock' => [],
                         'needed_role' => null,
+                        'automatic_report' => false,
                     ],
                     'inputs' => [
                         'good_input' => ['type' => 'string', 'required' => true],
@@ -155,6 +157,7 @@ class SpipuProcessExtensionTest extends TestCase
                         'process_lock_on_failed' => true,
                         'process_lock' => [],
                         'needed_role' => null,
+                        'automatic_report' => false,
                     ],
                     'inputs' => [
                         'good_input' => ['type' => 'string', 'required' => true],

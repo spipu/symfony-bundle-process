@@ -57,6 +57,11 @@ class Process
     private $logId;
 
     /**
+     * @var Report|null
+     */
+    private $report = null;
+
+    /**
      * Process constructor.
      * @param string $code
      * @param string $name
@@ -176,6 +181,25 @@ class Process
     public function setLogId(?int $logId): self
     {
         $this->logId = $logId;
+
+        return $this;
+    }
+
+    /**
+     * @return Report|null
+     */
+    public function getReport(): ?Report
+    {
+        return $this->report;
+    }
+
+    /**
+     * @param Report $report
+     * @return $this
+     */
+    public function setReport(Report $report): self
+    {
+        $this->report = $report;
 
         return $this;
     }
