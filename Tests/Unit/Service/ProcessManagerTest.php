@@ -425,6 +425,6 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(3, $process->getParameters()->get('result.count'));
 
         $consoleOutputResult = SymfonyMock::getConsoleOutputResult();
-        $this->assertSame(16, count($consoleOutputResult));
+        $this->assertSame(18, count($consoleOutputResult));
     }
 }

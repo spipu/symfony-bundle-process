@@ -19,6 +19,7 @@ use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\ProcessBundle\Service\InputsFactory;
+use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\UiBundle\Entity\EntityInterface;
 use Spipu\UiBundle\Entity\Form\Field;
 use Spipu\UiBundle\Entity\Form\FieldSet;
@@ -414,7 +415,8 @@ class ProcessForm implements EntityDefinitionInterface
             $field->setValue($this->currentUserName);
         }
 
-        if ($input->getName() === 'current_user_email' && $this->currentUserEmail !== null) {
+        $emailFields = [ProcessManager::AUTOMATIC_REPORT_EMAIL_FIELD, 'current_user_email'];
+        if (in_array($input->getName(), $emailFields) && $this->currentUserEmail !== null) {
             $field->setValue($this->currentUserEmail);
         }
 

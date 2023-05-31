@@ -24,6 +24,7 @@ use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\OptionException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Step\StepReportInterface;
 use Throwable;
 
 /**
@@ -33,6 +34,8 @@ use Throwable;
  */
 class ProcessManager
 {
+    public const AUTOMATIC_REPORT_EMAIL_FIELD = 'automatic_report_email';
+
     /**
      * @var ConfigReader
      */
@@ -297,6 +300,7 @@ class ProcessManager
         try {
             $this->executePrepareOptions($process, $logger);
             $this->executePrepareInputs($process, $logger);
+            $this->executePrepareReport($process, $logger);
             $this->executeUpdateTask($process, Status::RUNNING);
 
             $result = $this->executeSteps($process, $logger);
@@ -524,6 +528,28 @@ class ProcessManager
     /**
      * @param Process\Process $process
      * @param LoggerProcessInterface $logger
+     * @return void
+     * @throws InputException
+     */
+    private function executePrepareReport(Process\Process $process, LoggerProcessInterface $logger): void
+    {
+        if (!$process->getOptions()->hasAutomaticReport()) {
+            return;
+        }
+
+        $email = $process->getInputs()->get(self::AUTOMATIC_REPORT_EMAIL_FIELD);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InputException('The automatic report email is invalid: ' . $email);
+        }
+
+        $report = new Process\Report($process->getInputs()->get(self::AUTOMATIC_REPORT_EMAIL_FIELD));
+        $process->setReport($report);
+        $logger->debug(sprintf('Automatic report will be sent to [%s]', $email));
+    }
+
+    /**
+     * @param Process\Process $process
+     * @param LoggerProcessInterface $logger
      * @return mixed|null
      * @throws StepException
      */
@@ -538,11 +564,28 @@ class ProcessManager
             $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
+
+            $stepProcessor = $step->getProcessor();
+
+            if ($process->getReport()) {
+                $process->getReport()->addMessage('Step [' . $step->getCode() . ']');
+                if ($stepProcessor instanceof StepReportInterface) {
+                    $stepProcessor->setReport($process->getReport());
+                }
+            }
+
             $startTime = microtime(true);
+            $result = $stepProcessor->execute($step->getParameters(), $logger);
+            $deltaTime = microtime(true) - $startTime;
 
-            $result = $step->getProcessor()->execute($step->getParameters(), $logger);
+            if ($process->getReport()) {
+                $process->getReport()->addMessage('Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms');
+                if ($stepProcessor instanceof StepReportInterface) {
+                    $stepProcessor->setReport(null);
+                }
+            }
 
-            $process->getParameters()->set('time.' . $step->getCode(), microtime(true) - $startTime);
+            $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
             $process->getParameters()->set('result.' . $step->getCode(), $result);
         }
         $kSteps++;

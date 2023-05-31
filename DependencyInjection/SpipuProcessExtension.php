@@ -17,6 +17,7 @@ use Exception;
 use Spipu\CoreBundle\DependencyInjection\RolesHierarchyExtensionExtensionInterface;
 use Spipu\CoreBundle\Service\RoleDefinitionInterface;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\RoleDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -76,6 +77,18 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchyExt
     private function prepareConfig(array $process, string $processCode): array
     {
         $process['code'] = $processCode;
+
+        if ($process['options']['automatic_report']) {
+            $process['inputs'] = [
+                    ProcessManager::AUTOMATIC_REPORT_EMAIL_FIELD => [
+                        'type' => 'string',
+                        'required' => true,
+                        'allowed_mime_types' => [],
+                        'regexp' => null,
+                        'help' => null
+                    ]
+                ] + $process['inputs'];
+        }
 
         foreach ($process['inputs'] as $inputCode => &$input) {
             $input['name'] = $inputCode;

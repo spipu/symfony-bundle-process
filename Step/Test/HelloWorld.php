@@ -16,9 +16,13 @@ namespace Spipu\ProcessBundle\Step\Test;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
+use Spipu\ProcessBundle\Step\StepReportInterface;
+use Spipu\ProcessBundle\Step\StepReportTrait;
 
-class HelloWorld implements StepInterface
+class HelloWorld implements StepInterface, StepReportInterface
 {
+    use StepReportTrait;
+
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
@@ -33,6 +37,7 @@ class HelloWorld implements StepInterface
         );
 
         $logger->debug($message);
+        $this->addReportMessage($message);
 
         return $message;
     }

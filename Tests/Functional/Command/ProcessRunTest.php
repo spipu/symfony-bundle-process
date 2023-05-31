@@ -123,7 +123,15 @@ class ProcessRunTest extends AbstractFunctionalTest
 
         $foundException = null;
         try {
-            $commandTester->execute(['process' => 'test_simple', '--inputs' => ['name_from:foo']]);
+            $commandTester->execute(
+                [
+                    'process' => 'test_simple',
+                    '--inputs' => [
+                        'automatic_report_email:foo@bar.fr',
+                        'name_from:foo'
+                    ]
+                ]
+            );
         } catch (\Throwable $e) {
             $foundException = $e;
         }
@@ -133,12 +141,38 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString('This process needs some inputs', $output);
         $this->assertStringContainsString('name_to (string) required', $output);
     }
+    public function testExecuteWithBadReportEmail()
+    {
+        $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
+
+        $this->expectException(InputException::class);
+        $this->expectExceptionMessage('The automatic report email is invalid');
+        $commandTester->execute(
+            [
+                'process' => 'test_simple',
+                '--inputs' => [
+                    'automatic_report_email:foo',
+                    'name_from:foo',
+                    'name_to:bar',
+                ]
+            ]
+        );
+    }
 
     public function testExecuteWithInputOk()
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
-        $commandTester->execute(['process' => 'test_simple', '--inputs' => ['name_from:Foo', 'name_to:Bar']]);
+        $commandTester->execute(
+            [
+                'process' => 'test_simple',
+                '--inputs' => [
+                    'automatic_report_email:foo@bar.fr',
+                    'name_from:Foo',
+                    'name_to:Bar'
+                ]
+            ]
+        );
         $output = trim($commandTester->getDisplay());
         $this->assertStringContainsString('Execute process: test_simple', $output);
         $this->assertStringContainsString('Hello World Bar from Foo', $output);
