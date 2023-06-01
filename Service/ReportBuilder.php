@@ -83,12 +83,15 @@ class ReportBuilder implements ReportBuilderInterface
         $status = $process->getTask()->getStatus();
         $title = "{$websiteName} - Task \"{$process->getName()}\" report - $status";
 
-        return "
-<html lang='en'>
+        return "<!doctype html>
+<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">
     <head>
         <title>{$title}</title>
-        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-        <style>
+        <!--[if !mso]><!-->
+        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
+        <!--<![endif]-->
+        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
+        <style type=\"text/css\">
             * { font-family: Arial,Helvetica,sans-serif; }
             .text-bold      { font-weight: bold; }
             .text-finished  { color: #28a745; }
