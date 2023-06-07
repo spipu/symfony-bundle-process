@@ -582,7 +582,7 @@ class ProcessManager
      * @throws InputException
      * @throws StepException
      */
-    public function manageExecute(Process\Process $process, LoggerProcessInterface $logger)
+    private function manageExecute(Process\Process $process, LoggerProcessInterface $logger)
     {
         $this->executePrepareOptions($process, $logger);
         $this->executePrepareInputs($process, $logger);
@@ -612,7 +612,7 @@ class ProcessManager
      * @param bool $rerun
      * @return void
      */
-    public function manageExecuteError(
+    private function manageExecuteError(
         Process\Process $process,
         LoggerProcessInterface $logger,
         Throwable $exception,
