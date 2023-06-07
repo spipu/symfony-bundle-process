@@ -81,27 +81,25 @@ class ReportBuilder implements ReportBuilderInterface
     {
         $websiteName = $this->getWebsiteName();
         $status = $process->getTask()->getStatus();
-        $title = "{$websiteName} - Task \"{$process->getName()}\" report - $status";
+        $title = "$websiteName - Task \"{$process->getName()}\" report - $status";
 
-        return "
-<html lang='en'>
+        $statusColor = ($status === 'finished') ? '#28a745' : '#dc3545';
+
+        return "<!doctype html>
+<html
+    xmlns=\"http://www.w3.org/1999/xhtml\"
+    xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\"
+    lang=\"en\"
+>
     <head>
-        <title>{$title}</title>
-        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-        <style>
-            * { font-family: Arial,Helvetica,sans-serif; }
-            .text-bold      { font-weight: bold; }
-            .text-finished  { color: #28a745; }
-            .text-failed    { color: #dc3545; }
-            .step-container { margin: 0; padding: 0 0 0.5rem; border: none; background: transparent; }
-            .step           { border: solid 1px transparent; padding: 0.5rem; border-radius: .5rem; }
-            .step-message   { color: #202020; background-color: #ffffff; border-color: #6c757d; }
-            .step-warning   { color: #664d03; background-color: #fff3cd; border-color: #ffc107; }
-            .step-error     { color: #842029; background-color: #f8d7da; border-color: #DC3545; }
-        </style>
+        <title>$title</title>
+        <!--[if !mso]><!-->
+        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
+        <!--<![endif]-->
+        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">
     </head>
-    <body>
-        <h1>{$title}</h1>
+    <body style=\"font-family: Arial,Helvetica,sans-serif;\">
+        <h1>$title</h1>
         <h2>Process information</h2>
         <ul>
             <li>Code: {$process->getCode()}</li>
@@ -109,13 +107,15 @@ class ReportBuilder implements ReportBuilderInterface
         </ul>
         <h2>Task information</h2>
         <ul>
-            <li>Status:       <span class='text-bold text-{$status}'>{$status}</span></li>
+            <li>Status:       <span style=\"font-weight: bold; color: $statusColor\">$status</span></li>
             <li>Progress:     {$process->getTask()->getProgress()} %</li>
             <li>Executed at:  {$process->getTask()->getExecutedAt()->format('Y-m-d H:i:s')}</li>
             <li>Finished at:  {$process->getTask()->getUpdatedAt()->format('Y-m-d H:i:s')}</li>
         </ul>
         <h2>Report</h2>
+        <table>
         {{content}}
+        </table>
         <hr />
         <p>END OF REPORT</p>
     </body>
@@ -132,10 +132,28 @@ class ReportBuilder implements ReportBuilderInterface
         $message = $step->getMessage();
         if ($step->getLink()) {
             $link = htmlentities($step->getLink());
-            $message .= "<br /><a href='$link' target='_blank'>$link</a>";
+            $message .= "<br /><a href=\"$link\" target=\"_blank\">$link</a>";
         }
 
-        return "<div class='step-container'><div class='step step-{$step->getLevel()}'>{$message}</div></div>\n";
+        $styleTemplate = 'border: solid 1px %s; padding: 10px; border-radius: 10px; color: %s; background-color: %s;';
+        switch ($step->getLevel()) {
+            case 'error':
+                $style = sprintf($styleTemplate, '#DC3545', '#842029', '#f8d7da');
+                break;
+
+            case 'warning':
+                $style = sprintf($styleTemplate, '#ffc107', '#664d03', '#fff3cd');
+                break;
+
+            case 'message':
+            default:
+                $style = sprintf($styleTemplate, '#6c757d', '#202020', '#ffffff');
+                break;
+        }
+
+        return "
+<tr><td style=\"$style\">$message</td></tr>
+<tr><td style=\"padding: 0; border: none; background: transparent; height: 10px\"></td></tr>";
     }
 
     /**
