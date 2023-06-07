@@ -273,9 +273,10 @@ class ProcessManager
      */
     public function execute(Process\Process $process, callable $initCallback = null)
     {
-        if ($this->isProcessLockedByAnotherOne($process)) {
+        $blockingTaskId = $this->getBlockingTaskId($process);
+        if ($blockingTaskId !== null) {
             throw new ProcessException(
-                'This process can not be executed, because it is locked by another one'
+                'This process can not be executed, because it is locked by another one - Task #' . $blockingTaskId
             );
         }
 
@@ -377,7 +378,7 @@ class ProcessManager
             );
         }
 
-        if ($this->isProcessLockedByAnotherOne($process)) {
+        if ($this->getBlockingTaskId($process) !== null) {
             return $this->scheduleExecution($process, new DateTime());
         }
 
@@ -391,13 +392,13 @@ class ProcessManager
 
     /**
      * @param Process\Process $process
-     * @return bool
+     * @return int|null
      */
-    public function isProcessLockedByAnotherOne(Process\Process $process): bool
+    public function getBlockingTaskId(Process\Process $process): ?int
     {
         $processLocks = $process->getOptions()->getProcessLocks();
         if (count($processLocks) === 0) {
-            return false;
+            return null;
         }
 
         $query = $this->buildLockQuery(
@@ -408,9 +409,9 @@ class ProcessManager
 
         try {
             $result = $this->entityManager->getConnection()->executeQuery($query)->fetchOne();
-            return (!empty($result));
+            return empty($result) ? null : (int) $result;
         } catch (Throwable $e) {
-            return false;
+            return null;
         }
     }
 
@@ -427,23 +428,20 @@ class ProcessManager
             $processLock = $this->entityManager->getConnection()->quote($processLock);
         }
 
-        $statuses = [Status::CREATED, Status::RUNNING];
-        if ($lockOnFailed) {
-            $statuses[] = Status::FAILED;
-        }
-        foreach ($statuses as &$status) {
-            $status = $this->entityManager->getConnection()->quote($status);
-        }
-
-        $query = sprintf(
-            "SELECT `id` FROM `spipu_process_task` WHERE `code` IN (%s) AND `status` IN (%s)",
-            implode(',', $processLocks),
-            implode(',', $statuses)
-        );
-
+        $taskWhere = '';
         if ($taskId !== null) {
-            $query .= ' AND id < ' . $taskId;
+            $taskWhere .= ' AND id < ' . $taskId;
         }
+
+        $where = [];
+        $where[] = '(`status` = \'' . Status::CREATED . '\' AND `scheduled_at` IS NULL'. $taskWhere . ')';
+        $where[] = '(`status` = \'' . Status::RUNNING . '\')';
+        if ($lockOnFailed) {
+            $where[] = '(`status` = \'' . Status::FAILED . '\')';
+        }
+
+        $query = 'SELECT `id` FROM `spipu_process_task` WHERE `code` IN (' . implode(',', $processLocks) . ')';
+        $query .= ' AND (' . implode(' OR ', $where) . ')';
         $query .= ' ORDER BY `id` ASC LIMIT 1';
 
         return $query;

@@ -193,8 +193,13 @@ class TaskController extends AbstractController
         }
 
         $process = $processManager->loadFromTask($resource);
-        if ($processManager->isProcessLockedByAnotherOne($process)) {
-            $this->addFlashTrans('danger', 'spipu.process.error.locked');
+        $blockingTaskId = $processManager->getBlockingTaskId($process);
+        if ($blockingTaskId !== null) {
+            $this->addFlashTrans(
+                'danger',
+                'spipu.process.error.locked',
+                ['%taskId' => $blockingTaskId]
+            );
             return $redirect;
         }
 
