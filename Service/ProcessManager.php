@@ -434,7 +434,7 @@ class ProcessManager
         }
 
         $where = [];
-        $where[] = '(`status` = \'' . Status::CREATED . '\' AND `scheduled_at` IS NULL'. $taskWhere . ')';
+        $where[] = '(`status` = \'' . Status::CREATED . '\' AND `scheduled_at` IS NULL' . $taskWhere . ')';
         $where[] = '(`status` = \'' . Status::RUNNING . '\')';
         if ($lockOnFailed) {
             $where[] = '(`status` = \'' . Status::FAILED . '\')';
