@@ -18,23 +18,13 @@ use Spipu\ProcessBundle\Entity\Process;
 
 class ReportBuilder implements ReportBuilderInterface
 {
-    /**
-     * @var ConfigurationManager
-     */
     private ConfigurationManager $configurationManager;
 
-    /**
-     * @param ConfigurationManager $configurationManager
-     */
     public function __construct(ConfigurationManager $configurationManager)
     {
         $this->configurationManager = $configurationManager;
     }
 
-    /**
-     * @param Process\Process $process
-     * @return string
-     */
     public function buildTitle(Process\Process $process): string
     {
         return sprintf(
@@ -45,11 +35,6 @@ class ReportBuilder implements ReportBuilderInterface
         );
     }
 
-    /**
-     * @param Process\Process $process
-     * @param Process\Report $report
-     * @return string
-     */
     public function buildContent(Process\Process $process, Process\Report $report): string
     {
         return str_replace(
@@ -59,10 +44,6 @@ class ReportBuilder implements ReportBuilderInterface
         );
     }
 
-    /**
-     * @param Process\Report $report
-     * @return string
-     */
     public function buildContentSteps(Process\Report $report): string
     {
         $content = '';
@@ -73,10 +54,6 @@ class ReportBuilder implements ReportBuilderInterface
         return $content;
     }
 
-    /**
-     * @param Process\Process $process
-     * @return string
-     */
     private function buildContentTemplate(Process\Process $process): string
     {
         $websiteName = $this->getWebsiteName();
@@ -123,10 +100,6 @@ class ReportBuilder implements ReportBuilderInterface
 ";
     }
 
-    /**
-     * @param Process\ReportStep $step
-     * @return string
-     */
     private function buildContentStep(Process\ReportStep $step): string
     {
         $message = $step->getMessage();

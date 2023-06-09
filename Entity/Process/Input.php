@@ -120,12 +120,6 @@ class Input
         return $this->allowedMimeTypes;
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     * @SuppressWarnings(PMD.CyclomaticComplexity)
-     */
     public function setValue(mixed $value): void
     {
         $value = $this->prepareValue($value);
@@ -179,9 +173,6 @@ class Input
         return true;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRegexp(): ?string
     {
         return $this->regexp;

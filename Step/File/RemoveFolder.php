@@ -18,19 +18,8 @@ use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 
-/**
- * Class RemoveFolder
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class RemoveFolder implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return true
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $folder  = $parameters->get('folder');
@@ -44,10 +33,6 @@ class RemoveFolder implements StepInterface
         return $this->removeDir($folder);
     }
 
-    /**
-     * @param string $dir
-     * @return bool
-     */
     private function removeDir(string $dir): bool
     {
         $items = array_diff(scandir($dir), ['.', '..']);

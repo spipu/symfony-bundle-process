@@ -15,20 +15,11 @@ namespace Spipu\ProcessBundle\Step\File\RowReader\Action;
 
 class ToDate implements ActionInterface
 {
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return 'toDate';
     }
 
-    /**
-     * Execute the action
-     * @param string|null $value
-     * @param array $parameters
-     * @return null|string
-     */
     public function execute(?string $value, array $parameters = []): ?string
     {
         if (preg_match('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', $value, $match)) {

@@ -18,20 +18,11 @@ class ToFloat implements ActionInterface
     public const DEFAULT_DECIMAL = 4;
     public const DEFAULT_SEPARATOR = '.';
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return 'toFloat';
     }
 
-    /**
-     * Execute the action
-     * @param string|null $value
-     * @param array $parameters
-     * @return null|string
-     */
     public function execute(?string $value, array $parameters = []): ?string
     {
         if (!isset($parameters['decimal'])) {

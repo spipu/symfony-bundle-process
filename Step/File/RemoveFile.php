@@ -18,19 +18,8 @@ use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 
-/**
- * Class RemoveFile
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class RemoveFile implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return true
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $file  = $parameters->get('file');

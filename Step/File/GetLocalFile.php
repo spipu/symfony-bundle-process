@@ -20,12 +20,6 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class GetLocalFile implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $folder = $parameters->get('folder');
@@ -50,12 +44,6 @@ class GetLocalFile implements StepInterface
         return $folder . $file;
     }
 
-    /**
-     * @param string $folder
-     * @param string $filePattern
-     * @return array
-     * @throws StepException
-     */
     private function getFiles(string $folder, string $filePattern): array
     {
         if (!is_dir($folder)) {

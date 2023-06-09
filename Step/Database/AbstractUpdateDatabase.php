@@ -14,44 +14,22 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Step\Database;
 
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
-use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 use Doctrine\DBAL\Connection;
 
 abstract class AbstractUpdateDatabase implements StepInterface
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
+    protected Connection $connection;
+    protected array $report = [];
+    protected LoggerInterface $logger;
 
-    /**
-     * @var array
-     */
-    protected $report = [];
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * ImportFileToTable constructor.
-     * @param Connection $connection
-     */
     public function __construct(
         Connection $connection
     ) {
         $this->connection = $connection;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return array
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $this->logger = $logger;
@@ -68,10 +46,5 @@ abstract class AbstractUpdateDatabase implements StepInterface
         return $this->report;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @return void
-     * @throws StepException
-     */
     abstract protected function updateDatabase(ParametersInterface $parameters): void;
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
-use Exception;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\CronManager;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
@@ -27,31 +26,14 @@ class ProcessCronManagerCommand extends Command
 {
     public const ARGUMENT_ACTION = 'cron_action';
 
-    /**
-     * @var CronManager
-     */
-    private $cronManager;
-
-    /**
-     * @var ModuleConfiguration
-     */
-    private $processConfiguration;
-
-    /**
-     * @var array
-     */
-    private $availableActions = [
+    private CronManager $cronManager;
+    private ModuleConfiguration $processConfiguration;
+    private array $availableActions = [
         'rerun'     => 'actionRerun',
         'cleanup'   => 'actionCleanup',
         'check-pid' => 'actionCheckRunningTasks',
     ];
 
-    /**
-     * RunProcess constructor.
-     * @param CronManager $cronManager
-     * @param ModuleConfiguration $processConfiguration
-     * @param null|string $name
-     */
     public function __construct(
         CronManager $cronManager,
         ModuleConfiguration $processConfiguration,
@@ -63,11 +45,6 @@ class ProcessCronManagerCommand extends Command
         $this->processConfiguration = $processConfiguration;
     }
 
-    /**
-     * Configure the command
-     *
-     * @return void
-     */
     protected function configure(): void
     {
         $this
@@ -82,15 +59,6 @@ class ProcessCronManagerCommand extends Command
         ;
     }
 
-    /**
-     * Execute the command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     * @throws Exception
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->processConfiguration->hasTaskCanExecute()) {

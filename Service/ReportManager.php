@@ -27,32 +27,11 @@ class ReportManager
 {
     public const AUTOMATIC_REPORT_EMAIL_FIELD = 'automatic_report_email';
 
-    /**
-     * @var MailManager
-     */
     private MailManager $mailManager;
-
-    /**
-     * @var Url
-     */
     private Url $processUrl;
-
-    /**
-     * @var ReportBuilderInterface
-     */
     private ReportBuilderInterface $reportBuilder;
-
-    /**
-     * @var ConfigurationManager
-     */
     private ConfigurationManager $configurationManager;
 
-    /**
-     * @param MailManager $mailManager
-     * @param ProcessUrl $processUrl
-     * @param ReportBuilderInterface $reportBuilder
-     * @param ConfigurationManager $configurationManager
-     */
     public function __construct(
         MailManager $mailManager,
         ProcessUrl $processUrl,
@@ -65,12 +44,6 @@ class ReportManager
         $this->configurationManager = $configurationManager;
     }
 
-    /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
-     * @return void
-     * @throws InputException
-     */
     public function prepareReport(Process\Process $process, LoggerProcessInterface $logger): void
     {
         if (!$process->getOptions()->hasAutomaticReport()) {
@@ -98,11 +71,6 @@ class ReportManager
         );
     }
 
-    /**
-     * @param StepInterface $stepProcessor
-     * @param Report|null $report
-     * @return void
-     */
     public function addReportToStep(StepInterface $stepProcessor, ?Process\Report $report): void
     {
         if ($stepProcessor instanceof StepReportInterface) {
@@ -110,11 +78,6 @@ class ReportManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @param string $message
-     * @return void
-     */
     public function addProcessReportMessage(Process\Process $process, string $message): void
     {
         if ($process->getReport()) {
@@ -122,11 +85,6 @@ class ReportManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @param string $message
-     * @return void
-     */
     public function addProcessReportWarning(Process\Process $process, string $message): void
     {
         if ($process->getReport()) {
@@ -134,11 +92,6 @@ class ReportManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @param string $message
-     * @return void
-     */
     public function addProcessReportError(Process\Process $process, string $message): void
     {
         if ($process->getReport()) {
@@ -146,10 +99,6 @@ class ReportManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @return void
-     */
     public function sendReport(Process\Process $process): void
     {
         if ($process->getReport() === null) {

@@ -19,20 +19,9 @@ use Spipu\ProcessBundle\Exception\ProcessException;
 
 class TaskManager
 {
-    /**
-     * @var Status
-     */
-    private $status;
+    private Status $status;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @param Status $status
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         Status $status,
         EntityManagerInterface $entityManager
@@ -58,12 +47,6 @@ class TaskManager
         return ($sid !== false) && ((int) $sid > 0);
     }
 
-    /**
-     * @param Task $task
-     * @param string $reason
-     * @return void
-     * @throws ProcessException
-     */
     public function kill(Task $task, string $reason): void
     {
         if (!$this->status->canKill($task->getStatus())) {

@@ -21,37 +21,15 @@ use Spipu\ProcessBundle\Form\Options\Process as OptionsProcess;
 use Spipu\ProcessBundle\Form\Options\Status as OptionsStatus;
 
 /**
- * Class TaskGrid
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
  */
 class TaskGrid implements GridDefinitionInterface
 {
-    /**
-     * @var Grid\Grid
-     */
-    private $definition;
+    private ?Grid\Grid $definition = null;
+    private OptionsProcess $optionsProcess;
+    private OptionsStatus $optionsStatus;
+    private OptionsYesNo $optionsYesNo;
 
-    /**
-     * @var OptionsProcess
-     */
-    private $optionsProcess;
-
-    /**
-     * @var OptionsStatus
-     */
-    private $optionsStatus;
-
-    /**
-     * @var OptionsYesNo
-     */
-    private $optionsYesNo;
-
-    /**
-     * TaskGrid constructor.
-     * @param OptionsProcess $optionsProcess
-     * @param OptionsStatus $optionsStatus
-     * @param OptionsYesNo $optionsYesNo
-     */
     public function __construct(
         OptionsProcess $optionsProcess,
         OptionsStatus $optionsStatus,
@@ -62,10 +40,6 @@ class TaskGrid implements GridDefinitionInterface
         $this->optionsYesNo = $optionsYesNo;
     }
 
-    /**
-     * @return Grid\Grid
-     * @throws GridException
-     */
     public function getDefinition(): Grid\Grid
     {
         if (!$this->definition) {

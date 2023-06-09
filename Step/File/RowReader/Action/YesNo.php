@@ -17,21 +17,11 @@ use Spipu\ProcessBundle\Exception\RowReaderException;
 
 class YesNo implements ActionInterface
 {
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return 'yesNo';
     }
 
-    /**
-     * Execute the action
-     * @param string|null $value
-     * @param array $parameters
-     * @return null|string
-     * @throws RowReaderException
-     */
     public function execute(?string $value, array $parameters = []): ?string
     {
         $valueYes  = ['y', 'o', '1'];

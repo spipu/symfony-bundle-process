@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
-use Exception;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\Status;
@@ -27,22 +26,9 @@ class ProcessCheckCommand extends Command
     public const OPTION_STATUS = 'status';
     public const OPTION_DIRECT = 'direct';
 
-    /**
-     * @var Status
-     */
-    private $status;
+    private Status $status;
+    private TaskRepository $taskRepository;
 
-    /**
-     * @var TaskRepository
-     */
-    private $taskRepository;
-
-    /**
-     * RunProcess constructor.
-     * @param Status $status
-     * @param TaskRepository $taskRepository
-     * @param null|string $name
-     */
     public function __construct(
         Status $status,
         TaskRepository $taskRepository,
@@ -53,11 +39,6 @@ class ProcessCheckCommand extends Command
         $this->taskRepository = $taskRepository;
     }
 
-    /**
-     * Configure the command
-     *
-     * @return void
-     */
     protected function configure(): void
     {
         $this
@@ -78,15 +59,6 @@ class ProcessCheckCommand extends Command
             );
     }
 
-    /**
-     * Execute the command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     * @throws Exception
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $status = $input->getOption(static::OPTION_STATUS);

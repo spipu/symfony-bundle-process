@@ -17,33 +17,11 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class Step
 {
-    /**
-     * @var string
-     */
-    private $code;
+    private string $code;
+    private Parameters $parameters;
+    private StepInterface $processor;
+    private bool $ignoreInProgress;
 
-    /**
-     * @var Parameters
-     */
-    private $parameters;
-
-    /**
-     * @var StepInterface
-     */
-    private $processor;
-
-    /**
-     * @var bool
-     */
-    private $ignoreInProgress;
-
-    /**
-     * Process constructor.
-     * @param string $code
-     * @param StepInterface $processor
-     * @param Parameters $parameters
-     * @param bool $ignoreInProgress
-     */
     public function __construct(
         string $code,
         StepInterface $processor,
@@ -56,33 +34,21 @@ class Step
         $this->ignoreInProgress = $ignoreInProgress;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return StepInterface
-     */
     public function getProcessor(): StepInterface
     {
         return $this->processor;
     }
 
-    /**
-     * @return Parameters
-     */
     public function getParameters(): Parameters
     {
         return $this->parameters;
     }
 
-    /**
-     * @return bool
-     */
     public function isIgnoreInProgress(): bool
     {
         return $this->ignoreInProgress;

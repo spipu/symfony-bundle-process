@@ -38,27 +38,10 @@ class ProcessRunCommand extends Command
     public const OPTION_INPUT = 'inputs';
     public const OPTION_DEBUG = 'debug';
 
-    /**
-     * @var ProcessManager
-     */
-    private $processManager;
+    private ProcessManager $processManager;
+    private ModuleConfiguration $processConfiguration;
+    private ?SymfonyStyle $symfonyStyle = null;
 
-    /**
-     * @var ModuleConfiguration
-     */
-    private $processConfiguration;
-
-    /**
-     * @var SymfonyStyle
-     */
-    private $symfonyStyle = null;
-
-    /**
-     * RunProcess constructor.
-     * @param ProcessManager $processManager
-     * @param ModuleConfiguration $processConfiguration
-     * @param null|string $name
-     */
     public function __construct(
         ProcessManager $processManager,
         ModuleConfiguration $processConfiguration,
@@ -70,11 +53,6 @@ class ProcessRunCommand extends Command
         $this->processConfiguration = $processConfiguration;
     }
 
-    /**
-     * Configure the command
-     *
-     * @return void
-     */
     protected function configure(): void
     {
         $this
@@ -100,14 +78,6 @@ class ProcessRunCommand extends Command
             );
     }
 
-    /**
-     * Ask for missing arguments and options
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return void
-     */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
         if (!$input->getArgument(static::ARGUMENT_PROCESS)) {
@@ -126,15 +96,6 @@ class ProcessRunCommand extends Command
         }
     }
 
-    /**
-     * Execute the command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     * @throws Exception
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->processConfiguration->hasTaskCanExecute()) {
@@ -168,14 +129,6 @@ class ProcessRunCommand extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * @param Process $process
-     * @param array $inputs
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return bool
-     * @throws InputException
-     */
     private function askInputs(Process $process, array $inputs, InputInterface $input, OutputInterface $output): bool
     {
         $inputObjects = $process->getInputs()->getInputs();
@@ -241,11 +194,6 @@ class ProcessRunCommand extends Command
         $process->getInputs()->set($key, $value);
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return SymfonyStyle
-     */
     private function getSymfonyStyle(InputInterface $input, OutputInterface $output): SymfonyStyle
     {
         if ($this->symfonyStyle === null) {
@@ -259,11 +207,11 @@ class ProcessRunCommand extends Command
     /**
      * @param string $value
      * @param string $type
-     * @return int|string
+     * @return string|int|float|bool|array
      * @throws InputException
      * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
-    private function validateInput(string $value, string $type)
+    private function validateInput(string $value, string $type): string|int|float|bool|array
     {
         switch ($type) {
             case 'file':
@@ -283,7 +231,7 @@ class ProcessRunCommand extends Command
 
             case 'array':
                 $value = json_decode($value, true);
-                if ($value === null) {
+                if (!is_array($value)) {
                     throw new InputException('json format must be used for array type');
                 }
                 return $value;

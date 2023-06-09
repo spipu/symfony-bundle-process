@@ -16,7 +16,6 @@ namespace Spipu\ProcessBundle\Ui;
 use DateTime;
 use DateTimeInterface;
 use Spipu\ProcessBundle\Entity\Process\Input;
-use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\ProcessBundle\Service\InputsFactory;
 use Spipu\ProcessBundle\Service\ReportManager;
@@ -36,64 +35,21 @@ use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Process Input Form
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
  * @SuppressWarnings(PMD.ExcessiveClassComplexity)
  */
 class ProcessForm implements EntityDefinitionInterface
 {
-    /**
-     * @var ConfigReader
-     */
     private ConfigReader $configReader;
-
-    /**
-     * @var InputsFactory
-     */
     private InputsFactory $inputsFactory;
-
-    /**
-     * @var YesNo
-     */
     private YesNo $yesNoOptions;
-
-    /**
-     * @var TranslatorInterface
-     */
     private TranslatorInterface $translator;
-
-    /**
-     * @var Form|null
-     */
     private ?Form $definition = null;
-
-    /**
-     * @var string
-     */
     private string $processCode = '';
-
-    /**
-     * @var string|null
-     */
     private ?string $currentUserName = null;
-
-    /**
-     * @var string|null
-     */
     private ?string $currentUserEmail = null;
-
-    /**
-     * @var DateTimeInterface|null;
-     */
     private ?DateTimeInterface $scheduledAt = null;
 
-    /**
-     * ConfigurationForm constructor.
-     * @param ConfigReader $configReader
-     * @param InputsFactory $inputsFactory
-     * @param YesNo $yesNoOptions
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ConfigReader $configReader,
         InputsFactory $inputsFactory,
@@ -106,10 +62,6 @@ class ProcessForm implements EntityDefinitionInterface
         $this->translator = $translator;
     }
 
-    /**
-     * @param string $processCode
-     * @return self
-     */
     public function setProcessCode(string $processCode): self
     {
         $this->processCode = $processCode;
@@ -117,10 +69,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $this;
     }
 
-    /**
-     * @param string|null $currentUserName
-     * @return self
-     */
     public function setCurrentUserName(?string $currentUserName): self
     {
         $this->currentUserName = $currentUserName;
@@ -128,10 +76,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $this;
     }
 
-    /**
-     * @param string|null $currentUserEmail
-     * @return self
-     */
     public function setCurrentUserEmail(?string $currentUserEmail): self
     {
         $this->currentUserEmail = $currentUserEmail;
@@ -139,11 +83,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $this;
     }
 
-    /**
-     * @return Form
-     * @throws ProcessException
-     * @throws FormException
-     */
     public function getDefinition(): Form
     {
         if ($this->definition === null) {
@@ -153,11 +92,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $this->definition;
     }
 
-    /**
-     * @return void
-     * @throws ProcessException
-     * @throws FormException
-     */
     private function prepareForm(): void
     {
         $this->definition = new Form('process');
@@ -208,20 +142,11 @@ class ProcessForm implements EntityDefinitionInterface
             );
     }
 
-    /**
-     * @return array
-     * @throws ProcessException
-     */
     public function getProcessDefinition(): array
     {
         return $this->configReader->getProcessDefinition($this->processCode);
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createField(Input $input): Field
     {
         $field = $this->createFieldBase($input);
@@ -233,11 +158,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $field;
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldBase(Input $input): Field
     {
         if ($input->getOptions()) {
@@ -247,11 +167,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $this->createFieldWithoutOption($input);
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldWithOption(Input $input): Field
     {
         if (!in_array($input->getType(), ['string', 'array'])) {
@@ -267,11 +182,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $this->createFieldOptions($input);
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldWithoutOption(Input $input): Field
     {
         switch ($input->getRealType()) {
@@ -309,31 +219,16 @@ class ProcessForm implements EntityDefinitionInterface
         );
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldInt(Input $input): Field
     {
         return $this->createFieldInput($input, Type\IntegerType::class);
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldFloat(Input $input): Field
     {
         return $this->createFieldInput($input, Type\NumberType::class);
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldBool(Input $input): Field
     {
         return new Field(
@@ -349,11 +244,6 @@ class ProcessForm implements EntityDefinitionInterface
         );
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldArray(Input $input): Field
     {
         return new Field(
@@ -369,11 +259,6 @@ class ProcessForm implements EntityDefinitionInterface
         );
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldDateTime(Input $input): Field
     {
         $input = $this->createFieldInput($input, Type\DateTimeType::class);
@@ -386,11 +271,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $input;
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldDate(Input $input): Field
     {
         $input = $this->createFieldInput($input, Type\DateType::class);
@@ -402,11 +282,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $input;
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldString(Input $input): Field
     {
         $field = $this->createFieldInput($input, Type\TextType::class);
@@ -428,12 +303,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $field;
     }
 
-    /**
-     * @param Input $input
-     * @param string $fieldType
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldInput(Input $input, string $fieldType): Field
     {
         return new Field(
@@ -447,11 +316,6 @@ class ProcessForm implements EntityDefinitionInterface
         );
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldFile(Input $input): Field
     {
         $field = $this->createFieldInput($input, Type\FileType::class);
@@ -465,11 +329,6 @@ class ProcessForm implements EntityDefinitionInterface
         return $field;
     }
 
-    /**
-     * @param Input $input
-     * @return Field
-     * @throws FormException
-     */
     private function createFieldOptions(Input $input): Field
     {
         $options = [
@@ -486,10 +345,6 @@ class ProcessForm implements EntityDefinitionInterface
         return new Field($input->getName(), Type\ChoiceType::class, 0, $options);
     }
 
-    /**
-     * @param string $code
-     * @return string
-     */
     private function prepareInputLabel(string $code): string
     {
         return ucwords(str_replace('_', ' ', $code));
@@ -532,9 +387,6 @@ class ProcessForm implements EntityDefinitionInterface
         $this->scheduledAt = $date->setTime((int) $time->format('H'), (int) $time->format('i'));
     }
 
-    /**
-     * @return DateTimeInterface|null
-     */
     public function getScheduledAt(): ?DateTimeInterface
     {
         return $this->scheduledAt;

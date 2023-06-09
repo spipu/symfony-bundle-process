@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
-use Exception;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\LoggerOutput;
@@ -31,34 +30,11 @@ class ProcessReRunCommand extends Command
     public const ARGUMENT_TASK = 'task-id';
     public const OPTION_DEBUG = 'debug';
 
-    /**
-     * @var TaskRepository
-     */
-    private $processTaskRepository;
+    private TaskRepository $processTaskRepository;
+    private ProcessManager $processManager;
+    private ProcessStatus $processStatus;
+    private ModuleConfiguration $processConfiguration;
 
-    /**
-     * @var ProcessManager
-     */
-    private $processManager;
-
-    /**
-     * @var ProcessStatus
-     */
-    private $processStatus;
-
-    /**
-     * @var ModuleConfiguration
-     */
-    private $processConfiguration;
-
-    /**
-     * RunProcess constructor.
-     * @param TaskRepository $processTaskRepository
-     * @param ProcessManager $processManager
-     * @param ProcessStatus $processStatus
-     * @param ModuleConfiguration $processConfiguration
-     * @param null|string $name
-     */
     public function __construct(
         TaskRepository $processTaskRepository,
         ProcessManager $processManager,
@@ -74,11 +50,6 @@ class ProcessReRunCommand extends Command
         $this->processConfiguration = $processConfiguration;
     }
 
-    /**
-     * Configure the command
-     *
-     * @return void
-     */
     protected function configure(): void
     {
         $this
@@ -98,14 +69,6 @@ class ProcessReRunCommand extends Command
             );
     }
 
-    /**
-     * Ask for missing arguments and options
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return void
-     */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
         if (!$input->getArgument(static::ARGUMENT_TASK)) {
@@ -117,15 +80,6 @@ class ProcessReRunCommand extends Command
         }
     }
 
-    /**
-     * Execute the command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     * @throws Exception
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->processConfiguration->hasTaskCanExecute()) {

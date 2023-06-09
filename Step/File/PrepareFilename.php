@@ -20,12 +20,6 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class PrepareFilename implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $folder    = $parameters->get('folder');

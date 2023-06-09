@@ -25,5 +25,5 @@ interface StepInterface
      * @return mixed
      * @throws StepException
      */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger);
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): mixed;
 }

@@ -17,7 +17,6 @@ use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\StepException;
-use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Service\Manager;
 use Spipu\ProcessBundle\Service\Url;
@@ -25,26 +24,10 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class ExecuteProcess implements StepInterface
 {
-    /**
-     * @var Manager
-     */
-    private $manager;
+    private Manager $manager;
+    private Url $url;
+    private LoggerInterface $logger;
 
-    /**
-     * @var Url
-     */
-    private $url;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * ExecuteProcess constructor.
-     * @param Manager $manager
-     * @param Url $url
-     */
     public function __construct(
         Manager $manager,
         Url $url
@@ -53,13 +36,7 @@ class ExecuteProcess implements StepInterface
         $this->url = $url;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return mixed
-     * @throws ProcessException
-     */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): mixed
     {
         $this->logger = $logger;
 
@@ -92,10 +69,6 @@ class ExecuteProcess implements StepInterface
         return $result;
     }
 
-    /**
-     * @param Process $process
-     * @return void
-     */
     public function addLogUrl(Process $process): void
     {
         $url = $this->url->getLogUrl($process->getLogId());

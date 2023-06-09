@@ -13,30 +13,15 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
-use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 
-/**
- * Class DispatchFiles
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class DispatchFiles implements StepInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return int
-     * @throws Exception
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): int
     {
         $this->logger = $logger;
@@ -85,13 +70,6 @@ class DispatchFiles implements StepInterface
         return $found;
     }
 
-    /**
-     * @param string $filename
-     * @param string $source
-     * @param string $destination
-     * @param string|null $filePattern
-     * @return void
-     */
     private function dispatchFile(string $filename, string $source, string $destination, ?string $filePattern): void
     {
         $this->logger->debug(sprintf(' move [%s] to [%s]', $filename, $destination));

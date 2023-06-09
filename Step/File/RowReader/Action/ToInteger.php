@@ -17,21 +17,11 @@ use Spipu\ProcessBundle\Exception\RowReaderException;
 
 class ToInteger implements ActionInterface
 {
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return 'toInteger';
     }
 
-    /**
-     * Execute the action
-     * @param string|null $value
-     * @param array $parameters
-     * @return null|string
-     * @throws RowReaderException
-     */
     public function execute(?string $value, array $parameters = []): ?string
     {
         if ($value === '') {

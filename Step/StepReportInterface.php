@@ -17,9 +17,5 @@ use Spipu\ProcessBundle\Entity\Process\Report;
 
 interface StepReportInterface
 {
-    /**
-     * @param Report|null $report
-     * @return void
-     */
     public function setReport(?Report $report): void;
 }

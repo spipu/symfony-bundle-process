@@ -20,11 +20,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class SpipuProcessConfiguration implements ConfigurationInterface
 {
-    /**
-     * Build the config tree
-     * @return TreeBuilder
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('process');
 
@@ -124,9 +120,6 @@ class SpipuProcessConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @return ArrayNodeDefinition
-     */
     private function addParametersNode(): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder('parameters');

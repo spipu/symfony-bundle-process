@@ -19,15 +19,10 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class PrepareQuery implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $query = [
-            'agency' => $parameters->get('agency'),
+            'agency'   => $parameters->get('agency'),
             'products' => $parameters->get('product_ids'),
         ];
 

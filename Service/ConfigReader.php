@@ -19,31 +19,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigReader
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
+    private ?array $list = null;
 
-    /**
-     * @var array
-     */
-    private $list;
-
-    /**
-     * ConfigReader constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(
         ContainerInterface $container
     ) {
         $this->container = $container;
     }
 
-    /**
-     * Get the list of the available process
-     *
-     * @return array
-     */
     public function getProcessList(): array
     {
         if (null === $this->list) {
@@ -57,12 +41,6 @@ class ConfigReader
         return $this->list;
     }
 
-
-    /**
-     * is the process code exists ?
-     * @param string $code
-     * @return bool
-     */
     public function isProcessExists(string $code): bool
     {
         $list = $this->getProcessList();
@@ -70,12 +48,6 @@ class ConfigReader
         return array_key_exists($code, $list);
     }
 
-    /**
-     * Get the process definition
-     * @param string $code
-     * @return array
-     * @throws ProcessException
-     */
     public function getProcessDefinition(string $code): array
     {
         if (!$this->isProcessExists($code)) {
@@ -87,11 +59,6 @@ class ConfigReader
         return $processes[$code];
     }
 
-    /**
-     * Get the step class from the classname
-     * @param string $classname
-     * @return StepInterface
-     */
     public function getStepClassFromClassname(string $classname): StepInterface
     {
         /** @var StepInterface $stepClass */

@@ -17,25 +17,13 @@ use Spipu\ProcessBundle\Entity\Process\Report;
 
 trait StepReportTrait
 {
-    /**
-     * @var Report|null
-     */
     private ?Report $report = null;
 
-    /**
-     * @param Report|null $report
-     * @return void
-     */
     public function setReport(?Report $report): void
     {
         $this->report = $report;
     }
 
-    /**
-     * @param string $message
-     * @param string|null $link
-     * @return void
-     */
     protected function addReportMessage(string $message, ?string $link = null): void
     {
         if ($this->report !== null) {
@@ -43,11 +31,6 @@ trait StepReportTrait
         }
     }
 
-    /**
-     * @param string $message
-     * @param string|null $link
-     * @return void
-     */
     protected function addReportWarning(string $message, ?string $link = null): void
     {
         if ($this->report !== null) {
@@ -55,11 +38,6 @@ trait StepReportTrait
         }
     }
 
-    /**
-     * @param string $message
-     * @param string|null $link
-     * @return void
-     */
     protected function addReportError(string $message, ?string $link = null): void
     {
         if ($this->report !== null) {

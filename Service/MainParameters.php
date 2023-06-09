@@ -44,12 +44,6 @@ class MainParameters implements ParametersInterface
         throw new ProcessException('You may not set a parent here !');
     }
 
-    /**
-     * Get a value
-     * @param string $code
-     * @return mixed
-     * @throws ConfigurationException
-     */
     public function get(string $code): mixed
     {
         if (preg_match('/^configuration\(([^\)]+)\)$/', $code, $match)) {

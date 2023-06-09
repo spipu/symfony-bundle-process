@@ -19,34 +19,16 @@ use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 use Doctrine\DBAL\Connection;
 
-/**
- * Class AddIndexToTable
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class AddIndexToTable implements StepInterface
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * CreateTemporaryTable constructor.
-     * @param Connection $connection
-     */
     public function __construct(
         Connection $connection
     ) {
         $this->connection = $connection;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return bool
-     * @throws Exception
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $tablename = $parameters->get('tablename');
