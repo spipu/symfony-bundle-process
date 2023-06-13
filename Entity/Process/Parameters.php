@@ -15,76 +15,39 @@ namespace Spipu\ProcessBundle\Entity\Process;
 
 class Parameters implements ParametersInterface
 {
-    /**
-     * @var array
-     */
-    private $values;
+    private array $values;
+    private ?ParametersInterface $parentParameters = null;
 
-    /**
-     * @var ParametersInterface
-     */
-    private $parentParameters;
-
-    /**
-     * Parameters constructor.
-     * @param array $values
-     */
     public function __construct(array $values = [])
     {
         $this->values = $values;
     }
 
-    /**
-     * @param ParametersInterface $parentParameters
-     * @return void
-     */
     public function setParentParameters(ParametersInterface $parentParameters): void
     {
         $this->parentParameters = $parentParameters;
     }
 
-    /**
-     * Set a value
-     * @param string $code
-     * @param mixed $value
-     * @return void
-     */
-    public function set(string $code, $value): void
+    public function set(string $code, mixed $value): void
     {
         $this->values[$code] = $value;
     }
 
-    /**
-     * Set a default value
-     * @param string $code
-     * @param mixed $value
-     * @return void
-     */
-    public function setDefaultValue(string $code, $value): void
+    public function setDefaultValue(string $code, mixed $value): void
     {
         if (!array_key_exists($code, $this->values)) {
             $this->values[$code] = $value;
         }
     }
 
-    /**
-     * Get a value
-     * @param string $code
-     * @return mixed
-     */
-    public function get(string $code)
+    public function get(string $code): mixed
     {
         $value = array_key_exists($code, $this->values) ? $this->values[$code] : $this->parentParameters->get($code);
 
         return $this->compute($value);
     }
 
-    /**
-     * Compute a value
-     * @param mixed $value
-     * @return mixed
-     */
-    private function compute($value)
+    private function compute(mixed $value): mixed
     {
         if (is_array($value)) {
             return $this->computeArray($value);
@@ -97,11 +60,6 @@ class Parameters implements ParametersInterface
         return $value;
     }
 
-    /**
-     * Compute an array value
-     * @param array $array
-     * @return array
-     */
     private function computeArray(array $array): array
     {
         foreach ($array as $key => $value) {
@@ -111,25 +69,18 @@ class Parameters implements ParametersInterface
         return $array;
     }
 
-    /**
-     * Compute a string value
-     * @param string $string
-     * @return mixed
-     */
-    private function computeString(string $string)
+    private function computeString(string $string): mixed
     {
         if (preg_match('/^{{ ([^}]+) }}$/', $string, $match)) {
             return $this->get($match[1]);
         }
 
-        $string = preg_replace_callback(
+        return preg_replace_callback(
             '/{{ ([^}]+) }}/',
             function ($match) {
                 return $this->get($match[1]);
             },
             $string
         );
-
-        return $string;
     }
 }

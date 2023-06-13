@@ -19,11 +19,6 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class ToUpperString implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $value = $parameters->get('value');

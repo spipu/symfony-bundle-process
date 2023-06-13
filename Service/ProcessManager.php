@@ -33,56 +33,15 @@ use Throwable;
  */
 class ProcessManager
 {
-    /**
-     * @var ConfigReader
-     */
     private ConfigReader $configReader;
-
-    /**
-     * @var MainParameters
-     */
     private MainParameters $mainParameters;
-
-    /**
-     * @var LoggerProcessInterface
-     */
     private LoggerProcessInterface $logger;
-
-    /**
-     * @var EntityManagerInterface
-     */
     private EntityManagerInterface $entityManager;
-
-    /**
-     * @var AsynchronousCommand
-     */
     private AsynchronousCommand $asynchronousCommand;
-
-    /**
-     * @var InputsFactory
-     */
     private InputsFactory $inputsFactory;
-
-    /**
-     * @var ReportManager
-     */
     private ReportManager $reportManager;
-
-    /**
-     * @var LoggerOutputInterface|null
-     */
     private ?LoggerOutputInterface $loggerOutput = null;
 
-    /**
-     * Manager constructor.
-     * @param ConfigReader $configReader
-     * @param MainParameters $mainParameters
-     * @param LoggerProcessInterface $logger
-     * @param EntityManagerInterface $entityManager
-     * @param AsynchronousCommand $asynchronousCommand
-     * @param InputsFactory $inputsFactory
-     * @param ReportManager $reportManager
-     */
     public function __construct(
         ConfigReader $configReader,
         MainParameters $mainParameters,
@@ -101,30 +60,16 @@ class ProcessManager
         $this->reportManager = $reportManager;
     }
 
-    /**
-     * Get the config reader
-     * @return ConfigReader
-     */
     public function getConfigReader(): ConfigReader
     {
         return $this->configReader;
     }
 
-    /**
-     * @param LoggerOutputInterface|null $loggerOutput
-     * @return void
-     */
     public function setLoggerOutput(?LoggerOutputInterface $loggerOutput): void
     {
         $this->loggerOutput = $loggerOutput;
     }
 
-    /**
-     * Init a process
-     * @param string $code
-     * @return Process\Process
-     * @throws ProcessException
-     */
     public function load(string $code): Process\Process
     {
         $processDefinition = $this->configReader->getProcessDefinition($code);
@@ -153,11 +98,6 @@ class ProcessManager
         return $process;
     }
 
-    /**
-     * @param Task $task
-     * @return Process\Process
-     * @throws Exception
-     */
     public function loadFromTask(Task $task): Process\Process
     {
         try {
@@ -182,11 +122,6 @@ class ProcessManager
         return $process;
     }
 
-    /**
-     * Prepare the list of the steps
-     * @param array $processDefinition
-     * @return Process\Step[]
-     */
     private function loadPrepareSteps(array $processDefinition): array
     {
         $steps = [];
@@ -199,11 +134,6 @@ class ProcessManager
         return $steps;
     }
 
-    /**
-     * Prepare a step
-     * @param array $stepDefinition
-     * @return Process\Step
-     */
     private function loadPrepareStep(array $stepDefinition): Process\Step
     {
         return new Process\Step(
@@ -214,40 +144,21 @@ class ProcessManager
         );
     }
 
-    /**
-     * Prepare parameters
-     * @param array $parametersDefinition
-     * @return Process\Parameters
-     */
     private function loadPrepareParameters(array $parametersDefinition): Process\Parameters
     {
         return new Process\Parameters($parametersDefinition);
     }
 
-    /**
-     * @param array $inputsDefinition
-     * @return Process\Inputs
-     * @throws InputException
-     */
     private function loadPrepareInputs(array $inputsDefinition): Process\Inputs
     {
         return $this->inputsFactory->create($inputsDefinition);
     }
 
-    /**
-     * @param bool[] $optionsDefinition
-     * @return Process\Options
-     * @throws OptionException
-     */
     private function loadPrepareOptions(array $optionsDefinition): Process\Options
     {
         return new Process\Options($optionsDefinition);
     }
 
-    /**
-     * @param string $processCode
-     * @return Task
-     */
     private function loadPrepareTask(string $processCode): Task
     {
         $task = new Task();
@@ -264,14 +175,7 @@ class ProcessManager
         return $task;
     }
 
-    /**
-     * Execute the process
-     * @param Process\Process $process
-     * @param callable|null $initCallback
-     * @return mixed
-     * @throws Exception
-     */
-    public function execute(Process\Process $process, callable $initCallback = null)
+    public function execute(Process\Process $process, callable $initCallback = null): mixed
     {
         $blockingTaskId = $this->getBlockingTaskId($process);
         if ($blockingTaskId !== null) {
@@ -326,10 +230,6 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @return int
-     */
     private function countMatterSteps(Process\Process $process): int
     {
         $nbSteps = 0;
@@ -343,13 +243,6 @@ class ProcessManager
         return ($nbSteps > 0) ? $nbSteps : 1;
     }
 
-    /**
-     * @param Process\Process $process
-     * @param DateTimeInterface $scheduleDate
-     * @return int
-     * @throws InputException
-     * @throws ProcessException
-     */
     public function scheduleExecution(Process\Process $process, DateTimeInterface $scheduleDate): int
     {
         if (!$process->getOptions()->canBePutInQueue()) {
@@ -365,11 +258,6 @@ class ProcessManager
         return $process->getTask()->getId();
     }
 
-    /**
-     * @param Process\Process $process
-     * @return int
-     * @throws Exception
-     */
     public function executeAsynchronously(Process\Process $process): int
     {
         if (!$process->getOptions()->canBePutInQueue()) {
@@ -390,10 +278,6 @@ class ProcessManager
         return $process->getTask()->getId();
     }
 
-    /**
-     * @param Process\Process $process
-     * @return int|null
-     */
     public function getBlockingTaskId(Process\Process $process): ?int
     {
         $processLocks = $process->getOptions()->getProcessLocks();
@@ -447,11 +331,6 @@ class ProcessManager
         return $query;
     }
 
-     /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
-     * @return void
-     */
     private function executePrepareOptions(Process\Process $process, LoggerProcessInterface $logger): void
     {
         foreach ($process->getOptions()->getOptions() as $key => $value) {
@@ -465,12 +344,6 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
-     * @return void
-     * @throws InputException
-     */
     private function executePrepareInputs(Process\Process $process, LoggerProcessInterface $logger): void
     {
         $this->prepareInputs($process);
@@ -492,11 +365,6 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @return void
-     * @throws InputException
-     */
     private function prepareInputs(Process\Process $process): void
     {
         if ($process->getTask()) {
@@ -506,13 +374,7 @@ class ProcessManager
         $process->getInputs()->validate();
     }
 
-    /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
-     * @return mixed|null
-     * @throws StepException
-     */
-    private function executeSteps(Process\Process $process, LoggerProcessInterface $logger)
+    private function executeSteps(Process\Process $process, LoggerProcessInterface $logger): mixed
     {
         $kSteps = -1;
         $result = null;
@@ -573,14 +435,7 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
-     * @return mixed
-     * @throws InputException
-     * @throws StepException
-     */
-    private function manageExecute(Process\Process $process, LoggerProcessInterface $logger)
+    private function manageExecute(Process\Process $process, LoggerProcessInterface $logger): mixed
     {
         $this->executePrepareOptions($process, $logger);
         $this->executePrepareInputs($process, $logger);
@@ -603,13 +458,6 @@ class ProcessManager
         return $result;
     }
 
-    /**
-     * @param Process\Process $process
-     * @param LoggerProcessInterface $logger
-     * @param Throwable $exception
-     * @param bool $rerun
-     * @return void
-     */
     private function manageExecuteError(
         Process\Process $process,
         LoggerProcessInterface $logger,

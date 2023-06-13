@@ -15,10 +15,8 @@ namespace Spipu\ProcessBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Spipu\UiBundle\Exception\GridException;
-use Spipu\UiBundle\Exception\UiException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Spipu\UiBundle\Service\Ui\GridFactory;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Spipu\ProcessBundle\Entity\Log;
 use Spipu\ProcessBundle\Ui\LogGrid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,38 +24,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/process/log")
- */
+#[Route(path: '/process/log')]
 class LogController extends AbstractController
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         EntityManagerInterface $entityManager
     ) {
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route(
-     *     "/",
-     *     name="spipu_process_admin_log_list",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')")
-     * @param GridFactory $gridFactory
-     * @param LogGrid $logGrid
-     * @return Response
-     * @throws UiException
-     * @throws GridException
-     */
+    #[Route(path: '/', name: 'spipu_process_admin_log_list', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')]
     public function index(GridFactory $gridFactory, LogGrid $logGrid): Response
     {
         $manager = $gridFactory->create($logGrid);
@@ -69,16 +48,8 @@ class LogController extends AbstractController
         return $this->render('@SpipuProcess/log/index.html.twig', ['manager' => $manager]);
     }
 
-    /**
-     * @Route(
-     *     "/show/{id}",
-     *     name="spipu_process_admin_log_show",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')")
-     * @param Log $resource
-     * @return Response
-     */
+    #[Route(path: '/show/{id}', name: 'spipu_process_admin_log_show', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')]
     public function show(Log $resource): Response
     {
         $messages = json_decode($resource->getContent(), true);
@@ -109,17 +80,8 @@ class LogController extends AbstractController
         );
     }
 
-    /**
-     * @Route(
-     *     "/delete/{id}",
-     *     name="spipu_process_admin_log_delete",
-     *     methods="DELETE"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_DELETE')")
-     * @param Request $request
-     * @param Log $resource
-     * @return Response
-     */
+    #[Route(path: '/delete/{id}', name: 'spipu_process_admin_log_delete', methods: 'DELETE')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_DELETE')]
     public function delete(
         Request $request,
         Log $resource
@@ -144,10 +106,6 @@ class LogController extends AbstractController
         return $this->redirectToRoute('spipu_process_admin_log_list');
     }
 
-    /**
-     * @param string $status
-     * @return string
-     */
     private function getCssFromStatus(string $status): string
     {
         $levelAlertsLink = [
@@ -168,31 +126,17 @@ class LogController extends AbstractController
         return $levelAlertsLink[$status];
     }
 
-    /**
-     * @param string $type
-     * @param string $message
-     * @param array $params
-     * @return void
-     */
     private function addFlashTrans(string $type, string $message, array $params = []): void
     {
         $this->addFlash($type, $this->trans($message, $params));
     }
 
-    /**
-     * @param string $message
-     * @param array $params
-     * @return string
-     */
     private function trans(string $message, array $params = []): string
     {
         return $this->container->get('translator')->trans($message, $params);
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return parent::getSubscribedServices() + [
             'translator',

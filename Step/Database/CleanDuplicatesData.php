@@ -20,34 +20,16 @@ use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 use Doctrine\DBAL\Connection;
 
-/**
- * Class CleanDuplicatesData
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class CleanDuplicatesData implements StepInterface
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * CreateTemporaryTable constructor.
-     * @param Connection $connection
-     */
     public function __construct(
         Connection $connection
     ) {
         $this->connection = $connection;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return array
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $tablename = $parameters->get('tablename');
@@ -142,9 +124,8 @@ class CleanDuplicatesData implements StepInterface
      */
     private function getCondition(array $fields, string $alias1, string $alias2): string
     {
-        $condition = array();
+        $condition = [];
         foreach ($fields as $field) {
-            /**@var array condition*/
             $condition[] = sprintf(
                 '%1$s.%3$s = %2$s.%3$s',
                 $alias1,

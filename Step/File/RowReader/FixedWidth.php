@@ -17,10 +17,6 @@ use Spipu\ProcessBundle\Exception\RowReaderException;
 
 class FixedWidth extends AbstractRowReader
 {
-    /**
-     * @param array $definition
-     * @return array
-     */
     protected function prepareField(array $definition): array
     {
         return [

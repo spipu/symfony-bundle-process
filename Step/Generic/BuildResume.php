@@ -19,11 +19,6 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class BuildResume implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return array
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $resume = [

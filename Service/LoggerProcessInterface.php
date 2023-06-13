@@ -44,9 +44,5 @@ interface LoggerProcessInterface extends LoggerInterface
      */
     public function finish(string $status): void;
 
-    /**
-     * @param LoggerOutputInterface|null $loggerOutput
-     * @return void
-     */
     public function setLoggerOutput(?LoggerOutputInterface $loggerOutput): void;
 }

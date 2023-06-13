@@ -17,49 +17,20 @@ use Spipu\ProcessBundle\Entity\Task;
 
 class Process
 {
-    /**
-     * @var string
-     */
-    private $code;
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var Parameters
-     */
-    private $parameters;
+    private string $code;
+    private string $name;
+    private Options $options;
+    private Inputs $inputs;
+    private Parameters $parameters;
 
     /**
      * @var Step[]
      */
-    private $steps;
+    private array $steps;
+    private ?Task $task = null;
+    private ?int $logId = null;
+    private ?Report $report = null;
 
-    /**
-     * @var Inputs
-     */
-    private $inputs;
-    /**
-     * @var Options
-     */
-    private $options;
-
-    /**
-     * @var Task|null
-     */
-    private $task;
-
-    /**
-     * @var int|null
-     */
-    private $logId;
-
-    /**
-     * @var Report|null
-     */
-    private $report = null;
 
     /**
      * Process constructor.
@@ -88,10 +59,6 @@ class Process
         $this->linkParameters();
     }
 
-    /**
-     * Link the process parameters to each step parameters
-     * @return void
-     */
     private function linkParameters(): void
     {
         foreach ($this->steps as $step) {
@@ -99,41 +66,26 @@ class Process
         }
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return Options
-     */
     public function getOptions(): Options
     {
         return $this->options;
     }
 
-    /**
-     * @return Inputs
-     */
     public function getInputs(): Inputs
     {
         return $this->inputs;
     }
 
-    /**
-     * @return Parameters
-     */
     public function getParameters(): Parameters
     {
         return $this->parameters;
@@ -147,10 +99,6 @@ class Process
         return $this->steps;
     }
 
-    /**
-     * @param Task $task
-     * @return Process
-     */
     public function setTask(Task $task): self
     {
         $this->task = $task;
@@ -158,26 +106,16 @@ class Process
         return $this;
     }
 
-    /**
-     * @return Task|null
-     */
     public function getTask(): ?Task
     {
         return $this->task;
     }
 
-    /**
-     * @return int|null
-     */
     public function getLogId(): ?int
     {
         return $this->logId;
     }
 
-    /**
-     * @param int|null $logId
-     * @return self
-     */
     public function setLogId(?int $logId): self
     {
         $this->logId = $logId;
@@ -185,18 +123,11 @@ class Process
         return $this;
     }
 
-    /**
-     * @return Report|null
-     */
     public function getReport(): ?Report
     {
         return $this->report;
     }
 
-    /**
-     * @param Report $report
-     * @return $this
-     */
     public function setReport(Report $report): self
     {
         $this->report = $report;

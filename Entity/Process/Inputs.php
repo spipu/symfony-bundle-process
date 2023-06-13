@@ -20,21 +20,13 @@ class Inputs
     /**
      * @var Input[]
      */
-    private $inputs = [];
+    private array $inputs = [];
 
-    /**
-     * @param Input $input
-     * @return void
-     */
     public function addInput(Input $input): void
     {
         $this->inputs[$input->getName()] = $input;
     }
 
-    /**
-     * @return bool
-     * @throws InputException
-     */
     public function validate(): bool
     {
         foreach ($this->inputs as $input) {
@@ -44,31 +36,16 @@ class Inputs
         return true;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    public function set(string $key, $value): void
+    public function set(string $key, mixed $value): void
     {
         $this->getInput($key)->setValue($value);
     }
 
-    /**
-     * @param string $key
-     * @return mixed
-     * @throws InputException
-     */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         return $this->getInput($key)->getValue();
     }
 
-    /**
-     * @return array
-     * @throws InputException
-     */
     public function getAll(): array
     {
         $values = [];
@@ -79,19 +56,11 @@ class Inputs
         return $values;
     }
 
-    /**
-     * @return Input[]
-     */
     public function getInputs(): array
     {
         return $this->inputs;
     }
 
-    /**
-     * @param string $key
-     * @return Input
-     * @throws InputException
-     */
     public function getInput(string $key): Input
     {
         if (!array_key_exists($key, $this->inputs)) {

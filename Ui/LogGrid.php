@@ -13,38 +13,20 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Ui;
 
-use Spipu\UiBundle\Exception\GridException;
 use Spipu\UiBundle\Service\Ui\Definition\GridDefinitionInterface;
 use Spipu\UiBundle\Entity\Grid;
 use Spipu\ProcessBundle\Form\Options\Process as OptionsProcess;
 use Spipu\ProcessBundle\Form\Options\Status as OptionsStatus;
 
 /**
- * Class LogGrid
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
  */
 class LogGrid implements GridDefinitionInterface
 {
-    /**
-     * @var Grid\Grid
-     */
-    private $definition;
+    private ?Grid\Grid $definition = null;
+    private OptionsProcess $optionsProcess;
+    private OptionsStatus $optionsStatus;
 
-    /**
-     * @var OptionsProcess
-     */
-    private $optionsProcess;
-
-    /**
-     * @var OptionsStatus
-     */
-    private $optionsStatus;
-
-    /**
-     * TaskGrid constructor.
-     * @param OptionsProcess $optionsProcess
-     * @param OptionsStatus $optionsStatus
-     */
     public function __construct(
         OptionsProcess $optionsProcess,
         OptionsStatus $optionsStatus
@@ -53,10 +35,6 @@ class LogGrid implements GridDefinitionInterface
         $this->optionsStatus = $optionsStatus;
     }
 
-    /**
-     * @return Grid\Grid
-     * @throws GridException
-     */
     public function getDefinition(): Grid\Grid
     {
         if (!$this->definition) {
@@ -66,10 +44,6 @@ class LogGrid implements GridDefinitionInterface
         return $this->definition;
     }
 
-    /**
-     * @return void
-     * @throws GridException
-     */
     private function prepareGrid(): void
     {
         $this->definition = (new Grid\Grid('process_log', 'SpipuProcessBundle:Log'))

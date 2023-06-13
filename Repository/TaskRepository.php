@@ -29,16 +29,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TaskRepository extends ServiceEntityRepository
 {
-    /**
-     * @var Status
-     */
-    private $status;
+    private Status $status;
 
-    /**
-     * ProcessTaskRepository constructor.
-     * @param ManagerRegistry $registry
-     * @param Status $status
-     */
     public function __construct(
         ManagerRegistry $registry,
         Status $status
@@ -99,10 +91,6 @@ class TaskRepository extends ServiceEntityRepository
         return $list;
     }
 
-    /**
-     * @param DateTimeInterface $limitDate
-     * @return int
-     */
     public function deleteFinishedTasks(DateTimeInterface $limitDate): int
     {
         $query = $this

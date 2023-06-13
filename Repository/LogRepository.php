@@ -27,16 +27,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class LogRepository extends ServiceEntityRepository
 {
-    /**
-     * @var Status
-     */
-    private $status;
+    private Status $status;
 
-    /**
-     * ProcessLogRepository constructor.
-     * @param ManagerRegistry $registry
-     * @param Status $status
-     */
     public function __construct(
         ManagerRegistry $registry,
         Status $status
@@ -45,10 +37,6 @@ class LogRepository extends ServiceEntityRepository
         $this->status = $status;
     }
 
-    /**
-     * @param DateTimeInterface $limitDate
-     * @return int
-     */
     public function deleteFinishedLogs(DateTimeInterface $limitDate): int
     {
         $query = $this

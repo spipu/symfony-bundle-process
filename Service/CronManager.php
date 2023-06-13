@@ -24,61 +24,19 @@ use Spipu\ProcessBundle\Repository\TaskRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class CronManager
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
  */
 class CronManager
 {
-    /**
-     * @var TaskRepository
-     */
-    private $processTaskRepository;
+    private TaskRepository $processTaskRepository;
+    private LogRepository $processLogRepository;
+    private Manager $processManager;
+    private Status $processStatus;
+    private ModuleConfiguration $processConfiguration;
+    private EntityManagerInterface $entityManager;
+    private Logger $logger;
+    private TaskManager $taskManager;
 
-    /**
-     * @var LogRepository
-     */
-    private $processLogRepository;
-
-    /**
-     * @var Manager
-     */
-    private $processManager;
-
-    /**
-     * @var Status
-     */
-    private $processStatus;
-
-    /**
-     * @var ModuleConfiguration
-     */
-    private $processConfiguration;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var TaskManager
-     */
-    private $taskManager;
-
-    /**
-     * @param TaskRepository $processTaskRepository
-     * @param LogRepository $processLogRepository
-     * @param Manager $processManager
-     * @param Status $processStatus
-     * @param ModuleConfiguration $processConfiguration
-     * @param EntityManagerInterface $entityManager
-     * @param Logger $logger
-     * @param TaskManager $taskManager
-     */
     public function __construct(
         TaskRepository $processTaskRepository,
         LogRepository $processLogRepository,
@@ -99,11 +57,6 @@ class CronManager
         $this->taskManager = $taskManager;
     }
 
-    /**
-     * Rerun the waiting tasks
-     * @param OutputInterface $output
-     * @return bool
-     */
     public function rerunWaitingTasks(OutputInterface $output): bool
     {
         $output->writeln('Search tasks to execute automatically');
@@ -145,9 +98,6 @@ class CronManager
         return true;
     }
 
-    /**
-     * @return DateTime
-     */
     private function getLimitWaitingTaskDate(): DateTime
     {
         $date = new DateTime();
@@ -156,11 +106,6 @@ class CronManager
         return $date;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param int $taskId
-     * @return bool
-     */
     private function rerunWaitingTask(OutputInterface $output, int $taskId): bool
     {
         $output->writeln(sprintf('Run task #%d', $taskId));
@@ -202,10 +147,6 @@ class CronManager
         return true;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @return bool
-     */
     public function cleanFinishedLogs(OutputInterface $output): bool
     {
         $output->writeln('Search finished logs to clean');
@@ -223,10 +164,6 @@ class CronManager
         return true;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @return bool
-     */
     public function cleanFinishedTasks(OutputInterface $output): bool
     {
         $output->writeln('Search finished tasks to clean');
@@ -244,10 +181,6 @@ class CronManager
         return true;
     }
 
-    /**
-     * @param int $nbDays
-     * @return DateTimeInterface
-     */
     private function prepareLimitDate(int $nbDays): DateTimeInterface
     {
         $date = new DateTime();
@@ -262,11 +195,6 @@ class CronManager
         return $date;
     }
 
-    /**
-     * Check the PID of the running tasks
-     * @param OutputInterface $output
-     * @return bool
-     */
     public function checkRunningTasksPid(OutputInterface $output): bool
     {
         $output->writeln('Search running tasks');
@@ -287,11 +215,6 @@ class CronManager
         return true;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param int $taskId
-     * @return void
-     */
     private function checkRunningTaskPid(OutputInterface $output, int $taskId): void
     {
         $task = $this->processTaskRepository->find($taskId);
@@ -331,10 +254,6 @@ class CronManager
         $this->entityManager->flush();
     }
 
-    /**
-     * @param Task $task
-     * @return bool
-     */
     private function isScheduledTask(Task $task): bool
     {
         $waitingDate = $this->getLimitWaitingTaskDate();

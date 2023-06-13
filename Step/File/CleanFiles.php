@@ -20,12 +20,6 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class CleanFiles implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return bool
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $folder = (string) $parameters->get('folder');

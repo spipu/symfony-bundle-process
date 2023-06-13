@@ -21,32 +21,11 @@ use Throwable;
 
 class MailManager
 {
-    /**
-     * @var ModuleConfiguration
-     */
-    private $configuration;
+    private ModuleConfiguration $configuration;
+    private BaseMailManager $mailManager;
+    private Url $url;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var BaseMailManager
-     */
-    private $mailManager;
-
-    /**
-     * @var Url
-     */
-    private $url;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * Mailer constructor.
-     * @param ModuleConfiguration $configuration
-     * @param BaseMailManager $mailManager
-     * @param Url $url
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ModuleConfiguration $configuration,
         BaseMailManager $mailManager,
@@ -59,11 +38,6 @@ class MailManager
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param ProcessLog $processLog
-     * @param Throwable|null $exception
-     * @return bool
-     */
     public function sendAlert(ProcessLog $processLog, ?Throwable $exception = null): bool
     {
         $logUrl = $this->url->getLogUrl($processLog->getId());

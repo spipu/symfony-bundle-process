@@ -27,10 +27,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 final class SpipuProcessExtension extends Extension implements RolesHierarchyExtensionExtensionInterface
 {
-    /**
-     * Get the alias in config file
-     * @return string
-     */
     public function getAlias(): string
     {
         return 'spipu_process';
@@ -106,11 +102,6 @@ final class SpipuProcessExtension extends Extension implements RolesHierarchyExt
         return $process;
     }
 
-    /**
-     * @param array $input
-     * @return void
-     * @throws ProcessException
-     */
     private function validateConfigInput(array $input): void
     {
         if (count($input['allowed_mime_types']) > 0 && $input['type'] !== 'file') {

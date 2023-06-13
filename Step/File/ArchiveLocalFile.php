@@ -21,16 +21,8 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class ArchiveLocalFile implements StepInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     * @throws StepException
-     */
+    private LoggerInterface $logger;
+
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $this->logger = $logger;
@@ -68,10 +60,6 @@ class ArchiveLocalFile implements StepInterface
         return $archiveFilename;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @return int|null
-     */
     private function getKeepNumberParameter(ParametersInterface $parameters): ?int
     {
         $parameters->setDefaultValue('keep_number', null);
@@ -88,10 +76,6 @@ class ArchiveLocalFile implements StepInterface
         return null;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @return string|null
-     */
     private function getKeepPatternParameter(ParametersInterface $parameters): ?string
     {
         $parameters->setDefaultValue('keep_pattern', null);
@@ -108,13 +92,7 @@ class ArchiveLocalFile implements StepInterface
         return null;
     }
 
-    /**
-     * @param string $folder
-     * @param int $keepNumber
-     * @param string|null $keepPattern
-     * @return bool
-     */
-    private function keepFiles(string $folder, int $keepNumber, ?string $keepPattern): bool
+    private function keepFiles(string $folder, int $keepNumber, ?string $keepPattern): void
     {
         $list = [];
 
@@ -131,7 +109,7 @@ class ArchiveLocalFile implements StepInterface
         }
 
         if (count($list) <= $keepNumber) {
-            return false;
+            return;
         }
 
         asort($list);
@@ -142,7 +120,5 @@ class ArchiveLocalFile implements StepInterface
         foreach ($filesToDelete as $fileToDelete) {
             unlink($folder . $fileToDelete);
         }
-
-        return true;
     }
 }

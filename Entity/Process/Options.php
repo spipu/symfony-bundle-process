@@ -17,16 +17,8 @@ use Spipu\ProcessBundle\Exception\OptionException;
 
 class Options
 {
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
-    /**
-     * Inputs constructor.
-     * @param array $options
-     * @throws OptionException
-     */
     public function __construct(
         array $options
     ) {
@@ -34,10 +26,6 @@ class Options
         $this->validateDefinition();
     }
 
-    /**
-     * @return void
-     * @throws OptionException
-     */
     private function validateDefinition(): void
     {
         $booleanKeys = [
@@ -68,9 +56,6 @@ class Options
         }
     }
 
-    /**
-     * @return bool[]
-     */
     public function getOptions(): array
     {
         return $this->options;
@@ -114,9 +99,6 @@ class Options
         return (array) $this->options['process_lock'];
     }
 
-    /**
-     * @return string|null
-     */
     public function getNeededRole(): ?string
     {
         return $this->options['needed_role'];

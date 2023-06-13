@@ -24,13 +24,7 @@ class GenerateError implements StepInterface, StepReportInterface
 {
     use StepReportTrait;
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return void
-     * @throws StepException
-     */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger): void
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $logger->debug('Test of message');
         $this->addReportMessage('Test of message');

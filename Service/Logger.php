@@ -19,6 +19,7 @@ use Exception;
 use Spipu\ProcessBundle\Entity\Log as ProcessLog;
 use Spipu\ProcessBundle\Entity\Task as ProcessTask;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Stringable;
 use Throwable;
 
 /**
@@ -26,56 +27,16 @@ use Throwable;
  */
 class Logger implements LoggerProcessInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
+    private ?MailManager $mailer;
+    private array $messages = [];
+    private ?ProcessLog $model = null;
+    private int $nbSteps = 0;
+    private int $currentStep = 0;
+    private bool $ignoreInProgress = false;
+    private ?LoggerOutputInterface $loggerOutput = null;
+    private ?Throwable $lastException = null;
 
-    /**
-     * @var array
-     */
-    private $messages;
-
-    /**
-     * @var ProcessLog|null
-     */
-    private $model;
-
-    /**
-     * @var MailManager
-     */
-    private $mailer;
-
-    /**
-     * @var int
-     */
-    private $nbSteps;
-
-    /**
-     * @var int
-     */
-    private $currentStep;
-
-    /**
-     * @var bool
-     */
-    private $ignoreInProgress;
-
-    /**
-     * @var LoggerOutputInterface|null
-     */
-    private $loggerOutput;
-
-    /**
-     * @var Throwable|null
-     */
-    private $lastException = null;
-
-    /**
-     * Logger constructor.
-     * @param EntityManagerInterface $entityManager
-     * @param MailManager|null $mailer
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
         MailManager $mailer = null
@@ -84,31 +45,17 @@ class Logger implements LoggerProcessInterface
         $this->mailer = $mailer;
     }
 
-    /**
-     * If destructed, do not transfer the model
-     */
     public function __destruct()
     {
         unset($this->model);
     }
 
-    /**
-     * If cloned, do not transfer the model
-     * @return void
-     */
     public function __clone()
     {
         unset($this->model);
         $this->model = null;
     }
 
-    /**
-     * Init the logger for a new process
-     * @param string $processCode
-     * @param int $nbSteps
-     * @param ProcessTask|null $task
-     * @return int
-     */
     public function init(string $processCode, int $nbSteps, ?ProcessTask $task): int
     {
         $this->messages = [];
@@ -127,35 +74,22 @@ class Logger implements LoggerProcessInterface
         return $this->model->getId();
     }
 
-    /**
-     * @param LoggerOutputInterface|null $loggerOutput
-     * @return void
-     */
     public function setLoggerOutput(?LoggerOutputInterface $loggerOutput): void
     {
         $this->loggerOutput = $loggerOutput;
     }
 
-    /**
-     * Set the current step, from 0 to n-1
-     * @param int $currentStep
-     * @param bool $ignoreInProgress
-     * @return void
-     */
     public function setCurrentStep(int $currentStep, bool $ignoreInProgress): void
     {
+        // Set the current step, from 0 to n-1.
         $this->currentStep = $currentStep;
         $this->ignoreInProgress = $ignoreInProgress;
         $this->setProgress(0);
     }
 
-    /**
-     * Set the progress on the current step
-     * @param int $progressOnCurrentStep
-     * @return void
-     */
     public function setProgress(int $progressOnCurrentStep): void
     {
+        // Set the progress on the current step.
         if ($this->ignoreInProgress) {
             $progressOnCurrentStep = 0;
         }
@@ -169,20 +103,11 @@ class Logger implements LoggerProcessInterface
         }
     }
 
-    /**
-     * @param Throwable|null $lastException
-     * @return void
-     */
     public function setLastException(?Throwable $lastException): void
     {
         $this->lastException = $lastException;
     }
 
-    /**
-     * Finish the logger for the current process
-     * @param string $status
-     * @return void
-     */
     public function finish(string $status): void
     {
         $this->model->setStatus($status);
@@ -200,11 +125,6 @@ class Logger implements LoggerProcessInterface
         $this->saveModel();
     }
 
-    /**
-     * save the model
-     * @return void
-     * @throws Exception
-     */
     private function saveModel(): void
     {
         if ($this->model === null) {
@@ -226,130 +146,47 @@ class Logger implements LoggerProcessInterface
         }
     }
 
-    /**
-     * System is unusable.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function emergency($message, array $context = array())
+    public function emergency(string|Stringable $message, array $context = []): void
     {
         $this->log('emergency', $message, $context);
     }
 
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function alert($message, array $context = array())
+    public function alert(string|Stringable $message, array $context = []): void
     {
         $this->log('alert', $message, $context);
     }
 
-    /**
-     * Critical conditions.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function critical($message, array $context = array())
+    public function critical(string|Stringable $message, array $context = []): void
     {
         $this->log('critical', $message, $context);
     }
 
-    /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function error($message, array $context = array())
+    public function error(string|Stringable $message, array $context = []): void
     {
         $this->log('error', $message, $context);
     }
 
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function warning($message, array $context = array())
+    public function warning(string|Stringable $message, array $context = []): void
     {
         $this->log('warning', $message, $context);
     }
 
-    /**
-     * Normal but significant events.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function notice($message, array $context = array())
+    public function notice(string|Stringable $message, array $context = []): void
     {
         $this->log('notice', $message, $context);
     }
 
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function info($message, array $context = array())
+    public function info(string|Stringable $message, array $context = []): void
     {
         $this->log('info', $message, $context);
     }
 
-    /**
-     * Detailed debug information.
-     *
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function debug($message, array $context = array())
+    public function debug(string|Stringable $message, array $context = []): void
     {
         $this->log('debug', $message, $context);
     }
 
-    /**
-     * Logs with an arbitrary level.
-     *
-     * @param mixed $level
-     * @param mixed $message
-     * @param array $context
-     *
-     * @return void
-     * @SuppressWarnings(PMD.UnusedFormalParameter)
-     */
-    public function log($level, $message, array $context = array())
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         $messageRow = [
             'date'        => (new DateTime())->getTimestamp(),
@@ -357,6 +194,7 @@ class Logger implements LoggerProcessInterface
             'memory_peak' => memory_get_peak_usage(),
             'level'       => (string) $level,
             'message'     => (string) mb_convert_encoding($message, 'UTF-8'),
+            'context'     => $context,
         ];
 
         if ($this->loggerOutput) {
@@ -368,28 +206,22 @@ class Logger implements LoggerProcessInterface
         $this->saveModel();
     }
 
-    /**
-     * @return ProcessLog|null
-     */
     public function getModel(): ?ProcessLog
     {
         return $this->model;
     }
 
-    /**
-     * @param ProcessLog $log
-     * @return void
-     */
     public function initFromExistingLog(ProcessLog $log): void
     {
         $this->model = $log;
         $this->nbSteps = 1;
 
         try {
-            $this->messages = json_decode($log->getContent(), true, 512, JSON_THROW_ON_ERROR);
-            if (!is_array($this->messages)) {
-                $this->messages = [];
+            $messages = json_decode($log->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($messages)) {
+                $messages = [];
             }
+            $this->messages = $messages;
         } catch (Exception $e) {
             $this->messages = [];
         }

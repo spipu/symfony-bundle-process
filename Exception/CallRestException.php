@@ -18,7 +18,7 @@ class CallRestException extends StepException
     /**
      * @var string[]
      */
-    private $codeMapping = [
+    private array $codeMapping = [
         1  => 'CURLE_UNSUPPORTED_PROTOCOL',
         2  => 'CURLE_FAILED_INIT',
         3  => 'CURLE_URL_MALFORMAT',
@@ -109,9 +109,6 @@ class CallRestException extends StepException
         88 => 'CURLE_CHUNK_FAILED',
     ];
 
-    /**
-     * @return string
-     */
     public function getCurlCode(): string
     {
         $code = $this->getCode();

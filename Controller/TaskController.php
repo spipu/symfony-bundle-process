@@ -16,8 +16,7 @@ namespace Spipu\ProcessBundle\Controller;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Service\TaskManager;
@@ -25,14 +24,12 @@ use Spipu\ProcessBundle\Ui\ProcessForm;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\UiBundle\Entity\Form\Field;
-use Spipu\UiBundle\Exception\UiException;
 use Spipu\UiBundle\Form\Options\YesNo;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\UiBundle\Service\Ui\FormFactory;
 use Spipu\UiBundle\Service\Ui\FormManagerInterface;
 use Spipu\UiBundle\Service\Ui\Grid\DataProvider\Doctrine;
 use Spipu\UiBundle\Service\Ui\GridFactory;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Spipu\ProcessBundle\Service\Manager as ProcessManager;
@@ -49,32 +46,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Throwable;
 
 /**
- * @Route("/process/task")
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
  */
+#[Route(path: '/process/task')]
 class TaskController extends AbstractController
 {
-    /**
-     * @var ModuleConfiguration
-     */
-    private $configuration;
+    private ModuleConfiguration $configuration;
+    private Status $status;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var Status
-     */
-    private $status;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * TaskController constructor.
-     * @param ModuleConfiguration $configuration
-     * @param Status $status
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         ModuleConfiguration $configuration,
         Status $status,
@@ -85,18 +65,8 @@ class TaskController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route(
-     *     "/",
-     *     name="spipu_process_admin_task_list",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')")
-     * @param GridFactory $gridFactory
-     * @param TaskGrid $taskGrid
-     * @return Response
-     * @throws UiException
-     */
+    #[Route(path: '/', name: 'spipu_process_admin_task_list', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')]
     public function index(GridFactory $gridFactory, TaskGrid $taskGrid): Response
     {
         $this->checkConfiguration();
@@ -110,22 +80,8 @@ class TaskController extends AbstractController
         return $this->render('@SpipuProcess/task/index.html.twig', ['manager' => $manager]);
     }
 
-    /**
-     * @Route(
-     *     "/show/{id}",
-     *     name="spipu_process_admin_task_show",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')")
-     * @param Task $resource
-     * @param YesNo $yesNoOptions
-     * @param GridFactory $gridFactory
-     * @param LogGrid $logGrid
-     * @param ConfigReader $configReader
-     * @return Response
-     * @throws ProcessException
-     * @throws UiException
-     */
+    #[Route(path: '/show/{id}', name: 'spipu_process_admin_task_show', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')]
     public function show(
         Task $resource,
         YesNo $yesNoOptions,
@@ -163,19 +119,8 @@ class TaskController extends AbstractController
         );
     }
 
-    /**
-     * @Route(
-     *     "/rerun/{id}",
-     *     name="spipu_process_admin_task_rerun",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_RERUN')")
-     * @param Task $resource
-     * @param ProcessManager $processManager
-     * @param AsynchronousCommand $asynchronousCommand
-     * @return Response
-     * @throws Exception
-     */
+    #[Route(path: '/rerun/{id}', name: 'spipu_process_admin_task_rerun', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_RERUN')]
     public function rerun(
         Task $resource,
         ProcessManager $processManager,
@@ -210,17 +155,8 @@ class TaskController extends AbstractController
         return $redirect;
     }
 
-    /**
-     * @Route(
-     *     "/kill/{id}",
-     *     name="spipu_process_admin_task_kill",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_KILL')")
-     * @param Task $resource
-     * @param TaskManager $taskManager
-     * @return Response
-     */
+    #[Route(path: '/kill/{id}', name: 'spipu_process_admin_task_kill', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_KILL')]
     public function kill(
         Task $resource,
         TaskManager $taskManager
@@ -242,17 +178,8 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('spipu_process_admin_task_show', ['id' => $resource->getId()]);
     }
 
-    /**
-     * @Route(
-     *     "/delete/{id}",
-     *     name="spipu_process_admin_task_delete",
-     *     methods="DELETE"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_DELETE')")
-     * @param Request $request
-     * @param Task $resource
-     * @return Response
-     */
+    #[Route(path: '/delete/{id}', name: 'spipu_process_admin_task_delete', methods: 'DELETE')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_DELETE')]
     public function delete(
         Request $request,
         Task $resource
@@ -276,17 +203,8 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('spipu_process_admin_task_list');
     }
 
-    /**
-     * @Route(
-     *     "/execute-choice",
-     *     name="spipu_process_admin_task_execute_choice",
-     *     methods="GET"
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')")
-     * @param ConfigReader $configReader
-     * @return Response
-     * @throws ProcessException
-     */
+    #[Route(path: '/execute-choice', name: 'spipu_process_admin_task_execute_choice', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')]
     public function executeChoice(ConfigReader $configReader): Response
     {
         $this->checkConfiguration();
@@ -321,23 +239,8 @@ class TaskController extends AbstractController
         );
     }
 
-    /**
-     * @Route(
-     *     "/execute/{processCode}",
-     *     name="spipu_process_admin_task_execute",
-     * )
-     * @Security("is_granted('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')")
-     * @param string $processCode
-     * @param FormFactory $formFactory
-     * @param ProcessForm $processForm
-     * @param ProcessManager $processManager
-     * @param Request $request
-     * @return Response
-     * @throws ProcessException
-     * @throws UiException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
+    #[Route(path: '/execute/{processCode}', name: 'spipu_process_admin_task_execute')]
+    #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_EXECUTE')]
     public function execute(
         string $processCode,
         FormFactory $formFactory,
@@ -399,14 +302,6 @@ class TaskController extends AbstractController
         );
     }
 
-    /**
-     * @param ProcessManager $processManager
-     * @param string $processCode
-     * @param FormManagerInterface $formManager
-     * @param DateTimeInterface|null $scheduledAt
-     * @return int
-     * @throws Exception
-     */
     private function launchProcess(
         ProcessManager $processManager,
         string $processCode,
@@ -447,11 +342,6 @@ class TaskController extends AbstractController
         return $taskId;
     }
 
-    /**
-     * @param FormManagerInterface $formManager
-     * @param Request $request
-     * @return void
-     */
     private function forceFormParameters(FormManagerInterface $formManager, Request $request): void
     {
         $processParams = $request->query->get('process');
@@ -465,12 +355,6 @@ class TaskController extends AbstractController
         }
     }
 
-    /**
-     * @param Process $process
-     * @param Input $input
-     * @param UploadedFile|null $file
-     * @return string|null
-     */
     private function manageInputFile(Process $process, Input $input, ?UploadedFile $file): ?string
     {
         if ($file === null) {
@@ -498,40 +382,23 @@ class TaskController extends AbstractController
         return $folder . '/' . $filename;
     }
 
-    /**
-     * @param string $type
-     * @param string $message
-     * @param array $params
-     * @return void
-     */
     private function addFlashTrans(string $type, string $message, array $params = []): void
     {
         $this->addFlash($type, $this->trans($message, $params));
     }
 
-    /**
-     * @param string $message
-     * @param array $params
-     * @return string
-     */
     private function trans(string $message, array $params = []): string
     {
         return $this->container->get('translator')->trans($message, $params);
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return parent::getSubscribedServices() + [
             'translator',
         ];
     }
 
-    /**
-     * @return void
-     */
     protected function checkConfiguration(): void
     {
         if (!$this->configuration->hasTaskCanExecute()) {

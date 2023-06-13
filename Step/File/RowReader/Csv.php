@@ -17,10 +17,7 @@ use Spipu\ProcessBundle\Exception\RowReaderException;
 
 class Csv extends AbstractRowReader
 {
-    /**
-     * @var array
-     */
-    private $header;
+    private ?array $header = null;
 
     /**
      * Validate the parameters
@@ -169,18 +166,20 @@ class Csv extends AbstractRowReader
         return true;
     }
 
-    /**
-     * @param resource $fileHandler
-     * @return array|false|null
-     */
-    private function readCsvLine($fileHandler)
+    private function readCsvLine($fileHandler): ?array
     {
-        return fgetcsv(
+        $row = fgetcsv(
             $fileHandler,
             0,
             $this->parameters['delimiter'],
             $this->parameters['enclosure'],
             $this->parameters['escape']
         );
+
+        if (empty($row)) {
+            return null;
+        }
+
+        return $row;
     }
 }

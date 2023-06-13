@@ -15,7 +15,6 @@ namespace Spipu\ProcessBundle\Step\File;
 
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
-use Spipu\ProcessBundle\Exception\RowReaderException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\File\RowReader\RowReaderInterface;
@@ -25,33 +24,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ImportFileToTable implements StepInterface
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
+    private ContainerInterface $container;
+    private int $maxRowToInsert;
+    private int $logEveryRows;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var int
-     */
-    private $maxRowToInsert;
-
-    /**
-     * @var int
-     */
-    private $logEveryRows;
-
-    /**
-     * ImportFileToTable constructor.
-     * @param Connection $connection
-     * @param ContainerInterface $container
-     * @param int $maxRowToInsert
-     * @param int $logEveryRows
-     */
     public function __construct(
         Connection $connection,
         ContainerInterface $container,
@@ -64,13 +41,6 @@ class ImportFileToTable implements StepInterface
         $this->logEveryRows = $logEveryRows;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return array
-     * @throws StepException
-     * @throws RowReaderException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $filename  = $parameters->get('filename');
@@ -149,11 +119,6 @@ class ImportFileToTable implements StepInterface
         ];
     }
 
-    /**
-     * Get the number of lines
-     * @param string $filename
-     * @return int
-     */
     private function getNbLines(string $filename): int
     {
         $cmd = 'wc -l ' . escapeshellarg($filename);
@@ -168,12 +133,6 @@ class ImportFileToTable implements StepInterface
         }
     }
 
-    /**
-     * @param array $definition
-     * @return RowReaderInterface
-     * @throws StepException
-     * @throws RowReaderException
-     */
     private function getRowReader(array $definition): RowReaderInterface
     {
         $rowReader = clone $this->container->get($definition['class']);
@@ -223,13 +182,6 @@ class ImportFileToTable implements StepInterface
         return $fileHandle;
     }
 
-    /**
-     * Insert the rows
-     * @param array $rows
-     * @param string $tablename
-     * @return void
-     * @throws StepException
-     */
     private function insertRows(array &$rows, string $tablename): void
     {
         $columns = array_keys($rows[0]);

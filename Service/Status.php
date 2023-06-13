@@ -45,10 +45,6 @@ class Status
         ];
     }
 
-    /**
-     * @param string $status
-     * @return bool
-     */
     public function canRerun(string $status): bool
     {
         return in_array(
@@ -57,42 +53,26 @@ class Status
         );
     }
 
-    /**
-     * @param string $status
-     * @return bool
-     */
     public function canKill(string $status): bool
     {
         return $status === static::RUNNING;
     }
 
-    /**
-     * @return string
-     */
     public function getCreatedStatus(): string
     {
         return self::CREATED;
     }
 
-    /**
-     * @return string
-     */
     public function getRunningStatus(): string
     {
         return self::RUNNING;
     }
 
-    /**
-     * @return string
-     */
     public function getFinishedStatus(): string
     {
         return self::FINISHED;
     }
 
-    /**
-     * @return string
-     */
     public function getFailedStatus(): string
     {
         return self::FAILED;

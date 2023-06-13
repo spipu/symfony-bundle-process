@@ -13,39 +13,22 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\Generic;
 
+use CurlHandle;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\CallRestException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 
-/**
- * Class CallRest
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class CallRest implements StepInterface
 {
-    /**
-     * @var array
-     */
-    private $headers;
+    private array $headers;
+    protected array $status;
 
-    /**
-     * the HTTP return status
-     * @var array
-     */
-    protected $status;
-
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return array
-     * @throws CallRestException
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
+        $this->init();
+
         $url     = $parameters->get('url');
         $method  = $this->getMethod($parameters);
         $options = $this->getOptions($parameters);
@@ -55,7 +38,6 @@ class CallRest implements StepInterface
             $options['headers'][] = 'Content-length: ' . strlen($data);
         }
 
-        $this->init();
         $curl = $this->getCurlSession($url, $options);
         $this->applyMethodAndData($curl, $method, $data);
 
@@ -94,21 +76,12 @@ class CallRest implements StepInterface
         ];
     }
 
-    /**
-     * Init the processor
-     * @return void
-     */
     private function init(): void
     {
         $this->headers = [];
         $this->status = ['code' => 0, 'message' => 'not executed'];
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @return array
-     * @throws StepException
-     */
     private function getOptions(ParametersInterface $parameters): array
     {
         $options = $parameters->get('options');
@@ -140,11 +113,6 @@ class CallRest implements StepInterface
         return $options;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @return string
-     * @throws StepException
-     */
     private function getMethod(ParametersInterface $parameters): string
     {
         $method = $parameters->get('method');
@@ -157,12 +125,6 @@ class CallRest implements StepInterface
         return $method;
     }
 
-    /**
-     * @param string $method
-     * @param ParametersInterface $parameters
-     * @return string
-     * @throws StepException
-     */
     private function getQueryString(string $method, ParametersInterface $parameters): string
     {
         if (in_array($method, array('GET', 'DELETE'))) {
@@ -181,12 +143,7 @@ class CallRest implements StepInterface
         return $data;
     }
 
-    /**
-     * @param string $url
-     * @param array $options
-     * @return resource
-     */
-    private function getCurlSession(string $url, array $options)
+    private function getCurlSession(string $url, array $options): CurlHandle
     {
         // Init the CURL object.
         $curl = curl_init();
@@ -228,14 +185,6 @@ class CallRest implements StepInterface
         return $curl;
     }
 
-    /**
-     * Apply the method and the data to the curl session
-     *
-     * @param resource $curl
-     * @param string   $method
-     * @param string   $data
-     * @return void
-     */
     private function applyMethodAndData($curl, string $method, string &$data): void
     {
         switch ($method) {
@@ -270,11 +219,8 @@ class CallRest implements StepInterface
     }
 
     /**
-     * read the headers
-     *
      * @param resource $resURL
      * @param string   $header
-     *
      * @return int
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */

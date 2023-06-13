@@ -18,74 +18,44 @@ use Spipu\UiBundle\Entity\EntityInterface;
 use Spipu\UiBundle\Entity\TimestampableInterface;
 use Spipu\UiBundle\Entity\TimestampableTrait;
 
-/**
- * @ORM\Table(name="spipu_process_log")
- * @ORM\Entity(repositoryClass="Spipu\ProcessBundle\Repository\LogRepository")
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\Entity(repositoryClass: 'Spipu\ProcessBundle\Repository\LogRepository')]
+#[ORM\Table(name: "spipu_process_log")]
+#[ORM\HasLifecycleCallbacks]
 class Log implements EntityInterface, TimestampableInterface
 {
     use TimestampableTrait;
 
-    /**
-     * @var int|null
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255)
-     */
-    private $code;
+    #[ORM\Column(length: 255)]
+    private ?string $code = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="text")
-     */
-    private $content = '';
+    #[ORM\Column(type: "text")]
+    private string $content = '';
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=16)
-     */
-    private $status;
+    #[ORM\Column(length: 16)]
+    private ?string $status = null;
 
-    /**
-     * @var Task
-     * @ORM\ManyToOne(targetEntity="Spipu\ProcessBundle\Entity\Task", inversedBy="logs")
-     * @ORM\JoinColumn(name="task_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    private $task;
+    #[ORM\ManyToOne(targetEntity: "Spipu\ProcessBundle\Entity\Task", inversedBy: "logs")]
+    #[ORM\JoinColumn(name: "task_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private ?Task $task = null;
 
-    /**
-     * @var int
-     * @ORM\Column(type="smallint")
-     */
-    private $progress = 0;
+    #[ORM\Column(type: "smallint")]
+    private int $progress = 0;
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return null|string
-     */
     public function getCode(): ?string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     * @return Log
-     */
     public function setCode(string $code): self
     {
         $this->code = $code;
@@ -93,18 +63,11 @@ class Log implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getContent(): ?string
     {
         return $this->content;
     }
 
-    /**
-     * @param string $content
-     * @return Log
-     */
     public function setContent(string $content): self
     {
         $this->content = $content;
@@ -112,18 +75,11 @@ class Log implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    /**
-     * @param string $status
-     * @return Log
-     */
     public function setStatus(string $status): self
     {
         $this->status = $status;
@@ -131,18 +87,11 @@ class Log implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return Task|null
-     */
     public function getTask(): ?Task
     {
         return $this->task;
     }
 
-    /**
-     * @param Task|null $task
-     * @return Log
-     */
     public function setTask(?Task $task): self
     {
         $this->task = $task;
@@ -150,18 +99,11 @@ class Log implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getProgress(): int
     {
         return $this->progress;
     }
 
-    /**
-     * @param int $progress
-     * @return Log
-     */
     public function setProgress(int $progress): self
     {
         $this->progress = $progress;

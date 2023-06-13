@@ -22,104 +22,57 @@ use Spipu\UiBundle\Entity\EntityInterface;
 use Spipu\UiBundle\Entity\TimestampableInterface;
 use Spipu\UiBundle\Entity\TimestampableTrait;
 
-/**
- * @ORM\Table(name="spipu_process_task")
- * @ORM\Entity(repositoryClass="Spipu\ProcessBundle\Repository\TaskRepository")
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\Entity(repositoryClass: 'Spipu\ProcessBundle\Repository\TaskRepository')]
+#[ORM\Table(name: "spipu_process_task")]
+#[ORM\HasLifecycleCallbacks]
 class Task implements EntityInterface, TimestampableInterface
 {
     use TimestampableTrait;
 
-    /**
-     * @var int
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255)
-     */
-    private $code;
+    #[ORM\Column(length: 255)]
+    private ?string $code = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="text")
-     */
-    private $inputs;
+    #[ORM\Column(type: "text")]
+    private ?string $inputs = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=16)
-     */
-    private $status;
+    #[ORM\Column(length: 16)]
+    private ?string $status = null;
 
-    /**
-     * @var Log[]
-     * @ORM\OneToMany(targetEntity="Spipu\ProcessBundle\Entity\Log", mappedBy="task")
-     */
-    private $logs;
+    #[ORM\OneToMany(mappedBy: "task", targetEntity: "Spipu\ProcessBundle\Entity\Log")]
+    private Collection $logs;
 
-    /**
-     * @var DateTimeInterface|null
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $scheduledAt;
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?DateTimeInterface $scheduledAt = null;
 
-    /**
-     * @var DateTimeInterface|null
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $executedAt;
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?DateTimeInterface $executedAt = null;
 
-    /**
-     * @var DateTimeInterface|null
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $tryLastAt;
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?DateTimeInterface $tryLastAt = null;
 
-    /**
-     * @var int
-     * @ORM\Column(type="integer")
-     */
-    private $tryNumber;
+    #[ORM\Column]
+    private ?int $tryNumber = 0;
 
-    /**
-     * @var string|null
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $tryLastMessage;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $tryLastMessage = null;
 
-    /**
-     * @var bool
-     * @ORM\Column(type="boolean")
-     */
-    private $canBeRerunAutomatically;
+    #[ORM\Column]
+    private ?bool $canBeRerunAutomatically = null;
 
-    /**
-     * @var int
-     * @ORM\Column(type="smallint")
-     */
-    private $progress = 0;
+    #[ORM\Column(type: "smallint")]
+    private int $progress = 0;
 
-    /**
-     * @var int|null
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $pidValue = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $pidValue = null;
 
-    /**
-     * @var DateTimeInterface|null
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $pidLastSeen = null;
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?DateTimeInterface $pidLastSeen = null;
 
-    /**
-     * ProcessTask constructor.
-     */
     public function __construct()
     {
         $this->logs = new ArrayCollection();
@@ -127,26 +80,16 @@ class Task implements EntityInterface, TimestampableInterface
         $this->setCanBeRerunAutomatically(false);
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return null|string
-     */
     public function getCode(): ?string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     * @return Task
-     */
     public function setCode(string $code): self
     {
         $this->code = $code;
@@ -154,9 +97,6 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getInputs(): ?string
     {
         return $this->inputs;
@@ -181,10 +121,6 @@ class Task implements EntityInterface, TimestampableInterface
         return $inputs;
     }
 
-    /**
-     * @param string $inputs
-     * @return Task
-     */
     public function setInputs(string $inputs): self
     {
         $this->inputs = $inputs;
@@ -192,18 +128,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    /**
-     * @param string $status
-     * @return Task
-     */
     public function setStatus(string $status): self
     {
         $this->status = $status;
@@ -219,10 +148,6 @@ class Task implements EntityInterface, TimestampableInterface
         return $this->logs;
     }
 
-    /**
-     * @param Log $log
-     * @return Task
-     */
     public function addLog(Log $log): self
     {
         if (!$this->logs->contains($log)) {
@@ -233,10 +158,6 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @param Log $log
-     * @return Task
-     */
     public function removeLog(Log $log): self
     {
         if ($this->logs->contains($log)) {
@@ -250,54 +171,33 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return DateTimeInterface|null
-     */
     public function getScheduledAt(): ?DateTimeInterface
     {
         return $this->scheduledAt;
     }
 
-    /**
-     * @param DateTimeInterface|null $scheduledAt
-     * @return Task
-     */
     public function setScheduledAt(?DateTimeInterface $scheduledAt): self
     {
         $this->scheduledAt = $scheduledAt;
         return $this;
     }
 
-    /**
-     * @return DateTimeInterface|null
-     */
     public function getExecutedAt(): ?DateTimeInterface
     {
         return $this->executedAt;
     }
 
-    /**
-     * @param DateTimeInterface|null $executedAt
-     * @return Task
-     */
     public function setExecutedAt(?DateTimeInterface $executedAt): self
     {
         $this->executedAt = $executedAt;
         return $this;
     }
 
-    /**
-     * @return DateTimeInterface|null
-     */
     public function getTryLastAt(): ?DateTimeInterface
     {
         return $this->tryLastAt;
     }
 
-    /**
-     * @param DateTimeInterface|null $tryLastAt
-     * @return Task
-     */
     public function setTryLastAt(?DateTimeInterface $tryLastAt): self
     {
         $this->tryLastAt = $tryLastAt;
@@ -305,18 +205,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getTryNumber(): ?int
     {
         return $this->tryNumber;
     }
 
-    /**
-     * @param int $tryNumber
-     * @return Task
-     */
     public function setTryNumber(int $tryNumber): self
     {
         $this->tryNumber = $tryNumber;
@@ -324,18 +217,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getTryLastMessage(): ?string
     {
         return $this->tryLastMessage;
     }
 
-    /**
-     * @param null|string $tryLastMessage
-     * @return Task
-     */
     public function setTryLastMessage(?string $tryLastMessage): self
     {
         $this->tryLastMessage = $tryLastMessage;
@@ -343,18 +229,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getCanBeRerunAutomatically(): ?bool
     {
         return $this->canBeRerunAutomatically;
     }
 
-    /**
-     * @param bool $canBeRerunAutomatically
-     * @return Task
-     */
     public function setCanBeRerunAutomatically(bool $canBeRerunAutomatically): self
     {
         $this->canBeRerunAutomatically = $canBeRerunAutomatically;
@@ -362,11 +241,6 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @param string $message
-     * @param bool $canBeRerunAutomatically
-     * @return Task
-     */
     public function incrementTry(string $message, bool $canBeRerunAutomatically): self
     {
         $message = mb_substr($message, 0, 255);
@@ -379,18 +253,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getProgress(): int
     {
         return $this->progress;
     }
 
-    /**
-     * @param int $progress
-     * @return Task
-     */
     public function setProgress(int $progress): self
     {
         $this->progress = $progress;
@@ -398,18 +265,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getPidValue(): ?int
     {
         return $this->pidValue;
     }
 
-    /**
-     * @param int|null $pidValue
-     * @return Task
-     */
     public function setPidValue(?int $pidValue): self
     {
         $this->pidValue = $pidValue;
@@ -417,18 +277,11 @@ class Task implements EntityInterface, TimestampableInterface
         return $this;
     }
 
-    /**
-     * @return DateTimeInterface|null
-     */
     public function getPidLastSeen(): ?DateTimeInterface
     {
         return $this->pidLastSeen;
     }
 
-    /**
-     * @param DateTimeInterface|null $pidLastSeen
-     * @return Task
-     */
     public function setPidLastSeen(?DateTimeInterface $pidLastSeen): self
     {
         $this->pidLastSeen = $pidLastSeen;

@@ -18,21 +18,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Url
 {
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $router;
+    private UrlGeneratorInterface $router;
+    private ConfigurationManager $configurationManager;
 
-    /**
-     * @var ConfigurationManager
-     */
-    private $configurationManager;
-
-    /**
-     * Url constructor.
-     * @param UrlGeneratorInterface $router
-     * @param ConfigurationManager $configurationManager
-     */
     public function __construct(
         UrlGeneratorInterface $router,
         ConfigurationManager $configurationManager
@@ -41,12 +29,6 @@ class Url
         $this->configurationManager = $configurationManager;
     }
 
-    /**
-     * Get a process log url
-     *
-     * @param int $processLogId
-     * @return string
-     */
     public function getLogUrl(int $processLogId): string
     {
         return
@@ -54,12 +36,6 @@ class Url
             $this->router->generate('spipu_process_admin_log_show', ['id' => $processLogId]);
     }
 
-    /**
-     * Get a process task url
-     *
-     * @param int $processTaskId
-     * @return string
-     */
     public function getTaskUrl(int $processTaskId): string
     {
         return

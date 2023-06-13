@@ -20,17 +20,9 @@ use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 use ZipArchive;
 
-/**
- * Class ExtractZipFile
- *
- * @package Spipu\ProcessBundle\Step\Generic
- */
 class ExtractZipFile implements StepInterface
 {
-    /**
-     * @var array
-     */
-    private $zipErrors = [
+    private array $zipErrors = [
         ZipArchive::ER_OK           => "No error.",
         ZipArchive::ER_MULTIDISK    => "Multi-disk zip archives not supported.",
         ZipArchive::ER_RENAME       => "Renaming temporary file failed.",
@@ -57,12 +49,6 @@ class ExtractZipFile implements StepInterface
         ZipArchive::ER_DELETED      => "Entry has been deleted",
     ];
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     * @throws Exception
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $file = (string) $parameters->get('file');

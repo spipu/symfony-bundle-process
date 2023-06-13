@@ -20,12 +20,6 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 class AnalyseResult implements StepInterface
 {
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return int
-     * @throws StepException
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): int
     {
         $result = $parameters->get('result');

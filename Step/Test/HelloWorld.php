@@ -23,11 +23,6 @@ class HelloWorld implements StepInterface, StepReportInterface
 {
     use StepReportTrait;
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return string
-     */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
         $message = sprintf(

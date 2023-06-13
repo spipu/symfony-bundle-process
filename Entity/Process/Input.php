@@ -20,62 +20,20 @@ class Input
 {
     public const AVAILABLE_TYPES = ['string', 'int', 'float', 'bool', 'array', 'file', 'date', 'datetime' ];
 
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $realType;
-
-    /**
-     * @var bool
-     */
-    private $required = true;
-
-    /**
-     * @var AbstractOptions|null
-     */
-    private $options;
+    private string $name;
+    private string $type;
+    private string $realType;
+    private bool $required = true;
+    private ?AbstractOptions $options;
+    private ?string $regexp;
+    private ?string $help;
+    private mixed $value = null;
 
     /**
      * @var string[]
      */
-    private $allowedMimeTypes;
+    private array $allowedMimeTypes;
 
-    /**
-     * @var string|null
-     */
-    private $regexp;
-
-    /**
-     * @var string|null
-     */
-    private $help;
-
-    /**
-     * @var mixed
-     */
-    private $value;
-
-    /**
-     * Input constructor.
-     * @param string $name
-     * @param string $type
-     * @param bool $required
-     * @param AbstractOptions|null $options
-     * @param array $allowedMimeTypes
-     * @param string|null $regexp
-     * @param string|null $help
-     * @throws InputException
-     */
     public function __construct(
         string $name,
         string $type,
@@ -96,15 +54,6 @@ class Input
         $this->saveProperties($type, $required, $options, $allowedMimeTypes, $regexp, $help);
     }
 
-    /**
-     * @param string $type
-     * @param bool $required
-     * @param AbstractOptions|null $options
-     * @param array $allowedMimeTypes
-     * @param string|null $regexp
-     * @param string|null $help
-     * @return void
-     */
     private function saveProperties(
         string $type,
         bool $required,
@@ -141,61 +90,37 @@ class Input
         }
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
     public function getRealType(): string
     {
         return $this->realType;
     }
 
-    /**
-     * @return bool
-     */
     public function isRequired(): bool
     {
         return $this->required;
     }
 
-    /**
-     * @return AbstractOptions|null
-     */
     public function getOptions(): ?AbstractOptions
     {
         return $this->options;
     }
 
-    /**
-     * @return array
-     */
     public function getAllowedMimeTypes(): array
     {
         return $this->allowedMimeTypes;
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     * @SuppressWarnings(PMD.CyclomaticComplexity)
-     */
-    public function setValue($value): void
+    public function setValue(mixed $value): void
     {
         $value = $this->prepareValue($value);
 
@@ -215,11 +140,7 @@ class Input
         $this->value = $value;
     }
 
-    /**
-     * @param mixed $value
-     * @return mixed
-     */
-    private function prepareValue($value)
+    private function prepareValue(mixed $value): mixed
     {
         if ($this->type === 'float' && is_int($value)) {
             $value = (float) $value;
@@ -236,21 +157,13 @@ class Input
         return $value;
     }
 
-    /**
-     * @return mixed
-     * @throws InputException
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         $this->validate();
 
         return $this->value;
     }
 
-    /**
-     * @return bool
-     * @throws InputException
-     */
     public function validate(): bool
     {
         if ($this->value === null && $this->required) {
@@ -260,40 +173,24 @@ class Input
         return true;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRegexp(): ?string
     {
         return $this->regexp;
     }
 
-    /**
-     * @return string|null
-     */
     public function getHelp(): ?string
     {
         return $this->help;
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    private function validateValueType($value): void
+    private function validateValueType(mixed $value): void
     {
         if (!call_user_func('is_' . $this->type, $value)) {
             throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
         }
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    private function validateValueOptions($value): void
+    private function validateValueOptions(mixed $value): void
     {
         if ($this->options !== null) {
             $list = is_array($value) ? $value : [$value];
@@ -305,12 +202,7 @@ class Input
         }
     }
 
-    /**
-     * @param mixed $value
-     * @return void
-     * @throws InputException
-     */
-    private function validateValueRegexp($value): void
+    private function validateValueRegexp(mixed $value): void
     {
         if ($this->regexp !== null && is_string($value) && !preg_match($this->regexp, $value)) {
             throw new InputException(sprintf('[%s] This value is not validated by the regexp', $this->name));

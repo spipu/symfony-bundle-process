@@ -22,21 +22,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MainParameters implements ParametersInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
+    private ConfigurationManager $configurationManager;
 
-    /**
-     * @var ConfigurationManager
-     */
-    private $configurationManager;
-
-    /**
-     * Parameters constructor.
-     * @param ContainerInterface $container
-     * @param ConfigurationManager $configurationManager
-     */
     public function __construct(
         ContainerInterface $container,
         ConfigurationManager $configurationManager
@@ -56,13 +44,7 @@ class MainParameters implements ParametersInterface
         throw new ProcessException('You may not set a parent here !');
     }
 
-    /**
-     * Get a value
-     * @param string $code
-     * @return mixed
-     * @throws ConfigurationException
-     */
-    public function get(string $code)
+    public function get(string $code): mixed
     {
         if (preg_match('/^configuration\(([^\)]+)\)$/', $code, $match)) {
             return $this->configurationManager->get($match[1]);
@@ -78,7 +60,7 @@ class MainParameters implements ParametersInterface
      * @throws Exception
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    public function set(string $code, $value): void
+    public function set(string $code, mixed $value): void
     {
         throw new ProcessException('You may not set a value here !');
     }
@@ -91,7 +73,7 @@ class MainParameters implements ParametersInterface
      * @throws Exception
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    public function setDefaultValue(string $code, $value): void
+    public function setDefaultValue(string $code, mixed $value): void
     {
         throw new ProcessException('You may not set a default value here !');
     }

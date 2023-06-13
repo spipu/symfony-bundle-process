@@ -15,32 +15,19 @@ namespace Spipu\ProcessBundle\Service;
 
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Inputs;
-use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\UiBundle\Form\Options\AbstractOptions;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InputsFactory
 {
-    /**
-     * @var ContainerInterface
-     */
     private ContainerInterface $container;
 
-    /**
-     * InputsFactory constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(
         ContainerInterface $container
     ) {
         $this->container = $container;
     }
 
-    /**
-     * @param array $definitions
-     * @return Inputs
-     * @throws InputException
-     */
     public function create(array $definitions): Inputs
     {
         $inputs = new Inputs();
@@ -51,11 +38,6 @@ class InputsFactory
         return $inputs;
     }
 
-    /**
-     * @param array $definition
-     * @return Input
-     * @throws InputException
-     */
     private function createInput(array $definition): Input
     {
         $options = null;

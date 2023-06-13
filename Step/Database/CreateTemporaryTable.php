@@ -22,30 +22,17 @@ use Doctrine\DBAL\Connection;
 
 class CreateTemporaryTable implements StepInterface
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * CreateTemporaryTable constructor.
-     * @param Connection $connection
-     */
     public function __construct(
         Connection $connection
     ) {
         $this->connection = $connection;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return mixed
-     * @throws Exception
-     */
-    public function execute(ParametersInterface $parameters, LoggerInterface $logger)
+    public function execute(ParametersInterface $parameters, LoggerInterface $logger): string
     {
-        $tablename = $parameters->get('tablename');
+        $tablename = (string) $parameters->get('tablename');
         $fields = $parameters->get('fields');
 
         $logger->debug(sprintf('Table to create: [%s] with [%d] fields', $tablename, count($fields)));

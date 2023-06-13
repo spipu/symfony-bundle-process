@@ -18,25 +18,14 @@ use Spipu\ProcessBundle\Service\Status as StatusService;
 
 class Status extends AbstractOptions
 {
-    /**
-     * @var StatusService
-     */
-    private $service;
+    private StatusService $service;
 
-    /**
-     * ProcessLogStatus constructor.
-     * @param StatusService $service
-     */
     public function __construct(
         StatusService $service
     ) {
         $this->service = $service;
     }
 
-    /**
-     * Build the list of the available options
-     * @return array
-     */
     protected function buildOptions(): array
     {
         $list = [];
