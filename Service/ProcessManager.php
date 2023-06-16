@@ -428,16 +428,18 @@ class ProcessManager
             $processLock = $this->entityManager->getConnection()->quote($processLock);
         }
 
-        $taskWhere = '';
+        $taskLowest  = '';
+        $taskNotSame = '';
         if ($taskId !== null) {
-            $taskWhere .= ' AND id < ' . $taskId;
+            $taskLowest  = ' AND id < ' . $taskId;
+            $taskNotSame = ' AND id <> ' . $taskId;
         }
 
         $where = [];
-        $where[] = '(`status` = \'' . Status::CREATED . '\' AND `scheduled_at` IS NULL' . $taskWhere . ')';
+        $where[] = '(`status` = \'' . Status::CREATED . '\' AND `scheduled_at` IS NULL' . $taskLowest . ')';
         $where[] = '(`status` = \'' . Status::RUNNING . '\')';
         if ($lockOnFailed) {
-            $where[] = '(`status` = \'' . Status::FAILED . '\')';
+            $where[] = '(`status` = \'' . Status::FAILED . '\'' . $taskNotSame . ')';
         }
 
         $query = 'SELECT `id` FROM `spipu_process_task` WHERE `code` IN (' . implode(',', $processLocks) . ')';
