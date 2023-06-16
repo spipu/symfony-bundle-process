@@ -346,7 +346,7 @@ class ProcessManagerTest extends TestCase
         $expectedQuery =
             "SELECT `id` FROM `spipu_process_task` " .
             "WHERE `code` IN ('lock','other') " .
-            "AND ((`status` = 'created' AND `scheduled_at` IS NULL AND id < 42) OR (`status` = 'running') OR (`status` = 'failed')) ".
+            "AND ((`status` = 'created' AND `scheduled_at` IS NULL AND id < 42) OR (`status` = 'running') OR (`status` = 'failed' AND id <> 42)) ".
             "ORDER BY `id` ASC LIMIT 1";
 
         $fakeResult = $this->createMock(DbalResult::class);
