@@ -118,7 +118,7 @@ class CallRest implements StepInterface
         $method = $parameters->get('method');
         $method = strtoupper($method);
 
-        if (!in_array($method, array('GET', 'POST', 'PUT', 'PATCH', 'DELETE'))) {
+        if (!in_array($method, array('GET', 'POST', 'PUT', 'PATCH', 'DELETE'), true)) {
             throw new StepException('The method [' . $method . '] is not allowed');
         }
 
@@ -127,7 +127,7 @@ class CallRest implements StepInterface
 
     private function getQueryString(string $method, ParametersInterface $parameters): string
     {
-        if (in_array($method, array('GET', 'DELETE'))) {
+        if (in_array($method, array('GET', 'DELETE'), true)) {
             return '';
         }
 

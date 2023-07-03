@@ -37,15 +37,15 @@ class YesNo implements ActionInterface
         }
 
         $value = mb_convert_case($value, MB_CASE_LOWER);
-        if (in_array($value, $valueYes)) {
+        if (in_array($value, $valueYes, true)) {
             return '1';
         }
 
-        if (in_array($value, $valueNo)) {
+        if (in_array($value, $valueNo, true)) {
             return '0';
         }
 
-        if (in_array($value, $valueNull)) {
+        if (in_array($value, $valueNull, true)) {
             return null;
         }
 

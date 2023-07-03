@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
-use Spipu\ConfigurationBundle\Service\Manager as ConfigurationManager;
+use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\CoreBundle\Service\MailManager;
 use Spipu\ProcessBundle\Entity\Process;
-use Spipu\ProcessBundle\Entity\Process\Report;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Service\Url as ProcessUrl;
 use Spipu\ProcessBundle\Step\StepInterface;

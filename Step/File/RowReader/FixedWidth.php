@@ -81,7 +81,10 @@ class FixedWidth extends AbstractRowReader
                     $value = $this->actionList->execute($action['name'], $value, $action['parameters']);
                 }
 
-                if (is_array($fieldDescription['condition']) && !in_array($value, $fieldDescription['condition'])) {
+                if (
+                    is_array($fieldDescription['condition'])
+                    && !in_array($value, $fieldDescription['condition'], true)
+                ) {
                     $skipLine = true;
                 }
                 if (is_string($fieldDescription['condition']) && $fieldDescription['condition'] !== $value) {

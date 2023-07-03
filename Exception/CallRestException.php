@@ -113,7 +113,7 @@ class CallRestException extends StepException
     {
         $code = $this->getCode();
 
-        if (in_array($code, $this->codeMapping)) {
+        if (in_array($code, $this->codeMapping, true)) {
             return $this->codeMapping[$code];
         }
 

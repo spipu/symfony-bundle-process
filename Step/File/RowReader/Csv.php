@@ -115,7 +115,10 @@ class Csv extends AbstractRowReader
                     $row[$fieldCode] = $value;
                 }
 
-                if (is_array($fieldDescription['condition']) && !in_array($value, $fieldDescription['condition'])) {
+                if (
+                    is_array($fieldDescription['condition'])
+                    && !in_array($value, $fieldDescription['condition'], true)
+                ) {
                     $skipLine = true;
                 }
                 if (is_string($fieldDescription['condition']) && $fieldDescription['condition'] !== $value) {

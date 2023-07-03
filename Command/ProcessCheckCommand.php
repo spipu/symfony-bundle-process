@@ -68,7 +68,7 @@ class ProcessCheckCommand extends Command
         $label = 'Number of tasks';
         if ($status !== null) {
             $statuses = $this->status->getStatuses();
-            if (!in_array($status, $statuses)) {
+            if (!in_array($status, $statuses, true)) {
                 throw new ProcessException('Unknown status. Use one of ' . implode(',', $statuses));
             }
             $label .= " in status [$status]";

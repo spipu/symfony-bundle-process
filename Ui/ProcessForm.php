@@ -169,7 +169,7 @@ class ProcessForm implements EntityDefinitionInterface
 
     private function createFieldWithOption(Input $input): Field
     {
-        if (!in_array($input->getType(), ['string', 'array'])) {
+        if (!in_array($input->getType(), ['string', 'array'], true)) {
             throw new FormException(
                 sprintf(
                     'Unknown input type [%s] with option for field [%s]',
@@ -291,7 +291,7 @@ class ProcessForm implements EntityDefinitionInterface
         }
 
         $emailFields = [ReportManager::AUTOMATIC_REPORT_EMAIL_FIELD, 'current_user_email'];
-        if (in_array($input->getName(), $emailFields) && $this->currentUserEmail !== null) {
+        if (in_array($input->getName(), $emailFields, true) && $this->currentUserEmail !== null) {
             $field->setValue($this->currentUserEmail);
         }
 

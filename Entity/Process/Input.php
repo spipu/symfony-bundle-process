@@ -43,7 +43,7 @@ class Input
         ?string $regexp = null,
         ?string $help = null
     ) {
-        if (!in_array($type, static::AVAILABLE_TYPES)) {
+        if (!in_array($type, static::AVAILABLE_TYPES, true)) {
             throw new InputException(
                 sprintf('[%s] type for [%s] input is not allowed', $type, $name)
             );

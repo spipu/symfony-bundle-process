@@ -227,7 +227,7 @@ class ProcessRunCommand extends Command
                 return (float) $value;
 
             case 'bool':
-                return in_array(strtolower($value), ['1', 'true', 'y', 'yes']);
+                return in_array(strtolower($value), ['1', 'true', 'y', 'yes'], true);
 
             case 'array':
                 $value = json_decode($value, true);

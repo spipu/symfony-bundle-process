@@ -49,7 +49,8 @@ class Status
     {
         return in_array(
             $status,
-            $this->getExecutableStatuses()
+            $this->getExecutableStatuses(),
+            true
         );
     }
 

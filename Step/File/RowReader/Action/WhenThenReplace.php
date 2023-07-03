@@ -22,7 +22,7 @@ class WhenThenReplace implements ActionInterface
 
     public function execute(?string $value, array $parameters = []): ?string
     {
-        if (in_array($value, $parameters['when'])) {
+        if (in_array($value, $parameters['when'], true)) {
             $value = $parameters['then'];
         } elseif (array_key_exists('else', $parameters)) {
             $value = $parameters['else'];
