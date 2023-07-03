@@ -18,18 +18,18 @@ use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
-use Spipu\ProcessBundle\Service\Manager;
+use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\Url;
 use Spipu\ProcessBundle\Step\StepInterface;
 
 class ExecuteProcess implements StepInterface
 {
-    private Manager $manager;
+    private ProcessManager $manager;
     private Url $url;
     private LoggerInterface $logger;
 
     public function __construct(
-        Manager $manager,
+        ProcessManager $manager,
         Url $url
     ) {
         $this->manager = $manager;

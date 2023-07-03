@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
-use Exception;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
@@ -27,7 +26,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Spipu\ProcessBundle\Service\Manager as ProcessManager;
+use Spipu\ProcessBundle\Service\ProcessManager;
 
 /**
  * @SuppressWarnings(PMD.CouplingBetweenObjects)

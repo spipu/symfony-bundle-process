@@ -18,7 +18,7 @@ use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Spipu\ProcessBundle\Service\Status as ProcessStatus;
-use Spipu\ProcessBundle\Service\Manager as ProcessManager;
+use Spipu\ProcessBundle\Service\ProcessManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

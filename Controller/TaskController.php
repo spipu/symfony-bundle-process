@@ -32,7 +32,7 @@ use Spipu\UiBundle\Service\Ui\Grid\DataProvider\Doctrine;
 use Spipu\UiBundle\Service\Ui\GridFactory;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
-use Spipu\ProcessBundle\Service\Manager as ProcessManager;
+use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Ui\LogGrid;
 use Spipu\ProcessBundle\Ui\TaskGrid;

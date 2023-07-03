@@ -30,7 +30,7 @@ class CronManager
 {
     private TaskRepository $processTaskRepository;
     private LogRepository $processLogRepository;
-    private Manager $processManager;
+    private ProcessManager $processManager;
     private Status $processStatus;
     private ModuleConfiguration $processConfiguration;
     private EntityManagerInterface $entityManager;
@@ -40,7 +40,7 @@ class CronManager
     public function __construct(
         TaskRepository $processTaskRepository,
         LogRepository $processLogRepository,
-        Manager $processManager,
+        ProcessManager $processManager,
         Status $processStatus,
         ModuleConfiguration $processConfiguration,
         EntityManagerInterface $entityManager,
