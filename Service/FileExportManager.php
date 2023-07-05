@@ -85,4 +85,13 @@ class FileExportManager
 
         return $this->finalFileName;
     }
+
+    public function cleanFiles(int $keepNumber): array
+    {
+        if ($this->finalFileName === null) {
+            throw new FileException('The FileExport is not yet finalized');
+        }
+
+        return $this->fileManager->cleanOutputFiles($this->folderCode, $this->fileCode, $keepNumber);
+    }
 }

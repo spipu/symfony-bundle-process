@@ -129,6 +129,33 @@ class FileManager implements FileManagerInterface
         return $fullPath;
     }
 
+    public function cleanOutputFiles(string $folderCode, string $fileCode, int $keepNumber): array
+    {
+        $folder = $this->getFolderExport() . $this->cleanCode($folderCode);
+        $this->prepareFolder($folder);
+
+        $fileCode = $this->cleanCode($fileCode);
+
+        $files = array_diff(scandir($folder), ['.', '..']);
+        $files = array_filter(
+            $files,
+            function (string $value) use ($fileCode) {
+                return (str_starts_with($value, $fileCode . '_'));
+            }
+        );
+
+        if (count($files) <= $keepNumber) {
+            return [];
+        }
+
+        sort($files);
+        $filesToDelete = array_slice($files, 0, count($files) - $keepNumber);
+        foreach ($filesToDelete as $fileToDelete) {
+            unlink($folder . '/' . $fileToDelete);
+        }
+        return $filesToDelete;
+    }
+
     private function getFolderImport(): string
     {
         return $this->folderImport;

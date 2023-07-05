@@ -34,8 +34,14 @@ class PrepareExportFile implements StepInterface
         $fileCode = (string) $parameters->get('file_code');
         $fileExtension = (string) $parameters->get('file_extension');
 
+        $logger->debug(sprintf(' - folder code: [%s]', $folderCode));
+        $logger->debug(sprintf(' - file code:   [%s]', $fileCode));
+        $logger->debug(sprintf(' - file ext:    [%s]', $fileExtension));
+
         $fileExport = new FileExportManager($this->fileManager, $folderCode, $fileCode, $fileExtension);
         $fileExport->prepare();
+
+        $logger->debug(' => Local file: ' . $fileExport->getLocalFilePath());
 
         return $fileExport;
     }

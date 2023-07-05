@@ -35,4 +35,6 @@ interface FileManagerInterface
     ): string;
 
     public function getOutputFileDownloadPath(string $folderCode, string $filename): string;
+
+    public function cleanOutputFiles(string $folderCode, string $fileCode, int $keepNumber): array;
 }

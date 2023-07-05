@@ -19,7 +19,7 @@ use Spipu\ProcessBundle\Service\FileExportManager;
 use Spipu\ProcessBundle\Service\LoggerInterface;
 use Spipu\ProcessBundle\Step\StepInterface;
 
-class FinalizeExportFile implements StepInterface
+class CleanExportFiles implements StepInterface
 {
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
@@ -28,9 +28,17 @@ class FinalizeExportFile implements StepInterface
             throw new StepException('The parameter [file_export] must be the result of the step [PrepareExportFile]');
         }
 
-        $fileExport->finalizeFile();
+        $keepNumber = (int) $parameters->get('keep_number');
+        if ($keepNumber < 1) {
+            $keepNumber = 1;
+        }
 
-        $logger->debug(' => Final file: ' . $fileExport->getFinalFileName());
+        $logger->debug(sprintf(' - keep Files: [%d]', $keepNumber));
+
+        $deletedFiles = $fileExport->cleanFiles($keepNumber);
+        foreach ($deletedFiles as $deletedFile) {
+            $logger->warning(sprintf(' => Delete [%s]', $deletedFile));
+        }
 
         return true;
     }
