@@ -40,6 +40,7 @@ class ProcessManager
     private AsynchronousCommand $asynchronousCommand;
     private InputsFactory $inputsFactory;
     private ReportManager $reportManager;
+    private FileManagerInterface $fileManager;
     private ?LoggerOutputInterface $loggerOutput = null;
 
     public function __construct(
@@ -49,7 +50,8 @@ class ProcessManager
         EntityManagerInterface $entityManager,
         AsynchronousCommand $asynchronousCommand,
         InputsFactory $inputsFactory,
-        ReportManager $reportManager
+        ReportManager $reportManager,
+        FileManagerInterface $fileManager
     ) {
         $this->configReader = $configReader;
         $this->mainParameters = $mainParameters;
@@ -58,6 +60,7 @@ class ProcessManager
         $this->asynchronousCommand = $asynchronousCommand;
         $this->inputsFactory = $inputsFactory;
         $this->reportManager = $reportManager;
+        $this->fileManager = $fileManager;
     }
 
     public function getConfigReader(): ConfigReader
@@ -363,6 +366,11 @@ class ProcessManager
                     (is_array($value) ? json_encode($value) : $value)
                 )
             );
+
+            if ($input->getType() === 'file') {
+                $value = $this->fileManager->getInputFilePath($process, $input, $value);
+            }
+
             $process->getParameters()->set('input.' . $name, $value);
         }
     }

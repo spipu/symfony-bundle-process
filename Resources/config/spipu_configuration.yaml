@@ -5,16 +5,6 @@ spipu_configuration:
         default:  "5"
         unit:     "file(s)"
 
-    process.folder.export:
-        type:     "string"
-        required: true
-        default:  "%kernel.project_dir%/var/export/"
-
-    process.folder.import:
-        type:     "string"
-        required: true
-        default:  "%kernel.project_dir%/var/import/"
-
     process.cleanup.finished_logs:
         type:     select
         options:  Spipu\UiBundle\Form\Options\ActiveStatus

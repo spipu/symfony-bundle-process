@@ -284,7 +284,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString('[debug__] Input [test_optional_option] (string): ', $output);
         $this->assertStringContainsString('[debug__] Input [test_multi_option] (array): ["created","finished"]', $output);
         $this->assertStringContainsString('[debug__] Input [test_optional_multi_option] (array): []', $output);
-        $this->assertStringContainsString('[debug__] Input [test_file] (file): ' . __FILE__, $output);
+        $this->assertStringContainsString('[debug__] Input [test_file] (file): test_file_', $output);
         $this->assertStringContainsString('Hello World Foo Bar from Foo Bar', $output);
     }
 }

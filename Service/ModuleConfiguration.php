@@ -112,16 +112,6 @@ class ModuleConfiguration
         return $value;
     }
 
-    public function getFolderImport(): string
-    {
-        return (string) $this->getConfigurationValue('process.folder.import');
-    }
-
-    public function getFolderExport(): string
-    {
-        return (string) $this->getConfigurationValue('process.folder.export');
-    }
-
     private function getConfigurationValue(string $key): mixed
     {
         return $this->manager->get($key);

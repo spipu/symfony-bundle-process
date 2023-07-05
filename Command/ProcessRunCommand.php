@@ -17,6 +17,7 @@ use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Service\FileManagerInterface;
 use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Symfony\Component\Console\Helper\Table;
@@ -27,6 +28,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Spipu\ProcessBundle\Service\ProcessManager;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
@@ -39,17 +41,20 @@ class ProcessRunCommand extends Command
 
     private ProcessManager $processManager;
     private ModuleConfiguration $processConfiguration;
+    private FileManagerInterface $fileManager;
     private ?SymfonyStyle $symfonyStyle = null;
 
     public function __construct(
         ProcessManager $processManager,
         ModuleConfiguration $processConfiguration,
+        FileManagerInterface $fileManager,
         ?string $name = null
     ) {
         parent::__construct($name);
 
         $this->processManager = $processManager;
         $this->processConfiguration = $processConfiguration;
+        $this->fileManager = $fileManager;
     }
 
     protected function configure(): void
@@ -188,7 +193,7 @@ class ProcessRunCommand extends Command
         }
 
         if ($inputObject->isRequired() || ($value !== '')) {
-            $value = $this->validateInput($value, $type);
+            $value = $this->validateInput($process, $inputObject, $value);
         }
         $process->getInputs()->set($key, $value);
     }
@@ -204,20 +209,25 @@ class ProcessRunCommand extends Command
     }
 
     /**
+     * @param Process $process
+     * @param Input $input
      * @param string $value
-     * @param string $type
      * @return string|int|float|bool|array
      * @throws InputException
      * @SuppressWarnings(PMD.CyclomaticComplexity)
      */
-    private function validateInput(string $value, string $type): string|int|float|bool|array
-    {
-        switch ($type) {
+    private function validateInput(
+        Process $process,
+        Input $input,
+        string $value,
+    ): string|int|float|bool|array {
+        switch ($input->getType()) {
             case 'file':
                 if (!is_file($value) || !is_readable($value)) {
                     throw new InputException('This is not a existing or readable file');
                 }
-                return $value;
+                $file = new File($value);
+                return $this->fileManager->saveInputFile($process, $input, $file);
 
             case 'int':
                 return (int) $value;

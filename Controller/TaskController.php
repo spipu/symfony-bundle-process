@@ -19,6 +19,7 @@ use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
+use Spipu\ProcessBundle\Service\FileManagerInterface;
 use Spipu\ProcessBundle\Service\TaskManager;
 use Spipu\ProcessBundle\Ui\ProcessForm;
 use Spipu\ProcessBundle\Exception\ProcessException;
@@ -246,7 +247,8 @@ class TaskController extends AbstractController
         FormFactory $formFactory,
         ProcessForm $processForm,
         ProcessManager $processManager,
-        Request $request
+        Request $request,
+        FileManagerInterface $fileManager
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -278,6 +280,7 @@ class TaskController extends AbstractController
                     [
                         'id' => $this->launchProcess(
                             $processManager,
+                            $fileManager,
                             $processCode,
                             $formManager,
                             $processForm->getScheduledAt()
@@ -304,6 +307,7 @@ class TaskController extends AbstractController
 
     private function launchProcess(
         ProcessManager $processManager,
+        FileManagerInterface $fileManager,
         string $processCode,
         FormManagerInterface $formManager,
         ?DateTimeInterface $scheduledAt
@@ -315,7 +319,7 @@ class TaskController extends AbstractController
 
             switch ($input->getType()) {
                 case 'file':
-                    $inputValue = $this->manageInputFile($process, $input, $inputValue);
+                    $inputValue = $this->manageInputFile($fileManager, $process, $input, $inputValue);
                     break;
 
                 case 'bool':
@@ -355,31 +359,17 @@ class TaskController extends AbstractController
         }
     }
 
-    private function manageInputFile(Process $process, Input $input, ?UploadedFile $file): ?string
-    {
+    private function manageInputFile(
+        FileManagerInterface $fileManager,
+        Process $process,
+        Input $input,
+        ?UploadedFile $file
+    ): ?string {
         if ($file === null) {
             return null;
         }
 
-        $processCode = str_replace(['\\', '/', '.'], '', mb_strtolower($process->getCode()));
-        $inputCode = str_replace(['\\', '/', '.'], '', mb_strtolower($input->getName()));
-
-        $folder = $this->configuration->getFolderImport() . '/' . $processCode;
-        $folder = str_replace(['\\', '//'], '/', $folder);
-
-        $extension = $file->guessExtension();
-        if ($extension === '' || $extension === null) {
-            $extension = 'bin';
-        }
-
-        $filename = $inputCode . '_' . date('Ymd_His') . '_' . uniqid() . '.' . $extension;
-
-        if (!is_dir($folder)) {
-            mkdir($folder, 0775, true);
-        }
-        $file->move($folder, $filename);
-
-        return $folder . '/' . $filename;
+        return $fileManager->saveInputFile($process, $input, $file);
     }
 
     private function addFlashTrans(string $type, string $message, array $params = []): void

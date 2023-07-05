@@ -11,6 +11,7 @@ use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Service\FileManagerInterface;
 use Spipu\ProcessBundle\Service\Logger;
 use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ProcessManager;
@@ -48,6 +49,7 @@ class ProcessManagerTest extends TestCase
         }
 
         $reportManager = $testCase->createMock(ReportManager::class);
+        $fileManager = $testCase->createMock(FileManagerInterface::class);
 
         /** @var Logger $logger */
         /** @var AsynchronousCommand $asynchronousCommand */
@@ -60,7 +62,8 @@ class ProcessManagerTest extends TestCase
             $entityManager,
             $asynchronousCommand,
             InputsFactoryTest::getService($testCase),
-            $reportManager
+            $reportManager,
+            $fileManager
         );
     }
 

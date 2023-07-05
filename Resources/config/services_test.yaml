@@ -1,4 +1,10 @@
 services:
+    Spipu\ProcessBundle\Service\FileManagerInterface:
+        class: Spipu\ProcessBundle\Service\FileManager
+        arguments:
+            $folderImport: '%kernel.project_dir%/var-test/import/'
+            $folderExport: '%kernel.project_dir%/var-test/export/'
+
     Spipu\ProcessBundle\Service\ProcessManager:
         autowire: true
         public: true

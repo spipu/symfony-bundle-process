@@ -185,7 +185,12 @@ class Input
 
     private function validateValueType(mixed $value): void
     {
-        if (!call_user_func('is_' . $this->type, $value)) {
+        $type = $this->type;
+        if ($type === 'file') {
+            $type = 'string';
+        }
+
+        if (!call_user_func('is_' . $type, $value)) {
             throw new InputException(sprintf('[%s] must be an %s', $this->name, $this->type));
         }
     }
