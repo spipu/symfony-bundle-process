@@ -23,6 +23,8 @@ class DisplayFileInfo implements StepInterface
     {
         $filename  = (string) $parameters->get('filename');
 
+        clearstatcache(true, $filename);
+
         $exist = is_file($filename);
 
         $logger->debug('File Information');
@@ -31,8 +33,8 @@ class DisplayFileInfo implements StepInterface
         $logger->debug(' - exist: ' . ($exist ? 'Yes' : 'no'));
 
         if ($exist) {
-            $logger->debug(' - size: ' . ((string) filesize($filename)));
-            $logger->debug(' - date: ' . date('Y-m-f H:i:s', (int) filemtime($filename)));
+            $logger->debug(sprintf(' - size: %s Ko', number_format(filesize($filename) / 1024, 2, '.', ' ')));
+            $logger->debug(sprintf(' - date: %s', date('Y-m-d H:i:s', (int) filemtime($filename))));
         }
 
         return true;
