@@ -91,8 +91,8 @@ class CronManager
         }
 
         // We are using ids because a task can take some time to execute, we must reload it just before the execution.
-        foreach ($taskIds as $taskId) {
-            $this->rerunWaitingTask($output, $taskId);
+        foreach ($taskIds as $taskKey => $taskId) {
+            $this->rerunWaitingTask($output, $taskKey + 1, $taskId);
         }
 
         return true;
@@ -106,9 +106,9 @@ class CronManager
         return $date;
     }
 
-    private function rerunWaitingTask(OutputInterface $output, int $taskId): bool
+    private function rerunWaitingTask(OutputInterface $output, int $taskKey, int $taskId): bool
     {
-        $output->writeln(sprintf('Run task #%d', $taskId));
+        $output->writeln(sprintf(' %d. Run task at %s - #%d', $taskKey, date('Y-m-d H:i:s'), $taskId));
 
         $task = $this->processTaskRepository->find($taskId);
         $this->entityManager->refresh($task);
