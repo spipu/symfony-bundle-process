@@ -367,7 +367,7 @@ class ProcessManager
                 )
             );
 
-            if ($input->getType() === 'file') {
+            if ($input->getType() === 'file' && $value !== null) {
                 $value = $this->fileManager->getInputFilePath($process, $input, $value);
             }
 
