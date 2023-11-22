@@ -118,7 +118,7 @@ class CallRest implements StepInterface
         $method = $parameters->get('method');
         $method = strtoupper($method);
 
-        if (!in_array($method, array('GET', 'POST', 'PUT', 'PATCH', 'DELETE'), true)) {
+        if (!in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], true)) {
             throw new StepException('The method [' . $method . '] is not allowed');
         }
 
@@ -127,7 +127,7 @@ class CallRest implements StepInterface
 
     private function getQueryString(string $method, ParametersInterface $parameters): string
     {
-        if (in_array($method, array('GET', 'DELETE'), true)) {
+        if (in_array($method, ['GET', 'DELETE'], true)) {
             return '';
         }
 
@@ -164,7 +164,7 @@ class CallRest implements StepInterface
         // All the good options.
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HEADERFUNCTION, array($this, 'readHeader'));
+        curl_setopt($curl, CURLOPT_HEADERFUNCTION, [$this, 'readHeader']);
         curl_setopt($curl, CURLOPT_URL, $url);
 
         // Add custom headers if asked.
@@ -228,18 +228,18 @@ class CallRest implements StepInterface
     {
         // Analyse the headers without status message.
         if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+)$/', trim($header), $match)) {
-            $this->status = array(
+            $this->status = [
                 'code' => $match[1],
                 'message' => 'http status ' . $match[1],
-            );
+            ];
         }
 
         // Analyse the headers with status message.
         if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+) (.*)$/', trim($header), $match)) {
-            $this->status = array(
+            $this->status = [
                 'code' => $match[1],
                 'message' => $match[2],
-            );
+            ];
         }
 
         if (trim($header)) {
