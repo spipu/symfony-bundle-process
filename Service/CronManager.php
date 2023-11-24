@@ -140,7 +140,7 @@ class CronManager
         }
 
         $securityTime = 5;
-        $maxDelta = $this->processConfiguration->hasTaskAutomaticRerun() * 60 - $securityTime;
+        $maxDelta = $this->processConfiguration->getTaskLimitRerunEvery() * 60 - $securityTime;
 
         // We are using ids because a task can take some time to execute, we must reload it just before the execution.
         foreach ($taskIds as $taskKey => $taskId) {
