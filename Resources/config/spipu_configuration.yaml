@@ -52,6 +52,12 @@ spipu_configuration:
         required: true
         default:  "1000"
 
+    process.task.rerun_every:
+        type:     integer
+        required: true
+        default:  "5"
+        unit:     "minute(s)"
+
     process.failed.send_email:
         type:     select
         options:  Spipu\UiBundle\Form\Options\ActiveStatus
