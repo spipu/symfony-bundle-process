@@ -113,6 +113,8 @@ class CronManager
             return false;
         }
 
+        $startTime = time();
+
         $waitingDate = $this->getLimitWaitingTaskDate();
 
         $scheduledTaskIds = $this->processTaskRepository->getScheduledIdsToRun();
@@ -137,8 +139,15 @@ class CronManager
             $taskIds = array_splice($taskIds, 0, $limitPerRun);
         }
 
+        $securityTime = 5;
+        $maxDelta = $this->processConfiguration->hasTaskAutomaticRerun() * 60 - $securityTime;
+
         // We are using ids because a task can take some time to execute, we must reload it just before the execution.
         foreach ($taskIds as $taskId) {
+            if ((time() - $startTime) < $maxDelta) {
+                $output->writeln(sprintf('  => Stop execution, less than %d seconds available', $securityTime));
+                break;
+            }
             $this->rerunWaitingTask($output, $taskId);
         }
 
@@ -163,7 +172,7 @@ class CronManager
      */
     private function rerunWaitingTask(OutputInterface $output, int $taskId): bool
     {
-        $output->writeln(sprintf('Run task #%d', $taskId));
+        $output->writeln(sprintf('Run task #%d at %s', $taskId, date('Y-m-d H:i:s')));
 
         $task = $this->processTaskRepository->find($taskId);
         $this->entityManager->refresh($task);
