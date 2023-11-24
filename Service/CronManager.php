@@ -144,7 +144,7 @@ class CronManager
 
         // We are using ids because a task can take some time to execute, we must reload it just before the execution.
         foreach ($taskIds as $taskKey => $taskId) {
-            if ((time() - $startTime) < $maxDelta) {
+            if ((time() - $startTime) > $maxDelta) {
                 $output->writeln(sprintf('  => Stop execution, less than %d seconds available', $securityTime));
                 break;
             }
