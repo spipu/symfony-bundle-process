@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Service;
 
 use Exception;
-use Spipu\ConfigurationBundle\Exception\ConfigurationException;
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\ProcessException;

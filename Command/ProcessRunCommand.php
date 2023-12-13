@@ -128,7 +128,7 @@ class ProcessRunCommand extends Command
 
         // Display the result.
         $output->writeln(' => Result:');
-        $output->writeln($result);
+        $output->writeln((string) $result);
 
         return self::SUCCESS;
     }

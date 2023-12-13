@@ -119,7 +119,7 @@ class ProcessReRunCommand extends Command
         $result = $this->processManager->execute($process);
 
         $output->writeln(' => Result:');
-        $output->writeln($result);
+        $output->writeln((string) $result);
 
         return self::SUCCESS;
     }

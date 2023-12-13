@@ -78,7 +78,7 @@ class ProcessCheckCommand extends Command
         if (!$direct) {
             $output->writeln($label);
         }
-        $output->writeln($count);
+        $output->writeln((string) $count);
 
         return self::SUCCESS;
     }

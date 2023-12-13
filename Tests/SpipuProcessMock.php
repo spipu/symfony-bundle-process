@@ -34,7 +34,7 @@ class SpipuProcessMock extends TestCase
      * @param int|null $id
      * @return Log
      */
-    public static function getLogEntity(int $id = null)
+    public static function getLogEntity(int $id = null): Log
     {
         $entity = new Log();
 
@@ -56,7 +56,7 @@ class SpipuProcessMock extends TestCase
      * @param int|null $id
      * @return Task
      */
-    public static function getTaskEntity(int $id = null)
+    public static function getTaskEntity(int $id = null): Task
     {
         $entity = new Task();
 
@@ -78,7 +78,7 @@ class SpipuProcessMock extends TestCase
      * @param TestCase $testCase
      * @return MainParameters
      */
-    public static function getMainParameters(TestCase $testCase)
+    public static function getMainParameters(TestCase $testCase): MainParameters
     {
         return new MainParameters(
             self::getContainer($testCase),
@@ -238,7 +238,7 @@ class SpipuProcessMock extends TestCase
     /**
      * @return StepInterface
      */
-    public static function getStepCountProcessor()
+    public static function getStepCountProcessor(): StepInterface
     {
         $classname = static::COUNT_CLASSNAME;
 
@@ -250,7 +250,7 @@ class SpipuProcessMock extends TestCase
     /**
      * @return StepInterface
      */
-    public static function getStepErrorProcessor()
+    public static function getStepErrorProcessor(): StepInterface
     {
         $classname = static::ERROR_CLASSNAME;
 

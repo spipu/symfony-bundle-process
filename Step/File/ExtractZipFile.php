@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Step\File;
 
-use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use Spipu\ProcessBundle\Entity\Task;
 use Spipu\UiBundle\Exception\GridException;
 use Spipu\UiBundle\Service\Ui\Definition\GridDefinitionInterface;
 use Spipu\UiBundle\Entity\Grid;
@@ -56,10 +57,11 @@ class TaskGrid implements GridDefinitionInterface
      */
     private function prepareGrid(): void
     {
-        $this->definition = (new Grid\Grid('process_task', 'SpipuProcessBundle:Task'))
+        $this->definition = (new Grid\Grid('process_task', Task::class))
             ->setPager(
                 (new Grid\Pager([10, 20, 50, 100], 20))
             )
+            ->setPersonalize(true)
             ->addColumn(
                 (new Grid\Column('id', 'spipu.process.field.task.id', 'id', 10))
                     ->setType((new Grid\ColumnType(Grid\ColumnType::TYPE_INTEGER)))

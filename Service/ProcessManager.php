@@ -21,7 +21,6 @@ use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Entity\Process;
 use Spipu\ProcessBundle\Exception\InputException;
-use Spipu\ProcessBundle\Exception\OptionException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Throwable;

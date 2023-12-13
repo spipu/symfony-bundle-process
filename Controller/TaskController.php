@@ -16,7 +16,6 @@ namespace Spipu\ProcessBundle\Controller;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Service\FileManagerInterface;
@@ -42,8 +41,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Throwable;
 
 /**

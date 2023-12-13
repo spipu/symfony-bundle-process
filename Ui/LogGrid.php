@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Ui;
 
+use Spipu\ProcessBundle\Entity\Log;
 use Spipu\UiBundle\Service\Ui\Definition\GridDefinitionInterface;
 use Spipu\UiBundle\Entity\Grid;
 use Spipu\ProcessBundle\Form\Options\Process as OptionsProcess;
@@ -46,10 +47,11 @@ class LogGrid implements GridDefinitionInterface
 
     private function prepareGrid(): void
     {
-        $this->definition = (new Grid\Grid('process_log', 'SpipuProcessBundle:Log'))
+        $this->definition = (new Grid\Grid('process_log', Log::class))
             ->setPager(
                 (new Grid\Pager([10, 20, 50, 100], 20))
             )
+            ->setPersonalize(true)
             ->addColumn(
                 (new Grid\Column('id', 'spipu.process.field.log.id', 'id', 10))
                     ->setType((new Grid\ColumnType(Grid\ColumnType::TYPE_INTEGER)))
