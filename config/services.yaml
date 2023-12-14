@@ -1,8 +1,8 @@
 services:
     # Generic Declaration
     Spipu\ProcessBundle\:
-        resource: '../../*'
-        exclude: '../../{DependencyInjection,Entity,Tests,SpipuProcessBundle.php}'
+        resource: '../src/*'
+        exclude: '../src/{Entity,SpipuProcessBundle.php}'
         autowire: true
         autoconfigure: true
 
@@ -31,7 +31,7 @@ services:
 
     # Steps
     Spipu\ProcessBundle\Step\:
-        resource: '../../Step/*'
+        resource: '../src/Step/*'
         tags: ['spipu.process.step']
         public: true
         autowire: true
@@ -44,7 +44,7 @@ services:
             $container: '@service_container'
 
     Spipu\ProcessBundle\Step\File\RowReader\Action\:
-        resource: '../../Step/File/RowReader/Action/*'
+        resource: '../src/Step/File/RowReader/Action/*'
         tags: ['spipu.process.row-reader.action']
 
     Spipu\ProcessBundle\Step\File\RowReader\ActionList:
