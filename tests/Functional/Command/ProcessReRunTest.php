@@ -62,6 +62,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
 
     public function testExecuteFinishedTask()
     {
+        /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);
         $process = $manager->load('test_simple');
         $process->getInputs()->set('automatic_report_email', 'foo@bar.fr');
@@ -79,6 +80,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
 
     public function testExecuteCreatedTaskWithoutDebug()
     {
+        /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);
         $process = $manager->load('test_simple');
         $process->getInputs()->set('automatic_report_email', 'foo@bar.fr');
@@ -102,6 +104,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
 
     public function testExecuteCreatedTaskWithDebug()
     {
+        /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);
         $process = $manager->load('test_simple');
         $process->getInputs()->set('automatic_report_email', 'foo@bar.fr');

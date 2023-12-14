@@ -62,6 +62,7 @@ class ProcessCheckTest extends AbstractFunctionalTest
         $commandTester->execute(['--status' => 'finished', '--direct' => 1]);
         $this->assertSame('0', trim($commandTester->getDisplay()));
 
+        /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);
         $process = $manager->load('test_sleep');
         $manager->scheduleExecution($process, new DateTime());
