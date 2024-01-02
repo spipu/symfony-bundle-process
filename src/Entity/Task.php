@@ -224,6 +224,10 @@ class Task implements EntityInterface, TimestampableInterface
 
     public function setTryLastMessage(?string $tryLastMessage): self
     {
+        if ($tryLastMessage !== null) {
+            $tryLastMessage = mb_substr($tryLastMessage, 0, 255);
+        }
+
         $this->tryLastMessage = $tryLastMessage;
 
         return $this;
@@ -243,7 +247,6 @@ class Task implements EntityInterface, TimestampableInterface
 
     public function incrementTry(string $message, bool $canBeRerunAutomatically): self
     {
-        $message = mb_substr($message, 0, 255);
         $this
             ->setTryLastAt(new DateTime())
             ->setTryLastMessage($message)
