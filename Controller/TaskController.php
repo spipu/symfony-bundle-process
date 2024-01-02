@@ -51,6 +51,7 @@ use Throwable;
 /**
  * @Route("/process/task")
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PMD.ExcessiveClassComplexity)
  */
 class TaskController extends AbstractController
 {
@@ -203,10 +204,14 @@ class TaskController extends AbstractController
             return $redirect;
         }
 
-        $asynchronousCommand->execute('spipu:process:rerun', [$resource->getId()]);
-        sleep(1);
+        try {
+            $asynchronousCommand->execute('spipu:process:rerun', [$resource->getId()]);
+            sleep(1);
+            $this->addFlashTrans('success', 'spipu.process.success.rerun');
+        } catch (Throwable $e) {
+            $this->addFlashTrans('danger', $e->getMessage());
+        }
 
-        $this->addFlashTrans('success', 'spipu.process.success.rerun');
         return $redirect;
     }
 
