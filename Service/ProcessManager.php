@@ -17,6 +17,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Spipu\CoreBundle\Exception\AsynchronousCommandException;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Entity\Process;
@@ -195,16 +196,7 @@ class ProcessManager
 
         $this->executeUpdateTask($process, Status::RUNNING);
 
-        $logger = clone $this->logger;
-        $logger->setLastException(null);
-
-        if ($this->loggerOutput) {
-            $logger->setLoggerOutput($this->loggerOutput);
-        }
-
-        $nbSteps = $this->countMatterSteps($process);
-        $logId = $logger->init($process->getCode(), $nbSteps, $process->getTask());
-        $process->setLogId($logId);
+        $logger = $this->initProcessLogger($process);
 
         if ($initCallback) {
             call_user_func($initCallback, $process);
@@ -276,7 +268,12 @@ class ProcessManager
         $this->prepareInputs($process);
         $this->executeUpdateTask($process, Status::CREATED);
 
-        $this->asynchronousCommand->execute('spipu:process:rerun', [$process->getTask()->getId()]);
+        try {
+            $this->asynchronousCommand->execute('spipu:process:rerun', [$process->getTask()->getId()]);
+        } catch (AsynchronousCommandException $exception) {
+            $logger = $this->initProcessLogger($process);
+            $this->manageExecuteError($process, $logger, $exception, true);
+        }
 
         return $process->getTask()->getId();
     }
@@ -490,5 +487,25 @@ class ProcessManager
         $this->reportManager->addProcessReportError($process, 'ERROR DURING TASK EXECUTION');
         $this->reportManager->addProcessReportError($process, $exception->getMessage());
         $this->reportManager->sendReport($process);
+    }
+
+    /**
+     * @param Process\Process $process
+     * @return LoggerProcessInterface
+     */
+    private function initProcessLogger(Process\Process $process): LoggerProcessInterface
+    {
+        $logger = clone $this->logger;
+        $logger->setLastException(null);
+
+        if ($this->loggerOutput) {
+            $logger->setLoggerOutput($this->loggerOutput);
+        }
+
+        $nbSteps = $this->countMatterSteps($process);
+        $logId = $logger->init($process->getCode(), $nbSteps, $process->getTask());
+        $process->setLogId($logId);
+
+        return $logger;
     }
 }
