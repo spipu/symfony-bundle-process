@@ -489,10 +489,6 @@ class ProcessManager
         $this->reportManager->sendReport($process);
     }
 
-    /**
-     * @param Process\Process $process
-     * @return LoggerProcessInterface
-     */
     private function initProcessLogger(Process\Process $process): LoggerProcessInterface
     {
         $logger = clone $this->logger;
