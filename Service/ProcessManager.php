@@ -70,6 +70,11 @@ class ProcessManager
     private ReportManager $reportManager;
 
     /**
+     * @var ModuleConfiguration
+     */
+    private ModuleConfiguration $moduleConfiguration;
+
+    /**
      * @var LoggerOutputInterface|null
      */
     private ?LoggerOutputInterface $loggerOutput = null;
@@ -83,6 +88,7 @@ class ProcessManager
      * @param AsynchronousCommand $asynchronousCommand
      * @param InputsFactory $inputsFactory
      * @param ReportManager $reportManager
+     * @param ModuleConfiguration $moduleConfiguration
      */
     public function __construct(
         ConfigReader $configReader,
@@ -91,7 +97,8 @@ class ProcessManager
         EntityManagerInterface $entityManager,
         AsynchronousCommand $asynchronousCommand,
         InputsFactory $inputsFactory,
-        ReportManager $reportManager
+        ReportManager $reportManager,
+        ModuleConfiguration $moduleConfiguration
     ) {
         $this->configReader = $configReader;
         $this->mainParameters = $mainParameters;
@@ -100,6 +107,7 @@ class ProcessManager
         $this->asynchronousCommand = $asynchronousCommand;
         $this->inputsFactory = $inputsFactory;
         $this->reportManager = $reportManager;
+        $this->moduleConfiguration = $moduleConfiguration;
     }
 
     /**
@@ -368,6 +376,10 @@ class ProcessManager
             throw new ProcessException(
                 'This process can not be executed asynchronously, because it can not be put in queue'
             );
+        }
+
+        if ($this->moduleConfiguration->hasTaskForceScheduleForAsync()) {
+            return $this->scheduleExecution($process, new DateTime());
         }
 
         if ($this->getBlockingTaskId($process) !== null) {

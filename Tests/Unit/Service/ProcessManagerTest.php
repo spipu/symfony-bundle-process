@@ -49,6 +49,8 @@ class ProcessManagerTest extends TestCase
 
         $reportManager = $testCase->createMock(ReportManager::class);
 
+        $moduleConfiguration = ModuleConfigurationTest::getService($testCase);
+
         /** @var Logger $logger */
         /** @var AsynchronousCommand $asynchronousCommand */
         /** @var ReportManager $reportManager */
@@ -60,7 +62,8 @@ class ProcessManagerTest extends TestCase
             $entityManager,
             $asynchronousCommand,
             InputsFactoryTest::getService($testCase),
-            $reportManager
+            $reportManager,
+            $moduleConfiguration
         );
     }
 

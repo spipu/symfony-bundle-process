@@ -16,19 +16,20 @@ class ModuleConfigurationTest extends TestCase
     public static function getService(TestCase $testCase, array $values = [], string $mailSenderConfig = 'app.email.sender')
     {
         $defaultValues = [
-            'process.task.automatic_rerun'         => 1,
-            'process.task.can_kill'                => 1,
-            'process.task.limit_per_rerun'         => 1000,
-            'process.failed.send_email'            => 1,
-            'process.failed.email'                 => 'to@mock.fr',
-            $mailSenderConfig                      => 'from@mock.fr',
-            'process.failed.max_retry'             => 5,
-            'process.cleanup.finished_logs'        => 1,
-            'process.cleanup.finished_logs_after'  => 5,
-            'process.cleanup.finished_tasks'       => 1,
-            'process.cleanup.finished_tasks_after' => 7,
-            'process.folder.import'                => './var/import/',
-            'process.folder.export'                => './var/export/',
+            'process.task.automatic_rerun'          => 1,
+            'process.task.can_kill'                 => 1,
+            'process.task.limit_per_rerun'          => 1000,
+            'process.task.force_schedule_for_async' => 0,
+            'process.failed.send_email'             => 1,
+            'process.failed.email'                  => 'to@mock.fr',
+            $mailSenderConfig                       => 'from@mock.fr',
+            'process.failed.max_retry'              => 5,
+            'process.cleanup.finished_logs'         => 1,
+            'process.cleanup.finished_logs_after'   => 5,
+            'process.cleanup.finished_tasks'        => 1,
+            'process.cleanup.finished_tasks_after'  => 7,
+            'process.folder.import'                 => './var/import/',
+            'process.folder.export'                 => './var/export/',
         ];
 
         $values = array_merge($defaultValues, $values);
@@ -46,12 +47,13 @@ class ModuleConfigurationTest extends TestCase
     public function testService()
     {
         $values = [
-            'process.cleanup.finished_logs'        => 0,
-            'process.cleanup.finished_tasks'       => 0,
-            'process.failed.send_email'            => 0,
-            'process.task.automatic_rerun'         => 0,
-            'process.task.can_kill'                => 0,
-            'process.task.can_execute'             => 0,
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -61,14 +63,16 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
-            'process.cleanup.finished_logs'        => 1,
-            'process.cleanup.finished_tasks'       => 0,
-            'process.failed.send_email'            => 0,
-            'process.task.automatic_rerun'         => 0,
-            'process.task.can_kill'                => 0,
-            'process.task.can_execute'             => 0,
+            'process.cleanup.finished_logs'         => 1,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -78,14 +82,16 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
-            'process.cleanup.finished_logs'        => 0,
-            'process.cleanup.finished_tasks'       => 1,
-            'process.failed.send_email'            => 0,
-            'process.task.automatic_rerun'         => 0,
-            'process.task.can_kill'                => 0,
-            'process.task.can_execute'             => 0,
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 1,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -95,14 +101,16 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
-            'process.cleanup.finished_logs'        => 0,
-            'process.cleanup.finished_tasks'       => 0,
-            'process.failed.send_email'            => 1,
-            'process.task.automatic_rerun'         => 0,
-            'process.task.can_kill'                => 0,
-            'process.task.can_execute'             => 0,
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 1,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -112,14 +120,16 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
-            'process.cleanup.finished_logs'        => 0,
-            'process.cleanup.finished_tasks'       => 0,
-            'process.failed.send_email'            => 0,
-            'process.task.automatic_rerun'         => 1,
-            'process.task.can_kill'                => 0,
-            'process.task.can_execute'             => 0,
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 1,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -129,14 +139,16 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(true, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
-            'process.cleanup.finished_logs'        => 0,
-            'process.cleanup.finished_tasks'       => 0,
-            'process.failed.send_email'            => 0,
-            'process.task.automatic_rerun'         => 0,
-            'process.task.can_kill'                => 1,
-            'process.task.can_execute'             => 0,
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 1,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -146,14 +158,16 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(true, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
-            'process.cleanup.finished_logs'        => 0,
-            'process.cleanup.finished_tasks'       => 0,
-            'process.failed.send_email'            => 0,
-            'process.task.automatic_rerun'         => 0,
-            'process.task.can_kill'                => 0,
-            'process.task.can_execute'             => 1,
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 1,
+            'process.task.force_schedule_for_async' => 0,
         ];
         $moduleConfiguration = self::getService($this, $values);
 
@@ -163,6 +177,26 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
         $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
         $this->assertSame(true,  $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(false, $moduleConfiguration->hasTaskForceScheduleForAsync());
+
+        $values = [
+            'process.cleanup.finished_logs'         => 0,
+            'process.cleanup.finished_tasks'        => 0,
+            'process.failed.send_email'             => 0,
+            'process.task.automatic_rerun'          => 0,
+            'process.task.can_kill'                 => 0,
+            'process.task.can_execute'              => 0,
+            'process.task.force_schedule_for_async' => 1,
+        ];
+        $moduleConfiguration = self::getService($this, $values);
+
+        $this->assertSame(false, $moduleConfiguration->hasCleanupFinishedLogs());
+        $this->assertSame(false, $moduleConfiguration->hasCleanupFinishedTasks());
+        $this->assertSame(false, $moduleConfiguration->hasFailedSendEmail());
+        $this->assertSame(false, $moduleConfiguration->hasTaskAutomaticRerun());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanKill());
+        $this->assertSame(false, $moduleConfiguration->hasTaskCanExecute());
+        $this->assertSame(true, $moduleConfiguration->hasTaskForceScheduleForAsync());
 
         $values = [
             'process.cleanup.finished_logs_after'  => 42,

@@ -65,6 +65,14 @@ class ModuleConfiguration
     }
 
     /**
+     * @return bool
+     */
+    public function hasTaskForceScheduleForAsync(): bool
+    {
+        return ($this->getConfigurationValue('process.task.force_schedule_for_async') == 1);
+    }
+
+    /**
      * @return int
      */
     public function getTaskLimitPerRerun(): int
