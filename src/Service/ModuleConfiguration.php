@@ -43,6 +43,11 @@ class ModuleConfiguration
         return ($this->getConfigurationValue('process.task.can_execute') == 1);
     }
 
+    public function hasTaskForceScheduleForAsync(): bool
+    {
+        return ($this->getConfigurationValue('process.task.force_schedule_for_async') == 1);
+    }
+
     public function getTaskLimitPerRerun(): int
     {
         $value = (int) $this->getConfigurationValue('process.task.limit_per_rerun');
