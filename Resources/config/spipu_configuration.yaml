@@ -58,6 +58,13 @@ spipu_configuration:
         default:  "5"
         unit:     "minute(s)"
 
+    process.task.force_schedule_for_async:
+        type:     select
+        options:  Spipu\UiBundle\Form\Options\ActiveStatus
+        required: true
+        default:  "0"
+        help:     "force schedule for asynchronous task execution"
+
     process.failed.send_email:
         type:     select
         options:  Spipu\UiBundle\Form\Options\ActiveStatus

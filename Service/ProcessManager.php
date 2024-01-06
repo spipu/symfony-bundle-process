@@ -41,6 +41,7 @@ class ProcessManager
     private AsynchronousCommand $asynchronousCommand;
     private InputsFactory $inputsFactory;
     private ReportManager $reportManager;
+    private ModuleConfiguration $moduleConfiguration;
     private FileManagerInterface $fileManager;
     private ?LoggerOutputInterface $loggerOutput = null;
 
@@ -52,6 +53,7 @@ class ProcessManager
         AsynchronousCommand $asynchronousCommand,
         InputsFactory $inputsFactory,
         ReportManager $reportManager,
+        ModuleConfiguration $moduleConfiguration,
         FileManagerInterface $fileManager
     ) {
         $this->configReader = $configReader;
@@ -61,6 +63,7 @@ class ProcessManager
         $this->asynchronousCommand = $asynchronousCommand;
         $this->inputsFactory = $inputsFactory;
         $this->reportManager = $reportManager;
+        $this->moduleConfiguration = $moduleConfiguration;
         $this->fileManager = $fileManager;
     }
 
@@ -259,6 +262,10 @@ class ProcessManager
             throw new ProcessException(
                 'This process can not be executed asynchronously, because it can not be put in queue'
             );
+        }
+
+        if ($this->moduleConfiguration->hasTaskForceScheduleForAsync()) {
+            return $this->scheduleExecution($process, new DateTime());
         }
 
         if ($this->getBlockingTaskId($process) !== null) {
