@@ -169,7 +169,7 @@ class ProcessForm implements EntityDefinitionInterface
 
     private function createFieldWithOption(Input $input): Field
     {
-        if (!in_array($input->getType(), ['string', 'array'], true)) {
+        if (!in_array($input->getType(), ['string', 'array', 'int'], true)) {
             throw new FormException(
                 sprintf(
                     'Unknown input type [%s] with option for field [%s]',
