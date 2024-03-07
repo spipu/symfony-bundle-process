@@ -2,7 +2,7 @@
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use DateTime;
-use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Exception\NoKeyValue AS DbalException;
 use Doctrine\DBAL\Result as DbalResult;
 use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Service\AsynchronousCommand;

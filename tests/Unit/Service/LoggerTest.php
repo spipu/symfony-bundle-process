@@ -1,7 +1,7 @@
 <?php
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
-use Doctrine\DBAL\Exception AS DbalException;
+use Doctrine\DBAL\Exception\NoKeyValue AS DbalException;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Spipu\CoreBundle\Tests\SymfonyMock;

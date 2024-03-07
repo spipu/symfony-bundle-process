@@ -16,6 +16,7 @@ use Spipu\ProcessBundle\Command\ProcessRunCommand;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use Throwable;
 
 class ProcessRunTest extends AbstractFunctionalTest
 {
@@ -25,7 +26,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $foundException = null;
         try {
             $commandTester->execute([]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $foundException = $e;
         }
         $this->assertNotNull($foundException);
@@ -46,7 +47,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $foundException = null;
         try {
             $commandTester->execute(['process' => 'foo']);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $foundException = $e;
         }
         $this->assertNotNull($foundException);
@@ -110,7 +111,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $foundException = null;
         try {
             $commandTester->execute(['process' => 'test_simple', '--inputs' => ['name_from=foo']]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $foundException = $e;
         }
         $this->assertNotNull($foundException);
@@ -132,7 +133,7 @@ class ProcessRunTest extends AbstractFunctionalTest
                     ]
                 ]
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $foundException = $e;
         }
         $this->assertNotNull($foundException);

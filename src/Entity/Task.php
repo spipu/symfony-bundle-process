@@ -43,7 +43,7 @@ class Task implements EntityInterface, TimestampableInterface
     #[ORM\Column(length: 16)]
     private ?string $status = null;
 
-    #[ORM\OneToMany(mappedBy: "task", targetEntity: "Spipu\ProcessBundle\Entity\Log")]
+    #[ORM\OneToMany(targetEntity: "Spipu\ProcessBundle\Entity\Log", mappedBy: "task")]
     private Collection $logs;
 
     #[ORM\Column(type: "datetime", nullable: true)]
