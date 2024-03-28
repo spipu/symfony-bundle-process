@@ -156,17 +156,17 @@ class FileManager implements FileManagerInterface
         return $filesToDelete;
     }
 
-    private function getFolderImport(): string
+    protected function getFolderImport(): string
     {
         return $this->folderImport;
     }
 
-    private function getFolderExport(): string
+    protected function getFolderExport(): string
     {
         return $this->folderExport;
     }
 
-    private function buildFilename(string $fileCode, string $fileExtension): string
+    protected function buildFilename(string $fileCode, string $fileExtension): string
     {
         $fileCode = $this->cleanCode($fileCode);
         return $fileCode . '_' . date('YmdHis') . '_' . uniqid() . '.' . $fileExtension;
@@ -178,7 +178,7 @@ class FileManager implements FileManagerInterface
      * @throws FileException
      * @SuppressWarnings(PMD.ErrorControlOperator)
      */
-    private function prepareFolder(string $folder): void
+    protected function prepareFolder(string $folder): void
     {
         if (!is_dir($folder)) {
             if (!@mkdir($folder, 0775, true)) {
@@ -190,6 +190,11 @@ class FileManager implements FileManagerInterface
         }
     }
 
+    protected function cleanCode(string $code): string
+    {
+        return trim(str_replace(['\\', '/', '.', ' '], '', mb_strtolower($code)));
+    }
+
     private function cleanPath(string $path): string
     {
         $path = rtrim(str_replace(['\\', '//'], '/', $path), '/');
@@ -199,10 +204,5 @@ class FileManager implements FileManagerInterface
         }
 
         return $path . '/';
-    }
-
-    private function cleanCode(string $code): string
-    {
-        return trim(str_replace(['\\', '/', '.', ' '], '', mb_strtolower($code)));
     }
 }
