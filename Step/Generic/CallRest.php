@@ -227,7 +227,7 @@ class CallRest implements StepInterface
     public function readHeader($resURL, string $header): int
     {
         // Analyse the headers without status message.
-        if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+)$/', trim($header), $match)) {
+        if (preg_match('/^HTTP\/[0-3].?[0-9]? ([0-9]+)$/', trim($header), $match)) {
             $this->status = [
                 'code' => $match[1],
                 'message' => 'http status ' . $match[1],
@@ -235,7 +235,7 @@ class CallRest implements StepInterface
         }
 
         // Analyse the headers with status message.
-        if (preg_match('/^HTTP\/[0-2].[0-9] ([0-9]+) (.*)$/', trim($header), $match)) {
+        if (preg_match('/^HTTP\/[0-3].?[0-9]? ([0-9]+) (.*)$/', trim($header), $match)) {
             $this->status = [
                 'code' => $match[1],
                 'message' => $match[2],
