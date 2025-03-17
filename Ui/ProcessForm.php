@@ -502,7 +502,7 @@ class ProcessForm implements EntityDefinitionInterface
      * @throws FormException
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    public function setSpecificFields(FormInterface $form, EntityInterface $resource = null): void
+    public function setSpecificFields(FormInterface $form, ?EntityInterface $resource = null): void
     {
         $date = $form['taskExecutedAtDate']->getData();
         $time = $form['taskExecutedAtTime']->getData();
