@@ -191,12 +191,7 @@ class ImportFileToTable implements StepInterface
 
         foreach ($rows as &$row) {
             foreach ($row as &$value) {
-                $fieldValue = $value;
-                $value = $this->connection->quote($value);
-
-                if (is_null($fieldValue)) {
-                    $value = 'NULL';
-                }
+                $value = (($value === null) ? 'NULL' : $this->connection->quote($value));
             }
             $row = '(' . implode(',', $row) . ')';
         }
