@@ -98,7 +98,7 @@ class CleanDuplicatesData implements StepInterface
         );
 
         try {
-            $nbPurgedLines = $this->connection->executeQuery($query);
+            $nbPurgedLines = (int) $this->connection->executeStatement($query);
         } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
