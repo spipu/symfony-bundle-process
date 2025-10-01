@@ -25,6 +25,7 @@ use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\OptionException;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Exception\StopExecutionException;
 use Throwable;
 
 /**
@@ -599,7 +600,13 @@ class ProcessManager
 
         $this->reportManager->prepareReport($process, $logger);
 
-        $result = $this->executeSteps($process, $logger);
+        try {
+            $result = $this->executeSteps($process, $logger);
+        } catch (StopExecutionException $exception) {
+            $logger->critical((string) $exception);
+            $logger->warning('A "Stop Execution" exception was thrown, the process will be stopped without failure');
+            $result = false;
+        }
 
         $message = sprintf('Process Finished [%s]', $process->getCode());
 
