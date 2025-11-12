@@ -75,6 +75,7 @@
                             <th>{{ 'spipu.process.field.message.level'|trans }}</th>
                             <th>{{ 'spipu.process.field.message.memory'|trans }}</th>
                             <th>{{ 'spipu.process.field.message.memory_peak'|trans }}</th>
+                            <th>{{ 'spipu.process.field.message.memory_real'|trans }}</th>
                             <th>{{ 'spipu.process.field.message.duration'|trans }}</th>
                             <th>{{ 'spipu.process.field.message.message'|trans }}</th>
                         </tr>
@@ -86,6 +87,7 @@
                                 <td>{{ message.level }}</td>
                                 <td>{{ convertSize.bytesToSize(message.memory) }}</td>
                                 <td>{{ convertSize.bytesToSize(message.memory_peak) }}</td>
+                                <td>{{ convertSize.bytesToSize(message.memory_real ?? message.memory_peak) }}</td>
                                 <td>{{ message.duration }}</td>
                                 <td><pre>{{ message.message|raw }}</pre></td>
                             </tr>
