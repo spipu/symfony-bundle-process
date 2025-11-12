@@ -28,10 +28,11 @@ class LoggerOutput implements LoggerOutputInterface
     {
         $this->output->writeln(
             sprintf(
-                '[%s][%s][%s][%s] %s',
+                '[%s][%s][%s][%s][%s] %s',
                 date('Y-m-d H:i:s', $message['date']),
                 $this->formatMemory((int) $message['memory']),
                 $this->formatMemory((int) $message['memory_peak']),
+                $this->formatMemory((int) $message['memory_real']),
                 $this->formatLevel($message['level']),
                 $message['message']
             )
