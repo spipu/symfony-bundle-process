@@ -70,6 +70,7 @@ spipu:
                 level:                    "Date"
                 memory:                   "Mem"
                 memory_peak:              "Peak"
+                memory_real:              "Real"
                 duration:                 "Duration"
                 message:                  "Message"
 

@@ -192,6 +192,7 @@ class Logger implements LoggerProcessInterface
             'date'        => (new DateTime())->getTimestamp(),
             'memory'      => memory_get_usage(),
             'memory_peak' => memory_get_peak_usage(),
+            'memory_real' => memory_get_peak_usage(true),
             'level'       => (string) $level,
             'message'     => (string) mb_convert_encoding($message, 'UTF-8'),
             'context'     => $context,

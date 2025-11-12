@@ -85,6 +85,7 @@ class LoggerTest extends TestCase
             '            [date] => xxxx',
             '            [memory] => xxxx',
             '            [memory_peak] => xxxx',
+            '            [memory_real] => xxxx',
             '            [level] => info',
             '            [message] => Process Started [test]',
             '            [context] => Array',
@@ -99,8 +100,8 @@ class LoggerTest extends TestCase
         $this->assertSame($expectedException, $foundException);
         $this->assertSame(count($expectedResult), count($foundResult));
 
-        unset($expectedResult[7], $expectedResult[8], $expectedResult[9]);
-        unset($foundResult[7], $foundResult[8], $foundResult[9]);
+        unset($expectedResult[7], $expectedResult[8], $expectedResult[9], $expectedResult[10]);
+        unset($foundResult[7], $foundResult[8], $foundResult[9], $foundResult[10]);
 
         $this->assertSame($expectedResult, $foundResult);
     }
@@ -241,7 +242,7 @@ class LoggerTest extends TestCase
         $logger->debug('end of test');
 
         $outputMessages = [];
-        $outputRegexp = '/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}]\[[ 0-9.]+ Mo]\[[ 0-9.]+ Mo](.*)$/';
+        $outputRegexp = '/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}]\[[ 0-9.]+ Mo]\[[ 0-9.]+ Mo]\[[ 0-9.]+ Mo](.*)$/';
         foreach (SymfonyMock::getConsoleOutputResult() as $outputMessage) {
             if (preg_match($outputRegexp, $outputMessage, $match)) {
                 $outputMessages[] = $match[1];
