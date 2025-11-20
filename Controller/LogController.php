@@ -84,12 +84,24 @@ class LogController extends AbstractController
         $messages = json_decode($resource->getContent(), true);
 
         $start = (isset($messages[0]['date']) ? $messages[0]['date'] : 0);
+
+        $duration = 0;
+        $formatedDuration = null;
+        $logGraph = [];
         foreach ($messages as &$message) {
             $duration = (int) $message['date'] - $start;
-            $sec = ($duration % 60);
-            $min = (int) ($duration / 60);
+            $formatedDuration = gmdate('H:i:s', $duration);
 
-            $message['duration'] = ($min > 9 ? '' : '0') . ($min) . ':' . ($sec > 9 ? '' : '0') . ($sec);
+            $logGraph[] = [
+                't' => $duration,
+                'd' => $formatedDuration,
+                'v' => [
+                    'mem'  => $this->convertMemoryValue($message['memory']),
+                    'real' => $this->convertMemoryValue($message['memory_real'] ?? $message['memory_peak']),
+                ],
+            ];
+
+            $message['duration'] = $formatedDuration;
             $message['class']    = $this->getCssFromStatus($message['level']);
             $message['message']  = htmlentities($message['message']);
             $message['message']  = preg_replace(
@@ -100,13 +112,25 @@ class LogController extends AbstractController
             $message['message']  = str_replace(['[',']'], ['<b>[',']</b>'], $message['message']);
         }
 
+        if ($duration === 0 || !in_array($resource->getStatus(), ['failed', 'finished'])) {
+            $formatedDuration = null;
+            $logGraph = null;
+        }
+
         return $this->render(
             '@SpipuProcess/log/show.html.twig',
             [
                 'resource' => $resource,
                 'messages' => $messages,
+                'duration' => $formatedDuration,
+                'logGraph' => $logGraph,
             ]
         );
+    }
+
+    private function convertMemoryValue(int $value): float
+    {
+        return ((float) $value) / (1024. * 1024.);
     }
 
     /**
