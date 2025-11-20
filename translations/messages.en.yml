@@ -18,6 +18,7 @@ spipu:
                 log:
                     list:     "Process Logs"
                     show:     "Show Process Log #%id"
+                    memory_graph: "Memory Usage Graph"
 
         fieldset:
             task:        "Task"
