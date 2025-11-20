@@ -65,6 +65,17 @@
         </div>
     </div>
 
+    {% if (duration)  %}
+        <div class="row">
+            <div class="col-12 col-md-6 m-auto">
+                <div class="card mb-3">
+                    <div class="card-header font-weight-bold">{{ 'spipu.process.page.admin.log.memory_graph'|trans }}</div>
+                    <div class="card-body" id="log-memory-graph" style="height: 300px">...</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="row">
         <div class="col-xs-12 col-md-12 overflow-auto">
             <div class="card mb-3">
@@ -115,14 +126,13 @@
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
+{% block javascripts %}{{ parent() }}
 
     {% if resource.status == 'running' %}
-    <script type="application/javascript">
-
-        window.onload = function () {
-            'use strict';
+    <script>
+        documentReady.add(function () {
+            // Scroll to bottom page
+            window.scrollTo(0,document.body.scrollHeight);
 
             let card = $('#process-log-card-refresh');
 
@@ -153,10 +163,26 @@
                 }
                 setTimeout(function(){ refreshTime(remaining); }, 1000);
             })(10);
-        };
+        });
+    </script>
 
-        // Scroll to bottom page
-        window.scrollTo(0,document.body.scrollHeight);
+    {% elseif (duration) %}
+
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="{{ asset('/bundles/spipuui/js/google-graph-plots.js') }}"></script>
+    <script src="{{ asset('/bundles/spipuui/js/spipu-graph-plots.js') }}"></script>
+    <script>
+        documentReady.add(function () {
+            new SpipuGraphPlots(
+                'log-memory-graph',
+                '00:00:00',
+                '{{ duration }}',
+                {{ logGraph|json_encode|raw }},
+                true,
+                'HH:mm:ss',
+                40
+            );
+        });
     </script>
     {% endif %}
 {% endblock %}
