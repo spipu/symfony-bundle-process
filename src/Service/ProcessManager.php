@@ -141,8 +141,16 @@ class ProcessManager
         return $steps;
     }
 
-    private function loadPrepareStep(array $stepDefinition): Process\Step
+    private function loadPrepareStep(array $stepDefinition): Process\Step|Process\Loop
     {
+        if (!isset($stepDefinition['class']) && isset($stepDefinition['steps'])) {
+            return new Process\Loop(
+                $stepDefinition['code'],
+                $this->loadPrepareSteps($stepDefinition),
+                $this->loadPrepareParameters($stepDefinition['parameters']),
+                $stepDefinition['ignore_in_progress']
+            );
+        }
         return new Process\Step(
             $stepDefinition['code'],
             $this->configReader->getStepClassFromClassname($stepDefinition['class']),
@@ -397,27 +405,51 @@ class ProcessManager
                 $kSteps++;
             }
             $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
-            $logger->info(sprintf('Step [%s]', $step->getCode()));
-
-            $stepProcessor = $step->getProcessor();
-
-            $message = 'Step [' . $step->getCode() . ']';
-            $this->reportManager->addProcessReportWarning($process, $message);
-            $this->reportManager->addReportToStep($stepProcessor, $process->getReport());
-
-            $startTime = microtime(true);
-            $result = $stepProcessor->execute($step->getParameters(), $logger);
-            $deltaTime = microtime(true) - $startTime;
-
-            $message = 'Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms';
-            $this->reportManager->addProcessReportMessage($process, $message);
-            $this->reportManager->addReportToStep($stepProcessor, null);
-
-            $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
-            $process->getParameters()->set('result.' . $step->getCode(), $result);
+            $result = $this->executeStep($process, $step, $logger);
         }
         $kSteps++;
         $logger->setCurrentStep($kSteps, false);
+
+        return $result;
+    }
+
+    private function executeStep(Process\Process $process, Process\Step|Process\Loop $step, LoggerProcessInterface $logger): mixed
+    {
+        $result = null;
+        $logger->info(sprintf('Step [%s]', $step->getCode()));
+
+        if ($step instanceof Process\Loop) {
+            $iterable = $step->getParameters()->get('iterable');
+            if (!is_iterable($iterable)) {
+                return null;
+            }
+            foreach ($iterable as $key => $value) {
+                $logger->info('⭯ Iteration key: [' . $key . ']');
+                $process->getParameters()->set('loop.' . $step->getCode(), $value);
+                foreach ($step->getSteps() as $subStep) {
+                    $subStep->getParameters()->setParentParameters($step->getParameters());
+                    $result = $this->executeStep($process, $subStep, $logger);
+                }
+            }
+            return $result;
+        }
+
+        $stepProcessor = $step->getProcessor();
+
+        $message = 'Step [' . $step->getCode() . ']';
+        $this->reportManager->addProcessReportWarning($process, $message);
+        $this->reportManager->addReportToStep($stepProcessor, $process->getReport());
+
+        $startTime = microtime(true);
+        $result = $stepProcessor->execute($step->getParameters(), $logger);
+        $deltaTime = microtime(true) - $startTime;
+
+        $message = 'Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms';
+        $this->reportManager->addProcessReportMessage($process, $message);
+        $this->reportManager->addReportToStep($stepProcessor, null);
+
+        $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
+        $process->getParameters()->set('result.' . $step->getCode(), $result);
 
         return $result;
     }

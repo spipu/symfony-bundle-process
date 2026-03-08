@@ -107,13 +107,33 @@ class SpipuProcessBundle extends AbstractBundle
                             ->append($this->addParametersNode())
                             ->children()
                                 ->scalarNode('class')
-                                    ->isRequired()
                                     ->cannotBeEmpty()
                                 ->end()
                             ->end()
                             ->children()
                                 ->booleanNode('ignore_in_progress')
                                     ->defaultFalse()
+                                ->end()
+                            ->end()
+                            ->children()
+                                ->arrayNode('steps')
+                                    ->requiresAtLeastOneElement()
+                                    ->normalizeKeys(true)
+                                    ->useAttributeAsKey('code')
+                                    ->arrayPrototype()
+                                        ->append($this->addParametersNode())
+                                        ->children()
+                                            ->scalarNode('class')
+                                                ->isRequired()
+                                                ->cannotBeEmpty()
+                                            ->end()
+                                        ->end()
+                                        ->children()
+                                            ->booleanNode('ignore_in_progress')
+                                                ->defaultFalse()
+                                            ->end()
+                                        ->end()
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -194,6 +214,11 @@ class SpipuProcessBundle extends AbstractBundle
 
         foreach ($process['steps'] as $stepCode => &$step) {
             $step['code'] = $stepCode;
+            if (isset($step['steps'])) {
+                foreach ($step['steps'] as $stepStepCode => &$stepStep) {
+                    $stepStep['code'] = $stepStepCode;
+                }
+            }
         }
 
         return $process;
