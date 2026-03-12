@@ -14,6 +14,7 @@ use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\FileManagerInterface;
 use Spipu\ProcessBundle\Service\Logger;
 use Spipu\ProcessBundle\Service\LoggerOutput;
+use Spipu\ProcessBundle\Service\ProcessBuilder;
 use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\ReportManager;
 use Spipu\ProcessBundle\Service\Status;
@@ -57,16 +58,21 @@ class ProcessManagerTest extends TestCase
         /** @var AsynchronousCommand $asynchronousCommand */
         /** @var ReportManager $reportManager */
 
-        return new ProcessManager(
+        $processBuilder = new ProcessBuilder(
             $configReader,
             $mainParameters,
+            InputsFactoryTest::getService($testCase),
+        );
+
+        return new ProcessManager(
+            $configReader,
             LoggerTest::getService($testCase),
             $entityManager,
             $asynchronousCommand,
-            InputsFactoryTest::getService($testCase),
             $reportManager,
             $moduleConfiguration,
-            $fileManager
+            $fileManager,
+            $processBuilder
         );
     }
 

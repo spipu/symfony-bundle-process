@@ -42,9 +42,12 @@ class Parameters implements ParametersInterface
 
     public function get(string $code): mixed
     {
-        $value = array_key_exists($code, $this->values) ? $this->values[$code] : $this->parentParameters->get($code);
+        return $this->compute($this->getRaw($code));
+    }
 
-        return $this->compute($value);
+    public function getRaw(string $code): mixed
+    {
+        return array_key_exists($code, $this->values) ? $this->values[$code] : $this->parentParameters->get($code);
     }
 
     private function compute(mixed $value): mixed

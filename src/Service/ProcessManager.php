@@ -35,36 +35,33 @@ use Throwable;
 class ProcessManager
 {
     private ConfigReader $configReader;
-    private MainParameters $mainParameters;
     private LoggerProcessInterface $logger;
     private EntityManagerInterface $entityManager;
     private AsynchronousCommand $asynchronousCommand;
-    private InputsFactory $inputsFactory;
     private ReportManager $reportManager;
     private ModuleConfiguration $moduleConfiguration;
     private FileManagerInterface $fileManager;
+    private ProcessBuilder $processBuilder;
     private ?LoggerOutputInterface $loggerOutput = null;
 
     public function __construct(
         ConfigReader $configReader,
-        MainParameters $mainParameters,
         LoggerProcessInterface $logger,
         EntityManagerInterface $entityManager,
         AsynchronousCommand $asynchronousCommand,
-        InputsFactory $inputsFactory,
         ReportManager $reportManager,
         ModuleConfiguration $moduleConfiguration,
-        FileManagerInterface $fileManager
+        FileManagerInterface $fileManager,
+        ProcessBuilder $processBuilder
     ) {
         $this->configReader = $configReader;
-        $this->mainParameters = $mainParameters;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->asynchronousCommand = $asynchronousCommand;
-        $this->inputsFactory = $inputsFactory;
         $this->reportManager = $reportManager;
         $this->moduleConfiguration = $moduleConfiguration;
         $this->fileManager = $fileManager;
+        $this->processBuilder = $processBuilder;
     }
 
     public function getConfigReader(): ConfigReader
@@ -79,36 +76,13 @@ class ProcessManager
 
     public function load(string $code): Process\Process
     {
-        $processDefinition = $this->configReader->getProcessDefinition($code);
-
-        $processOptions = $this->loadPrepareOptions($processDefinition['options']);
-        $processInputs = $this->loadPrepareInputs($processDefinition['inputs']);
-
-        $processParameters = $this->loadPrepareParameters($processDefinition['parameters']);
-        $processParameters->setParentParameters($this->mainParameters);
-
-        $process = new Process\Process(
-            $processDefinition['code'],
-            $processDefinition['name'],
-            $processOptions,
-            $processInputs,
-            $processParameters,
-            $this->loadPrepareSteps($processDefinition)
-        );
-
-        if ($process->getOptions()->canBePutInQueue()) {
-            $task = $this->loadPrepareTask($process->getCode());
-
-            $process->setTask($task);
-        }
-
-        return $process;
+        return $this->processBuilder->buildProcess($code);
     }
 
     public function loadFromTask(Task $task): Process\Process
     {
         try {
-            $process = $this->load($task->getCode());
+            $process = $this->processBuilder->buildProcess($task->getCode());
             $process->setTask($task);
 
             $inputsData = json_decode($task->getInputs(), true);
@@ -127,59 +101,6 @@ class ProcessManager
         }
 
         return $process;
-    }
-
-    private function loadPrepareSteps(array $processDefinition): array
-    {
-        $steps = [];
-
-        foreach ($processDefinition['steps'] as $stepDefinition) {
-            $step = $this->loadPrepareStep($stepDefinition);
-            $steps[$step->getCode()] = $step;
-        }
-
-        return $steps;
-    }
-
-    private function loadPrepareStep(array $stepDefinition): Process\Step
-    {
-        return new Process\Step(
-            $stepDefinition['code'],
-            $this->configReader->getStepClassFromClassname($stepDefinition['class']),
-            $this->loadPrepareParameters($stepDefinition['parameters']),
-            $stepDefinition['ignore_in_progress']
-        );
-    }
-
-    private function loadPrepareParameters(array $parametersDefinition): Process\Parameters
-    {
-        return new Process\Parameters($parametersDefinition);
-    }
-
-    private function loadPrepareInputs(array $inputsDefinition): Process\Inputs
-    {
-        return $this->inputsFactory->create($inputsDefinition);
-    }
-
-    private function loadPrepareOptions(array $optionsDefinition): Process\Options
-    {
-        return new Process\Options($optionsDefinition);
-    }
-
-    private function loadPrepareTask(string $processCode): Task
-    {
-        $task = new Task();
-
-        $task
-            ->setCode($processCode)
-            ->setInputs("[]")
-            ->setStatus(Status::CREATED)
-            ->setTryNumber(0)
-            ->setTryLastAt(null)
-            ->setScheduledAt(null)
-            ->setExecutedAt(null);
-
-        return $task;
     }
 
     public function execute(Process\Process $process, callable $initCallback = null): mixed
@@ -399,25 +320,33 @@ class ProcessManager
             $logger->setCurrentStep(max($kSteps, 0), $step->isIgnoreInProgress());
             $logger->info(sprintf('Step [%s]', $step->getCode()));
 
-            $stepProcessor = $step->getProcessor();
-
-            $message = 'Step [' . $step->getCode() . ']';
-            $this->reportManager->addProcessReportWarning($process, $message);
-            $this->reportManager->addReportToStep($stepProcessor, $process->getReport());
-
-            $startTime = microtime(true);
-            $result = $stepProcessor->execute($step->getParameters(), $logger);
-            $deltaTime = microtime(true) - $startTime;
-
-            $message = 'Step executed in ' . number_format($deltaTime, 3, '.', '') . ' ms';
-            $this->reportManager->addProcessReportMessage($process, $message);
-            $this->reportManager->addReportToStep($stepProcessor, null);
-
-            $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
-            $process->getParameters()->set('result.' . $step->getCode(), $result);
+            $result = $this->executeStep($process, $logger, $step);
         }
+
         $kSteps++;
         $logger->setCurrentStep($kSteps, false);
+
+        return $result;
+    }
+
+    private function executeStep(Process\Process $process, LoggerProcessInterface $logger, Process\Step $step): mixed
+    {
+        $stepProcessor = $step->getProcessor();
+
+        $message = 'Step [' . $step->getCode() . ']';
+        $this->reportManager->addProcessReportWarning($process, $message);
+        $this->reportManager->addReportToStep($stepProcessor, $process->getReport());
+
+        $startTime = microtime(true);
+        $result = $stepProcessor->execute($step->getParameters(), $logger);
+        $deltaTime = microtime(true) - $startTime;
+
+        $message = 'Step executed in ' . number_format($deltaTime, 3, '.', '') . ' s';
+        $this->reportManager->addProcessReportMessage($process, $message);
+        $this->reportManager->addReportToStep($stepProcessor, null);
+
+        $process->getParameters()->set('time.' . $step->getCode(), $deltaTime);
+        $process->getParameters()->set('result.' . $step->getCode(), $result);
 
         return $result;
     }
