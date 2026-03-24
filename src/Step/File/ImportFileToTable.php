@@ -182,6 +182,10 @@ class ImportFileToTable implements StepInterface
         return $fileHandle;
     }
 
+    /**
+     * IMPORTANT: DO NOT SPLIT THIS METHOD, WE NEED PERFORMANCES !!!!
+     * @SuppressWarnings(PMD.CyclomaticComplexity)
+     */
     private function insertRows(array &$rows, string $tablename): void
     {
         $columns = array_keys($rows[0]);
@@ -191,7 +195,27 @@ class ImportFileToTable implements StepInterface
 
         foreach ($rows as &$row) {
             foreach ($row as &$value) {
-                $value = (($value === null) ? 'NULL' : $this->connection->quote($value));
+                if ($value === null) {
+                    $value = 'NULL';
+                    continue;
+                }
+
+                if ($value === false) {
+                    $value = '0';
+                    continue;
+                }
+
+                if ($value === true) {
+                    $value = '1';
+                    continue;
+                }
+
+                if (is_int($value) || is_float($value)) {
+                    $value = (string) $value;
+                    continue;
+                }
+
+                $value = $this->connection->quote((string) $value);
             }
             $row = '(' . implode(',', $row) . ')';
         }

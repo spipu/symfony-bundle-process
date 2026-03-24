@@ -237,7 +237,7 @@ class ProcessManager
     private function buildLockQuery(array $processLocks, bool $lockOnFailed, ?int $taskId): string
     {
         foreach ($processLocks as &$processLock) {
-            $processLock = $this->entityManager->getConnection()->quote($processLock);
+            $processLock = $this->entityManager->getConnection()->quote((string) $processLock);
         }
 
         $taskLowest  = '';
