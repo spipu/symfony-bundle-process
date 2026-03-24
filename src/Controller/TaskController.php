@@ -353,8 +353,8 @@ class TaskController extends AbstractController
 
     private function forceFormParameters(FormManagerInterface $formManager, Request $request): void
     {
-        $processParams = $request->query->get('process');
-        if (is_array($processParams)) {
+        $processParams = $request->query->all('process');
+        if (!empty($processParams)) {
             $form = $formManager->getForm();
             foreach ($processParams as $param => $value) {
                 if ($form->has($param) && !$form->get($param)->getData()) {
