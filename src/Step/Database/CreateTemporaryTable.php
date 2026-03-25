@@ -35,11 +35,22 @@ class CreateTemporaryTable implements StepInterface
         $tablename = (string) $parameters->get('tablename');
         $fields = $parameters->get('fields');
 
+        $parameters->setDefaultValue('charset', 'utf8mb4');
+        $charset = $parameters->get('charset');
+
+        $parameters->setDefaultValue('collation', 'utf8mb4_unicode_ci');
+        $collation = $parameters->get('collation');
+
         $logger->debug(sprintf('Table to create: [%s] with [%d] fields', $tablename, count($fields)));
 
         $table = new Table($tablename);
+        $table->addOption('charset', $charset);
+        $table->addOption('collation', $collation);
         $table->addColumn('id', 'bigint', ['notnull' => true, 'autoincrement' => true]);
         $table->addColumn('row_id', 'bigint', ['notnull' => false]);
+        $table->setPrimaryKey(array('id'));
+        $table->addUniqueIndex(['row_id']);
+
         foreach ($fields as $name => $definition) {
             $type = $definition['type'];
             $options = [];
@@ -48,8 +59,6 @@ class CreateTemporaryTable implements StepInterface
             }
             $table->addColumn($name, $type, $options);
         }
-        $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(['row_id']);
 
         $schema = $this->connection->createSchemaManager();
         try {
