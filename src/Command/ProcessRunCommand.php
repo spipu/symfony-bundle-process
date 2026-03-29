@@ -220,7 +220,7 @@ class ProcessRunCommand extends Command
         Process $process,
         Input $input,
         string $value,
-    ): string|int|float|bool|array {
+    ): mixed {
         switch ($input->getType()) {
             case 'file':
                 if (!is_file($value) || !is_readable($value)) {
