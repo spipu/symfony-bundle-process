@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
@@ -15,7 +18,7 @@ class StatusTest extends TestCase
         return new Status();
     }
 
-    public function testService()
+    public function testService(): void
     {
         $service = self::getService($this);
 

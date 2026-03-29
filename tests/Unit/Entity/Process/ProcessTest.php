@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
 use PHPUnit\Framework\TestCase;
@@ -40,7 +43,7 @@ class ProcessTest extends TestCase
          return $process;
     }
 
-    public function testExecuteOk()
+    public function testExecuteOk(): void
     {
         $process = self::getProcess($this);
         $process->getInputs()->set('name', 'Bar');

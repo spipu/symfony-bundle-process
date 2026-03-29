@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
@@ -20,7 +22,7 @@ use Throwable;
 
 class ProcessCronManagerTest extends AbstractFunctionalTest
 {
-    public function testExecuteMissingAction()
+    public function testExecuteMissingAction(): void
     {
         $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
 
@@ -30,7 +32,7 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $commandTester->execute([]);
     }
 
-    public function testExecuteBadAction()
+    public function testExecuteBadAction(): void
     {
         $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
 
@@ -40,7 +42,7 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $commandTester->execute(['cron_action' => 'foo']);
     }
 
-    public function testExecuteDisable()
+    public function testExecuteDisable(): void
     {
         $configurationManager = self::getContainer()->get(ConfigurationManager::class);
         $configurationManager->set('process.task.can_execute', 0);
@@ -59,7 +61,7 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         }
     }
 
-    public function testExecuteActionRerun()
+    public function testExecuteActionRerun(): void
     {
         $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
 
@@ -74,7 +76,7 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $this->assertStringContainsString('Process Cron Manager - Rerun - End', $output);
     }
 
-    public function testExecuteActionCleanup()
+    public function testExecuteActionCleanup(): void
     {
         $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
 
@@ -91,7 +93,7 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $this->assertStringContainsString('Process Cron Manager - CleanUp - End', $output);
     }
 
-    public function testExecuteActionCheckPid()
+    public function testExecuteActionCheckPid(): void
     {
         $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Functional\Controller;
 
 use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
@@ -9,7 +11,7 @@ class InterfaceTasksTest extends AbstractFunctionalTest
 {
     use UiWebTestCaseTrait;
 
-    public function testAdmin()
+    public function testAdmin(): void
     {
         $client = static::createClient();
 

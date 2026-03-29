@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
@@ -42,7 +45,7 @@ class ModuleConfigurationTest extends TestCase
         return $moduleConfiguration;
     }
 
-    public function testService()
+    public function testService(): void
     {
         $values = [
             'process.cleanup.finished_logs'         => 0,
@@ -222,13 +225,11 @@ class ModuleConfigurationTest extends TestCase
         $this->assertSame(0, $moduleConfiguration->getCleanupFinishedTasksAfter());
         $this->assertSame(0, $moduleConfiguration->getFailedMaxRetry());
 
-
         $moduleConfiguration = self::getService($this);
         $this->assertSame(1000, $moduleConfiguration->getTaskLimitPerRerun());
 
         $moduleConfiguration = self::getService($this, ['process.task.limit_per_rerun' => 50]);
         $this->assertSame(50, $moduleConfiguration->getTaskLimitPerRerun());
-
 
         $moduleConfiguration = self::getService($this, ['process.task.limit_per_rerun' => 0]);
         $this->assertSame(1, $moduleConfiguration->getTaskLimitPerRerun());

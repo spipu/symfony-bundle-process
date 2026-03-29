@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
@@ -38,7 +41,7 @@ class ConfigReaderTest extends TestCase
         return new ConfigReader(static::getMockContainer($testCase));
     }
 
-    public function testGetWorkflowList()
+    public function testGetWorkflowList(): void
     {
         $expected = [];
         foreach (SpipuProcessMock::getConfigurationSampleDataBuilt() as $workflow) {
@@ -50,19 +53,19 @@ class ConfigReaderTest extends TestCase
         $this->assertEquals($expected, $configReader->getProcessList());
     }
 
-    public function testWorkflowExists()
+    public function testWorkflowExists(): void
     {
         $configReader = static::getService($this);
         $this->assertTrue($configReader->isProcessExists('test'));
     }
 
-    public function testWorkflowNotExists()
+    public function testWorkflowNotExists(): void
     {
         $configReader = static::getService($this);
         $this->assertFalse($configReader->isProcessExists('not_exists'));
     }
 
-    public function testWorkflowDefinitionExists()
+    public function testWorkflowDefinitionExists(): void
     {
         $configReader = static::getService($this);
         $result = $configReader->getProcessDefinition('test');
@@ -70,7 +73,7 @@ class ConfigReaderTest extends TestCase
         $this->assertSame(SpipuProcessMock::getConfigurationSampleDataBuilt()['test'], $result);
     }
 
-    public function testWorkflowDefinitionNotExists()
+    public function testWorkflowDefinitionNotExists(): void
     {
         $configReader = static::getService($this);
 
@@ -78,7 +81,7 @@ class ConfigReaderTest extends TestCase
         $configReader->getProcessDefinition('not_exists');
     }
 
-    public function testGetStepClass()
+    public function testGetStepClass(): void
     {
         $configReader = static::getService($this);
         $result = $configReader->getStepClassFromClassname(SpipuProcessMock::COUNT_CLASSNAME);

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use DateTime;
@@ -21,7 +23,7 @@ use Throwable;
 
 class ProcessReRunTest extends AbstractFunctionalTest
 {
-    public function testExecuteMissingTaskId()
+    public function testExecuteMissingTaskId(): void
     {
         $commandTester = self::loadCommand(ProcessReRunCommand::class, 'spipu:process:rerun');
 
@@ -31,7 +33,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
         $commandTester->execute([]);
     }
 
-    public function testExecuteBadTaskId()
+    public function testExecuteBadTaskId(): void
     {
         $commandTester = self::loadCommand(ProcessReRunCommand::class, 'spipu:process:rerun');
 
@@ -41,7 +43,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
         $commandTester->execute(['task-id' => 42]);
     }
 
-    public function testExecuteDisable()
+    public function testExecuteDisable(): void
     {
         $configurationManager = self::getContainer()->get(ConfigurationManager::class);
         $configurationManager->set('process.task.can_execute', 0);
@@ -60,7 +62,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
         }
     }
 
-    public function testExecuteFinishedTask()
+    public function testExecuteFinishedTask(): void
     {
         /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);
@@ -78,7 +80,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
         $commandTester->execute(['task-id' => $taskId]);
     }
 
-    public function testExecuteCreatedTaskWithoutDebug()
+    public function testExecuteCreatedTaskWithoutDebug(): void
     {
         /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);
@@ -102,7 +104,7 @@ class ProcessReRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString('Hello World Bar from Foo', $output);
     }
 
-    public function testExecuteCreatedTaskWithDebug()
+    public function testExecuteCreatedTaskWithDebug(): void
     {
         /** @var ProcessManager $manager */
         $manager = self::getContainer()->get(ProcessManager::class);

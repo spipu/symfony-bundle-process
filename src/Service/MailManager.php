@@ -49,7 +49,6 @@ class MailManager
             return false;
         }
 
-
         $message = "
     Hi,
     

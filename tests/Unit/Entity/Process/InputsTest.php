@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
 use PHPUnit\Framework\TestCase;
@@ -39,13 +42,13 @@ class InputsTest extends TestCase
         return InputsFactoryTest::getService($testCase, $services)->create($description);
     }
 
-    public function testInvalidType()
+    public function testInvalidType(): void
     {
         $this->expectException(InputException::class);
         self::getInputs($this, ['input' => ['type' => 'wrong']]);
     }
 
-    public function testInvalidSetterKey()
+    public function testInvalidSetterKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
@@ -53,7 +56,7 @@ class InputsTest extends TestCase
         $input->set('wrong', 'value');
     }
 
-    public function testInvalidGetterKey()
+    public function testInvalidGetterKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
         $input->set('input', 'value');
@@ -62,7 +65,7 @@ class InputsTest extends TestCase
         $input->get('wrong');
     }
 
-    public function testDefinition()
+    public function testDefinition(): void
     {
         $definitions = ['input' => ['type' => 'string']];
         $inputs = self::getInputs($this, $definitions);
@@ -71,7 +74,7 @@ class InputsTest extends TestCase
         $this->assertSame($definitions['input']['type'], $inputs->getInput('input')->getType());
     }
 
-    public function testStringNotSetKey()
+    public function testStringNotSetKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
@@ -79,7 +82,7 @@ class InputsTest extends TestCase
         $input->get('input');
     }
 
-    public function testStringWrongType()
+    public function testStringWrongType(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
@@ -87,14 +90,14 @@ class InputsTest extends TestCase
         $input->set('input', 10);
     }
 
-    public function testStringOk()
+    public function testStringOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
         $input->set('input', 'value');
         $this->assertSame('value', $input->get('input'));
     }
 
-    public function testIntNotSetKey()
+    public function testIntNotSetKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'int']]);
 
@@ -102,7 +105,7 @@ class InputsTest extends TestCase
         $input->get('input');
     }
 
-    public function testIntWrongType()
+    public function testIntWrongType(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'int']]);
 
@@ -110,7 +113,7 @@ class InputsTest extends TestCase
         $input->set('input', '10');
     }
 
-    public function testIntOk()
+    public function testIntOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'int']]);
         $input->set('input', 10);
@@ -119,7 +122,7 @@ class InputsTest extends TestCase
         $this->assertSame([], $input->getInput('input')->getAllowedMimeTypes());
     }
 
-    public function testFloatNotSetKey()
+    public function testFloatNotSetKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'float']]);
 
@@ -127,7 +130,7 @@ class InputsTest extends TestCase
         $input->get('input');
     }
 
-    public function testFloatWrongType()
+    public function testFloatWrongType(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'float']]);
 
@@ -135,7 +138,7 @@ class InputsTest extends TestCase
         $input->set('input', '10');
     }
 
-    public function testFloatOk()
+    public function testFloatOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'float']]);
         $input->set('input', 10.);
@@ -145,7 +148,7 @@ class InputsTest extends TestCase
         $this->assertSame(9., $input->get('input'));
     }
 
-    public function testBoolNotSetKey()
+    public function testBoolNotSetKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'bool']]);
 
@@ -153,7 +156,7 @@ class InputsTest extends TestCase
         $input->get('input');
     }
 
-    public function testBoolWrongType()
+    public function testBoolWrongType(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'bool']]);
 
@@ -161,14 +164,14 @@ class InputsTest extends TestCase
         $input->set('input', '10');
     }
 
-    public function testBoolOk()
+    public function testBoolOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'bool']]);
         $input->set('input', true);
         $this->assertSame(true, $input->get('input'));
     }
 
-    public function testArrayNotSetKey()
+    public function testArrayNotSetKey(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'array']]);
 
@@ -176,7 +179,7 @@ class InputsTest extends TestCase
         $input->get('input');
     }
 
-    public function testArrayWrongType()
+    public function testArrayWrongType(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'array']]);
 
@@ -184,14 +187,14 @@ class InputsTest extends TestCase
         $input->set('input', '10');
     }
 
-    public function testArrayOk()
+    public function testArrayOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'array']]);
         $input->set('input', ['value']);
         $this->assertSame(['value'], $input->get('input'));
     }
 
-    public function testValidateKo()
+    public function testValidateKo(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
 
@@ -199,7 +202,7 @@ class InputsTest extends TestCase
         $input->validate();
     }
 
-    public function testValidateOk()
+    public function testValidateOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string']]);
         $input->set('input', 'value');
@@ -208,7 +211,7 @@ class InputsTest extends TestCase
         $this->assertSame(['input' => 'value'], $input->getAll());
     }
 
-    public function testRequiredStringOk()
+    public function testRequiredStringOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => true]]);
         $this->assertTrue($input->getInput('input')->isRequired());
@@ -225,7 +228,7 @@ class InputsTest extends TestCase
         $this->assertNull($input->get('input'));
     }
 
-    public function testRequiredStringKo()
+    public function testRequiredStringKo(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => true]]);
         $this->assertTrue($input->getInput('input')->isRequired());
@@ -234,7 +237,7 @@ class InputsTest extends TestCase
         $input->set('input', '');
     }
 
-    public function testRequiredArrayOk()
+    public function testRequiredArrayOk(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'array', 'required' => true]]);
         $this->assertTrue($input->getInput('input')->isRequired());
@@ -255,7 +258,7 @@ class InputsTest extends TestCase
         $this->assertSame([], $input->get('input'));
     }
 
-    public function testRequiredArrayKo()
+    public function testRequiredArrayKo(): void
     {
         $input = self::getInputs($this, ['input' => ['type' => 'string', 'required' => true]]);
         $this->assertTrue($input->getInput('input')->isRequired());
@@ -264,7 +267,7 @@ class InputsTest extends TestCase
         $input->set('input', []);
     }
 
-    public function testOptionsOk()
+    public function testOptionsOk(): void
     {
         $input = self::getInputs(
             $this,
@@ -288,7 +291,7 @@ class InputsTest extends TestCase
         $input->set('input', 2);
     }
 
-    public function testFileOk()
+    public function testFileOk(): void
     {
         $input = self::getInputs(
             $this,

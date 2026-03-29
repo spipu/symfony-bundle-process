@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +23,7 @@ class InputsFactoryTest extends TestCase
         return new InputsFactory($container);
     }
 
-    public function testService()
+    public function testService(): void
     {
         $factory = static::getService($this);
 

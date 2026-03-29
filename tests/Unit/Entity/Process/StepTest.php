@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
 use PHPUnit\Framework\TestCase;
@@ -17,7 +20,7 @@ class StepTest extends TestCase
         );
     }
 
-    public function testOk()
+    public function testOk(): void
     {
         $step = static::getStep(
             $this,

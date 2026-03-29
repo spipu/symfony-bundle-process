@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
@@ -20,7 +22,7 @@ use Throwable;
 
 class ProcessRunTest extends AbstractFunctionalTest
 {
-    public function testExecuteMissingProcess()
+    public function testExecuteMissingProcess(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
         $foundException = null;
@@ -41,7 +43,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString("this_is_a_process_with_a_very_long_name_for_tests", $output);
     }
 
-    public function testExecuteBadProcess()
+    public function testExecuteBadProcess(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
         $foundException = null;
@@ -57,7 +59,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString("Execute process: foo", $output);
     }
 
-    public function testExecuteDisable()
+    public function testExecuteDisable(): void
     {
         $configurationManager = self::getContainer()->get(ConfigurationManager::class);
         $configurationManager->set('process.task.can_execute', 0);
@@ -76,7 +78,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         }
     }
 
-    public function testExecuteWithoutDebug()
+    public function testExecuteWithoutDebug(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
         $commandTester->execute(['process' => 'test_hello']);
@@ -90,7 +92,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString("Hello World Bar from Foo", $output);
     }
 
-    public function testExecuteWithDebug()
+    public function testExecuteWithDebug(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
         $commandTester->execute(['process' => 'test_hello', '--debug' => 1]);
@@ -104,7 +106,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString("Hello World Bar from Foo", $output);
     }
 
-    public function testExecuteWithInputBadFormat()
+    public function testExecuteWithInputBadFormat(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
@@ -118,7 +120,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString('The inputs format is invalid. It must be --inputs key:value', $foundException->getMessage());
     }
 
-    public function testExecuteWithInputMissing()
+    public function testExecuteWithInputMissing(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
@@ -142,7 +144,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString('This process needs some inputs', $output);
         $this->assertStringContainsString('name_to (string) required', $output);
     }
-    public function testExecuteWithBadReportEmail()
+    public function testExecuteWithBadReportEmail(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
@@ -160,7 +162,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         );
     }
 
-    public function testExecuteWithInputOk()
+    public function testExecuteWithInputOk(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
@@ -179,7 +181,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         $this->assertStringContainsString('Hello World Bar from Foo', $output);
     }
 
-    public function testExecuteWithAllInputsBadArray()
+    public function testExecuteWithAllInputsBadArray(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
@@ -210,8 +212,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         );
     }
 
-
-    public function testExecuteWithAllInputsBadFile()
+    public function testExecuteWithAllInputsBadFile(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 
@@ -242,7 +243,7 @@ class ProcessRunTest extends AbstractFunctionalTest
         );
     }
 
-    public function testExecuteWithAllInputsOk()
+    public function testExecuteWithAllInputsOk(): void
     {
         $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
 

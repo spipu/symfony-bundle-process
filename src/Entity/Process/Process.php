@@ -31,7 +31,6 @@ class Process
     private ?int $logId = null;
     private ?Report $report = null;
 
-
     /**
      * Process constructor.
      * @param string $code

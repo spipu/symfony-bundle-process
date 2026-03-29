@@ -64,7 +64,6 @@ class ProcessCheckCommand extends Command
         $status = $input->getOption(static::OPTION_STATUS);
         $direct = $input->getOption(static::OPTION_DIRECT);
 
-
         $label = 'Number of tasks';
         if ($status !== null) {
             $statuses = $this->status->getStatuses();

@@ -115,7 +115,6 @@ class ArchiveLocalFile implements StepInterface
         asort($list);
         $filesToDelete = array_keys(array_slice($list, 0, count($list) - $keepNumber));
 
-
         $this->logger->debug(sprintf('Old Files to delete: %s', print_r($filesToDelete, true)));
         foreach ($filesToDelete as $fileToDelete) {
             unlink($folder . $fileToDelete);

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
@@ -10,7 +13,7 @@ use Spipu\UiBundle\Event\FormDefinitionEvent;
 
 class MailManagerTest extends TestCase
 {
-    public function testServiceDisable()
+    public function testServiceDisable(): void
     {
         $configuration = ModuleConfigurationTest::getService($this, ['process.failed.send_email' => false]);
         $url = UrlTest::getService($this);
@@ -28,7 +31,7 @@ class MailManagerTest extends TestCase
         $this->assertSame(false, $service->sendAlert($log));
     }
 
-    public function testServiceEnable()
+    public function testServiceEnable(): void
     {
         $configuration = ModuleConfigurationTest::getService($this, ['process.failed.send_email' => true]);
         $url = UrlTest::getService($this);

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
 use PHPUnit\Framework\TestCase;
@@ -6,7 +9,7 @@ use Spipu\ProcessBundle\Entity\Process\Report;
 
 class ReportTest extends TestCase
 {
-    public function testOk()
+    public function testOk(): void
     {
         $report = new Report('foo@bar.fr');
         $this->assertSame('foo@bar.fr', $report->getEmail());

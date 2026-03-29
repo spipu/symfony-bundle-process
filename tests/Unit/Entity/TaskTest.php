@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity;
 
 use DateTime;
@@ -9,7 +12,7 @@ use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
 class TaskTest extends TestCase
 {
-    public function testEntity()
+    public function testEntity(): void
     {
         $entity = SpipuProcessMock::getTaskEntity(1);
 

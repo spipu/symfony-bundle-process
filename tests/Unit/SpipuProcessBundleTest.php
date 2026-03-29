@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
@@ -17,7 +20,7 @@ use Symfony\Component\DependencyInjection\Extension\ConfigurableExtensionInterfa
 
 class SpipuProcessBundleTest extends TestCase
 {
-    public function testBase()
+    public function testBase(): void
     {
         $builder = SymfonyMock::getContainerBuilder($this);
         $configurator = SymfonyMock::getContainerConfigurator($this);
@@ -36,7 +39,7 @@ class SpipuProcessBundleTest extends TestCase
         $this->assertSame([], $builder->getParameter('spipu_process'));
     }
 
-    public function testLoadOk()
+    public function testLoadOk(): void
     {
         $configs = SpipuProcessMock::getConfigurationSampleData();
         $workflows = SpipuProcessMock::getConfigurationSampleDataBuilt();
@@ -52,7 +55,7 @@ class SpipuProcessBundleTest extends TestCase
         $bundle->loadExtension($configs, $configurator, $builder);
     }
 
-    public function testLoadKoMimeTypeWithoutFile()
+    public function testLoadKoMimeTypeWithoutFile(): void
     {
         $configs = [
             'test' => [
@@ -97,7 +100,7 @@ class SpipuProcessBundleTest extends TestCase
         $bundle->loadExtension($configs, $configurator, $builder);
     }
 
-    public function testLoadKoRegexpWithoutString()
+    public function testLoadKoRegexpWithoutString(): void
     {
         $configs = [
             'test' => [
@@ -142,7 +145,7 @@ class SpipuProcessBundleTest extends TestCase
         $bundle->loadExtension($configs, $configurator, $builder);
     }
 
-    public function testLoadKoOptionWithFile()
+    public function testLoadKoOptionWithFile(): void
     {
         $configs = [
             'test' => [
@@ -187,7 +190,7 @@ class SpipuProcessBundleTest extends TestCase
         $bundle->loadExtension($configs, $configurator, $builder);
     }
 
-    public function testConfigurationMissingWorkflowName()
+    public function testConfigurationMissingWorkflowName(): void
     {
         $configs = [
             0 => [
@@ -212,7 +215,7 @@ class SpipuProcessBundleTest extends TestCase
         $processor->processConfiguration($configuration, $configs);
     }
 
-    public function testConfigurationMissingSteps()
+    public function testConfigurationMissingSteps(): void
     {
         $configs = [
             0 => [
@@ -233,7 +236,7 @@ class SpipuProcessBundleTest extends TestCase
         $processor->processConfiguration($configuration, $configs);
     }
 
-    public function testConfigurationEmptySteps()
+    public function testConfigurationEmptySteps(): void
     {
         $configs = [
             0 => [
@@ -257,7 +260,7 @@ class SpipuProcessBundleTest extends TestCase
         $processor->processConfiguration($configuration, $configs);
     }
 
-    public function testConfigurationMissingStepClass()
+    public function testConfigurationMissingStepClass(): void
     {
         $configs = [
             0 => [
@@ -282,7 +285,7 @@ class SpipuProcessBundleTest extends TestCase
         $processor->processConfiguration($configuration, $configs);
     }
 
-    public function testConfigurationOk()
+    public function testConfigurationOk(): void
     {
         $expected = SpipuProcessMock::getConfigurationSampleData();
 

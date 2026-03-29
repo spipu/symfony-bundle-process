@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests;
 
 use Closure;
@@ -34,7 +36,7 @@ class SpipuProcessMock extends TestCase
      * @param int|null $id
      * @return Log
      */
-    public static function getLogEntity(int $id = null): Log
+    public static function getLogEntity(?int $id = null): Log
     {
         $entity = new Log();
 
@@ -56,7 +58,7 @@ class SpipuProcessMock extends TestCase
      * @param int|null $id
      * @return Task
      */
-    public static function getTaskEntity(int $id = null): Task
+    public static function getTaskEntity(?int $id = null): Task
     {
         $entity = new Task();
 
@@ -90,7 +92,7 @@ class SpipuProcessMock extends TestCase
      * @param TestCase $testCase
      * @return MockObject|ContainerInterface
      */
-    public static function getContainer(TestCase $testCase)
+    public static function getContainer(TestCase $testCase): ContainerInterface
     {
         $services = [
             self::COUNT_CLASSNAME => self::getStepCountProcessor(),

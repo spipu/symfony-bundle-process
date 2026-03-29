@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
 use PHPUnit\Framework\TestCase;
@@ -17,7 +20,7 @@ class OptionsTest extends TestCase
         return new Options($description);
     }
 
-    public function testConvert()
+    public function testConvert(): void
     {
         $options = self::getOptions($this, ['can_be_put_in_queue' => 1, 'can_be_rerun_automatically' => 0, 'process_lock_on_failed' => 0, 'process_lock' => [], 'needed_role' => null, 'automatic_report' => false,]);
         $this->assertSame(true, $options->getOptions()['can_be_put_in_queue']);
@@ -26,7 +29,7 @@ class OptionsTest extends TestCase
         $this->assertSame(false, $options->getOptions()['automatic_report']);
     }
 
-    public function testOptionsOk()
+    public function testOptionsOk(): void
     {
         $options = self::getOptions($this, ['can_be_put_in_queue' => false, 'can_be_rerun_automatically' => false, 'process_lock_on_failed' => true, 'process_lock' => [], 'needed_role' => null, 'automatic_report' => false,]);
         $this->assertSame(false, $options->canBePutInQueue());
@@ -85,7 +88,7 @@ class OptionsTest extends TestCase
         $this->assertTrue($options->hasAutomaticReport());
     }
 
-    public function testOptionsKo()
+    public function testOptionsKo(): void
     {
         $this->expectException(OptionException::class);
         self::getOptions($this, ['can_be_put_in_queue' => false, 'can_be_rerun_automatically' => true, 'process_lock_on_failed' => true, 'process_lock' => [], 'needed_role' => null, 'automatic_report' => false,]);

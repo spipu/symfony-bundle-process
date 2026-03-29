@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use DateTime;
@@ -76,13 +79,13 @@ class ProcessManagerTest extends TestCase
         );
     }
 
-    public function testConfigReader()
+    public function testConfigReader(): void
     {
         $manager = static::getService($this);
         $this->assertTrue($manager->getConfigReader()->isProcessExists('test'));
     }
 
-    public function testInitNotExists()
+    public function testInitNotExists(): void
     {
         $manager = static::getService($this);
 
@@ -92,7 +95,7 @@ class ProcessManagerTest extends TestCase
         $manager->load('not_exists');
     }
 
-    public function testInitOk()
+    public function testInitOk(): void
     {
         $manager = static::getService($this);
         $process = $manager->load('test');
@@ -123,7 +126,7 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(3, count($process->getSteps()['second']->getParameters()->get('array')));
     }
 
-    public function testExecuteInputMissing()
+    public function testExecuteInputMissing(): void
     {
         $process = ProcessTest::getProcess($this);
 
@@ -133,7 +136,7 @@ class ProcessManagerTest extends TestCase
         $manager->execute($process);
     }
 
-    public function testExecuteOk()
+    public function testExecuteOk(): void
     {
         $process = ProcessTest::getProcess($this);
         $process->getInputs()->set('name', 'Bar');
@@ -153,7 +156,7 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(3, $process->getParameters()->get('result.second'));
     }
 
-    public function testExecuteWithGenericException()
+    public function testExecuteWithGenericException(): void
     {
         $manager = static::getService($this);
         $process = $manager->load('other');
@@ -177,7 +180,7 @@ class ProcessManagerTest extends TestCase
         }
     }
 
-    public function testExecuteWithCallRestException()
+    public function testExecuteWithCallRestException(): void
     {
         $manager = static::getService($this);
         $process = $manager->load('other');
@@ -200,7 +203,7 @@ class ProcessManagerTest extends TestCase
         }
     }
 
-    public function testLoadFromTaskOk()
+    public function testLoadFromTaskOk(): void
     {
         $manager = static::getService($this);
 
@@ -217,7 +220,7 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(Status::CREATED, $task->getStatus());
     }
 
-    public function testLoadFromTaskBadJsonInput()
+    public function testLoadFromTaskBadJsonInput(): void
     {
         $manager = static::getService($this);
 
@@ -239,7 +242,7 @@ class ProcessManagerTest extends TestCase
         }
     }
 
-    public function testLoadFromTaskBadKeyInput()
+    public function testLoadFromTaskBadKeyInput(): void
     {
         $manager = static::getService($this);
 
@@ -261,7 +264,7 @@ class ProcessManagerTest extends TestCase
         }
     }
 
-    public function testExecuteAsynchronousNotAuthorized()
+    public function testExecuteAsynchronousNotAuthorized(): void
     {
         $manager = static::getService($this);
 
@@ -272,7 +275,7 @@ class ProcessManagerTest extends TestCase
         $manager->executeAsynchronously($process);
     }
 
-    public function testExecuteAsynchronousAuthorized()
+    public function testExecuteAsynchronousAuthorized(): void
     {
         $manager = static::getService($this, true);
 
@@ -284,7 +287,7 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(1, $taskId);
     }
 
-    public function testScheduleExecutionNotAuthorized()
+    public function testScheduleExecutionNotAuthorized(): void
     {
         $manager = static::getService($this);
 
@@ -295,7 +298,7 @@ class ProcessManagerTest extends TestCase
         $manager->scheduleExecution($process, new DateTime());
     }
 
-    public function testScheduleExecutionAuthorized()
+    public function testScheduleExecutionAuthorized(): void
     {
         $manager = static::getService($this);
 
@@ -311,7 +314,7 @@ class ProcessManagerTest extends TestCase
         $this->assertSame($expectedDate, $process->getTask()->getScheduledAt());
     }
 
-    public function testProcessLockWithoutTask()
+    public function testProcessLockWithoutTask(): void
     {
         $manager = static::getService($this);
 
@@ -345,7 +348,7 @@ class ProcessManagerTest extends TestCase
         $manager->execute($process);
     }
 
-    public function testProcessLockWithTask()
+    public function testProcessLockWithTask(): void
     {
         $manager = static::getService($this);
 
@@ -387,7 +390,7 @@ class ProcessManagerTest extends TestCase
         $manager->execute($process);
     }
 
-    public function testProcessAsynchronousLock()
+    public function testProcessAsynchronousLock(): void
     {
         $manager = static::getService($this);
 
@@ -423,7 +426,7 @@ class ProcessManagerTest extends TestCase
         $this->assertNotNull($process->getTask()->getScheduledAt());
     }
 
-    public function testProcessLockWithoutTaskWithErrorOnQuery()
+    public function testProcessLockWithoutTaskWithErrorOnQuery(): void
     {
         $manager = static::getService($this);
 
@@ -443,7 +446,7 @@ class ProcessManagerTest extends TestCase
         $this->assertSame(3, $process->getParameters()->get('result.count'));
     }
 
-    public function testProcessWithOutput()
+    public function testProcessWithOutput(): void
     {
         $output = SymfonyMock::getConsoleOutput($this);
         $loggerOutput = new LoggerOutput($output);

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Entity;
 
 use PHPUnit\Framework\TestCase;
@@ -7,7 +10,7 @@ use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
 class LogTest extends TestCase
 {
-    public function testEntity()
+    public function testEntity(): void
     {
         $task = SpipuProcessMock::getTaskEntity();
 

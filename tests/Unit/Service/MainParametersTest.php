@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
@@ -18,7 +21,7 @@ class MainParametersTest extends TestCase
         );
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $mainParameters = static::getMainParameters($this);
 
@@ -34,7 +37,7 @@ class MainParametersTest extends TestCase
         $this->assertSame(null, $mainParameters->get(' configuration(foo.bar)'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $mainParameters = static::getMainParameters($this);
 
@@ -42,7 +45,7 @@ class MainParametersTest extends TestCase
         $mainParameters->set('key', 'value');
     }
 
-    public function testSetDefaultValue()
+    public function testSetDefaultValue(): void
     {
         $mainParameters = static::getMainParameters($this);
 
@@ -50,7 +53,7 @@ class MainParametersTest extends TestCase
         $mainParameters->setDefaultValue('key', 'value');
     }
 
-    public function testSetParentParameters()
+    public function testSetParentParameters(): void
     {
         $parameters = $this->createMock(ParametersInterface::class);
 

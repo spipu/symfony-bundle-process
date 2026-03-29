@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use DateTime;
@@ -19,21 +21,21 @@ use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
 
 class ProcessCheckTest extends AbstractFunctionalTest
 {
-    public function testExecuteWithoutStatus()
+    public function testExecuteWithoutStatus(): void
     {
         $commandTester = self::loadCommand(ProcessCheckCommand::class, 'spipu:process:check');
         $commandTester->execute([]);
         $this->assertSame("Number of tasks\n0", trim($commandTester->getDisplay()));
     }
 
-    public function testExecuteWithGoodStatus()
+    public function testExecuteWithGoodStatus(): void
     {
         $commandTester = self::loadCommand(ProcessCheckCommand::class, 'spipu:process:check');
         $commandTester->execute(['--status' => 'created']);
         $this->assertSame("Number of tasks in status [created]\n0", trim($commandTester->getDisplay()));
     }
 
-    public function testExecuteWithBadStatus()
+    public function testExecuteWithBadStatus(): void
     {
         $this->expectException(ProcessException::class);
         $this->expectExceptionMessage('Unknown status. Use one of created,running,finished,failed');
@@ -42,14 +44,14 @@ class ProcessCheckTest extends AbstractFunctionalTest
         $commandTester->execute(['--status' => 'foo']);
     }
 
-    public function testExecuteDirectStatus()
+    public function testExecuteDirectStatus(): void
     {
         $commandTester = self::loadCommand(ProcessCheckCommand::class, 'spipu:process:check');
         $commandTester->execute(['--status' => 'created', '--direct' => 1]);
         $this->assertSame('0', trim($commandTester->getDisplay()));
     }
 
-    public function testExecuteGoodCount()
+    public function testExecuteGoodCount(): void
     {
         $commandTester = self::loadCommand(ProcessCheckCommand::class, 'spipu:process:check');
 

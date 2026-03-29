@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use Doctrine\DBAL\Exception\NoKeyValue AS DbalException;
@@ -62,7 +65,6 @@ class LoggerTest extends TestCase
             ->willThrowException($expectedException);
 
         $logger = new Logger($entityManager, null);
-
 
         $foundException = null;
         try {
@@ -229,7 +231,7 @@ class LoggerTest extends TestCase
         $this->assertStringContainsString('mock error', $messages[3]['message']);
     }
 
-    public function testOutput()
+    public function testOutput(): void
     {
         $output = SymfonyMock::getConsoleOutput($this);
         $loggerOutput = new LoggerOutput($output);
@@ -260,7 +262,7 @@ class LoggerTest extends TestCase
         );
     }
 
-    public function testInitFromLog()
+    public function testInitFromLog(): void
     {
         $logger = static::getService($this);
 
@@ -284,7 +286,6 @@ class LoggerTest extends TestCase
         $log->setContent('bad json');
         $logger->initFromExistingLog($log);
         $this->assertSame([], $logger->getMessages());
-
 
         $messages = ['my foo', 'my bar'];
         $log = new ProcessLog();
