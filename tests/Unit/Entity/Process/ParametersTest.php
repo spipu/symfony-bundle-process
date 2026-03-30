@@ -10,7 +10,7 @@ use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
 class ParametersTest extends TestCase
 {
-    public static function getParameters(TestCase $testCase, array $values = [])
+    public static function getParameters(TestCase $testCase, array $values = []): Parameters
     {
         $mainParameters = SpipuProcessMock::getMainParameters($testCase);
 

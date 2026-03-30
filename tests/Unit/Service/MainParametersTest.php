@@ -13,7 +13,7 @@ use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
 class MainParametersTest extends TestCase
 {
-    public static function getMainParameters(TestCase $testCase)
+    public static function getMainParameters(TestCase $testCase): MainParameters
     {
         return new MainParameters(
             ConfigReaderTest::getMockContainer($testCase),

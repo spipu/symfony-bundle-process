@@ -11,12 +11,7 @@ use Spipu\ProcessBundle\Service\InputsFactory;
 
 class InputsFactoryTest extends TestCase
 {
-    /**
-     * @param TestCase $testCase
-     * @param array $services
-     * @return InputsFactory
-     */
-    public static function getService(TestCase $testCase, array $services = [])
+    public static function getService(TestCase $testCase, array $services = []): InputsFactory
     {
         $container = SymfonyMock::getContainer($testCase, $services);
 

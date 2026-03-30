@@ -26,7 +26,7 @@ use Spipu\ProcessBundle\Tests\Unit\Entity\Process\ProcessTest;
 
 class ProcessManagerTest extends TestCase
 {
-    public static function getService(TestCase $testCase, bool $toExecuteAsynchronously = false)
+    public static function getService(TestCase $testCase, bool $toExecuteAsynchronously = false): ProcessManager
     {
         $configReader = ConfigReaderTest::getService($testCase);
         $mainParameters = MainParametersTest::getMainParameters($testCase);

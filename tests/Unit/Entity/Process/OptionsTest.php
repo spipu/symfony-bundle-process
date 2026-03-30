@@ -10,12 +10,7 @@ use Spipu\ProcessBundle\Exception\OptionException;
 
 class OptionsTest extends TestCase
 {
-    /**
-     * @param TestCase $testCase
-     * @param array $description
-     * @return Options
-     */
-    public static function getOptions(TestCase $testCase, array $description = [])
+    public static function getOptions(TestCase $testCase, array $description = []): Options
     {
         return new Options($description);
     }

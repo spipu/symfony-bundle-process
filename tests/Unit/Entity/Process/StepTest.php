@@ -6,11 +6,12 @@ namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Step;
+use Spipu\ProcessBundle\Step\StepInterface;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
 class StepTest extends TestCase
 {
-    public static function getStep(TestCase $testCase, $code, $class, $parameters = [], $ignoreInProgress = false)
+    public static function getStep(TestCase $testCase, string $code, StepInterface $class, array $parameters = [], bool $ignoreInProgress = false): Step
     {
         return new Step(
             $code,

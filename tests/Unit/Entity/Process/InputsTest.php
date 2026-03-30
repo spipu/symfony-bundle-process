@@ -12,12 +12,7 @@ use Spipu\UiBundle\Tests\OptionIntegerMock;
 
 class InputsTest extends TestCase
 {
-    /**
-     * @param TestCase $testCase
-     * @param array $description
-     * @return Inputs
-     */
-    public static function getInputs(TestCase $testCase, array $description = [])
+    public static function getInputs(TestCase $testCase, array $description = []): Inputs
     {
         foreach($description as $name => &$config) {
             $config['name'] = $name;

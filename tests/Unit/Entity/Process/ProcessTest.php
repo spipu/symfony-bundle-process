@@ -10,7 +10,7 @@ use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
 class ProcessTest extends TestCase
 {
-    public static function getProcess(TestCase $testCase)
+    public static function getProcess(TestCase $testCase): Process
     {
         $process = new Process(
             'test',

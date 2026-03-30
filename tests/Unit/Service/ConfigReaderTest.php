@@ -18,7 +18,7 @@ class ConfigReaderTest extends TestCase
      * @param TestCase $testCase
      * @return MockObject|ContainerInterface
      */
-    public static function getMockContainer(TestCase $testCase)
+    public static function getMockContainer(TestCase $testCase): ContainerInterface
     {
         return SymfonyMock::getContainer(
             $testCase,
@@ -32,11 +32,7 @@ class ConfigReaderTest extends TestCase
         );
     }
 
-    /**
-     * @param TestCase $testCase
-     * @return ConfigReader
-     */
-    public static function getService(TestCase $testCase)
+    public static function getService(TestCase $testCase): ConfigReader
     {
         return new ConfigReader(static::getMockContainer($testCase));
     }

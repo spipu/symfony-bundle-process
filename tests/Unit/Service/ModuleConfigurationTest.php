@@ -10,13 +10,7 @@ use Spipu\ProcessBundle\Service\ModuleConfiguration;
 
 class ModuleConfigurationTest extends TestCase
 {
-    /**
-     * @param TestCase $testCase
-     * @param array $values
-     * @param string $mailSenderConfig
-     * @return ModuleConfiguration
-     */
-    public static function getService(TestCase $testCase, array $values = [], string $mailSenderConfig = 'app.email.sender')
+    public static function getService(TestCase $testCase, array $values = [], string $mailSenderConfig = 'app.email.sender'): ModuleConfiguration
     {
         $defaultValues = [
             'process.task.automatic_rerun'          => 1,

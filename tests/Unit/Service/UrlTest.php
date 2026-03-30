@@ -11,11 +11,7 @@ use Spipu\ProcessBundle\Service\Url;
 
 class UrlTest extends TestCase
 {
-    /**
-     * @param TestCase $testCase
-     * @return Url
-     */
-    public static function getService(TestCase $testCase)
+    public static function getService(TestCase $testCase): Url
     {
         $service = new Url(
             SymfonyMock::getRouter($testCase),
