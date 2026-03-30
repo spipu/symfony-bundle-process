@@ -80,7 +80,7 @@ class Parameters implements ParametersInterface
 
         return preg_replace_callback(
             '/{{ ([^}]+) }}/',
-            function ($match) {
+            function (array $match): string {
                 return $this->get($match[1]);
             },
             $string

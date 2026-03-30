@@ -66,7 +66,7 @@ class SpipuProcessBundle extends AbstractBundle
                             ->beforeNormalization()
                                 ->ifString()
                                 ->then(
-                                    function ($v) {
+                                    function (string $v) {
                                         return ['type' => $v];
                                     }
                                 )
