@@ -42,7 +42,7 @@ class SpipuProcessMock extends TestCase
 
         if ($id !== null) {
             $setId = Closure::bind(
-                function ($value) {
+                function (int $value): void {
                     $this->id = $value;
                 },
                 $entity,
@@ -64,7 +64,7 @@ class SpipuProcessMock extends TestCase
 
         if ($id !== null) {
             $setId = Closure::bind(
-                function ($value) {
+                function (int $value): void {
                     $this->id = $value;
                 },
                 $entity,

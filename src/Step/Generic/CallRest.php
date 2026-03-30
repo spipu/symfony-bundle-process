@@ -185,7 +185,7 @@ class CallRest implements StepInterface
         return $curl;
     }
 
-    private function applyMethodAndData($curl, string $method, string &$data): void
+    private function applyMethodAndData(CurlHandle $curl, string $method, string &$data): void
     {
         switch ($method) {
             // Read.
@@ -219,12 +219,12 @@ class CallRest implements StepInterface
     }
 
     /**
-     * @param resource $resURL
-     * @param string   $header
+     * @param CurlHandle $resURL
+     * @param string     $header
      * @return int
      * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    public function readHeader($resURL, string $header): int
+    public function readHeader(CurlHandle $resURL, string $header): int
     {
         // Analyse the headers without status message.
         if (preg_match('/^HTTP\/[0-3].?[0-9]? ([0-9]+)$/', trim($header), $match)) {

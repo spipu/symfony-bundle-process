@@ -25,7 +25,7 @@ class LoggerTest extends TestCase
         $entityManager
             ->method('persist')
             ->willReturnCallback(
-                function ($model) {
+                function (object $model): void {
                     $refObject = new ReflectionObject($model);
                     $refProperty = $refObject->getProperty('id');
                     $refProperty->setAccessible(true);
@@ -52,7 +52,7 @@ class LoggerTest extends TestCase
         $entityManager
             ->method('persist')
             ->willReturnCallback(
-                function ($model) {
+                function (object $model): void {
                     $refObject = new ReflectionObject($model);
                     $refProperty = $refObject->getProperty('id');
                     $refProperty->setAccessible(true);
