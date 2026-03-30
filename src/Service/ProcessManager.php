@@ -103,7 +103,7 @@ class ProcessManager
         return $process;
     }
 
-    public function execute(Process\Process $process, callable $initCallback = null): mixed
+    public function execute(Process\Process $process, ?callable $initCallback = null): mixed
     {
         $blockingTaskId = $this->getBlockingTaskId($process);
         if ($blockingTaskId !== null) {
@@ -362,7 +362,7 @@ class ProcessManager
     private function executeUpdateTask(
         Process\Process $process,
         string $status,
-        string $message = null,
+        ?string $message = null,
         bool $canBeRerunAutomatically = false
     ): void {
         $task = $process->getTask();

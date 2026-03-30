@@ -39,7 +39,7 @@ class Logger implements LoggerProcessInterface
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        MailManager $mailer = null
+        ?MailManager $mailer = null
     ) {
         $this->entityManager = $entityManager;
         $this->mailer = $mailer;
