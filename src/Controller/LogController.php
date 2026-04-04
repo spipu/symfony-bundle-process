@@ -18,7 +18,7 @@ use Exception;
 use Spipu\UiBundle\Service\Ui\GridFactory;
 use Spipu\ProcessBundle\Entity\Log;
 use Spipu\ProcessBundle\Ui\LogGrid;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Spipu\CoreBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -148,22 +148,5 @@ class LogController extends AbstractController
         }
 
         return $levelAlertsLink[$status];
-    }
-
-    private function addFlashTrans(string $type, string $message, array $params = []): void
-    {
-        $this->addFlash($type, $this->trans($message, $params));
-    }
-
-    private function trans(string $message, array $params = []): string
-    {
-        return $this->container->get('translator')->trans($message, $params);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return parent::getSubscribedServices() + [
-            'translator',
-        ];
     }
 }

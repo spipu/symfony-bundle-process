@@ -36,7 +36,7 @@ use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Ui\LogGrid;
 use Spipu\ProcessBundle\Ui\TaskGrid;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Spipu\CoreBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -375,23 +375,6 @@ class TaskController extends AbstractController
         }
 
         return $fileManager->saveInputFile($process, $input, $file);
-    }
-
-    private function addFlashTrans(string $type, string $message, array $params = []): void
-    {
-        $this->addFlash($type, $this->trans($message, $params));
-    }
-
-    private function trans(string $message, array $params = []): string
-    {
-        return $this->container->get('translator')->trans($message, $params);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return parent::getSubscribedServices() + [
-            'translator',
-        ];
     }
 
     protected function checkConfiguration(): void
