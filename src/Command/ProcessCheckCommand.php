@@ -16,11 +16,13 @@ namespace Spipu\ProcessBundle\Command;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\Status;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'spipu:process:check', description: 'Check the number of tasks.')]
 class ProcessCheckCommand extends Command
 {
     public const OPTION_STATUS = 'status';
@@ -42,8 +44,6 @@ class ProcessCheckCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('spipu:process:check')
-            ->setDescription('Check the number of tasks.')
             ->setHelp('This command allows you to check the number of tasks')
             ->addOption(
                 static::OPTION_STATUS,

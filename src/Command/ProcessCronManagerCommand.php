@@ -16,12 +16,17 @@ namespace Spipu\ProcessBundle\Command;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\CronManager;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'spipu:process:cron-manager',
+    description: 'Run the process manager (automatic relaunch, log cleaner, ...'
+)]
 class ProcessCronManagerCommand extends Command
 {
     public const ARGUMENT_ACTION = 'cron_action';
@@ -48,8 +53,6 @@ class ProcessCronManagerCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('spipu:process:cron-manager')
-            ->setDescription('Run the process manager (automatic relaunch, log cleaner, ...')
             ->setHelp('This command allows you to run the process manager')
             ->addArgument(
                 static::ARGUMENT_ACTION,

@@ -21,6 +21,7 @@ use Spipu\ProcessBundle\Service\FileManagerInterface;
 use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +34,7 @@ use Symfony\Component\HttpFoundation\File\File;
 /**
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
  */
+#[AsCommand(name: 'spipu:process:run', description: 'Run a new process.')]
 class ProcessRunCommand extends Command
 {
     public const ARGUMENT_PROCESS = 'process';
@@ -60,8 +62,6 @@ class ProcessRunCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('spipu:process:run')
-            ->setDescription('Run a new process.')
             ->setHelp('This command allows you to run any process')
             ->addArgument(
                 static::ARGUMENT_PROCESS,

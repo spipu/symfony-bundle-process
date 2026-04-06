@@ -19,12 +19,14 @@ use Spipu\ProcessBundle\Service\LoggerOutput;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Spipu\ProcessBundle\Service\Status as ProcessStatus;
 use Spipu\ProcessBundle\Service\ProcessManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'spipu:process:rerun', description: 'ReRun an existing failed process.')]
 class ProcessReRunCommand extends Command
 {
     public const ARGUMENT_TASK = 'task-id';
@@ -53,8 +55,6 @@ class ProcessReRunCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('spipu:process:rerun')
-            ->setDescription('ReRun an existing failed process.')
             ->setHelp('This command allows you to re-run an existing failed process task')
             ->addArgument(
                 static::ARGUMENT_TASK,
