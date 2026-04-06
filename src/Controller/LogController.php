@@ -16,7 +16,7 @@ namespace Spipu\ProcessBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Spipu\UiBundle\Service\Ui\GridFactory;
-use Spipu\ProcessBundle\Entity\Log;
+use Spipu\ProcessBundle\Repository\LogRepository;
 use Spipu\ProcessBundle\Ui\LogGrid;
 use Spipu\CoreBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +50,13 @@ class LogController extends AbstractController
 
     #[Route(path: '/show/{id}', name: 'spipu_process_admin_log_show', methods: 'GET')]
     #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')]
-    public function show(Log $resource): Response
+    public function show(LogRepository $logRepository, int $id): Response
     {
+        $resource = $logRepository->findOneBy(['id' => $id]);
+        if (!$resource) {
+            throw $this->createNotFoundException();
+        }
+
         $messages = json_decode($resource->getContent(), true);
 
         $start = (isset($messages[0]['date']) ? $messages[0]['date'] : 0);
@@ -108,8 +113,14 @@ class LogController extends AbstractController
     #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_DELETE')]
     public function delete(
         Request $request,
-        Log $resource
+        LogRepository $logRepository,
+        int $id
     ): Response {
+        $resource = $logRepository->findOneBy(['id' => $id]);
+        if (!$resource) {
+            throw $this->createNotFoundException();
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if (!$this->isCsrfTokenValid('delete_process_log_' . $resource->getId(), $request->request->get('_token'))) {

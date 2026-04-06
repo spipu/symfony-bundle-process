@@ -31,6 +31,7 @@ use Spipu\UiBundle\Service\Ui\FormManagerInterface;
 use Spipu\UiBundle\Service\Ui\Grid\DataProvider\Doctrine;
 use Spipu\UiBundle\Service\Ui\GridFactory;
 use Spipu\ProcessBundle\Entity\Task;
+use Spipu\ProcessBundle\Repository\TaskRepository;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 use Spipu\ProcessBundle\Service\ProcessManager;
 use Spipu\ProcessBundle\Service\Status;
@@ -85,12 +86,18 @@ class TaskController extends AbstractController
     #[Route(path: '/show/{id}', name: 'spipu_process_admin_task_show', methods: 'GET')]
     #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_SHOW')]
     public function show(
-        Task $resource,
+        TaskRepository $taskRepository,
+        int $id,
         YesNo $yesNoOptions,
         GridFactory $gridFactory,
         LogGrid $logGrid,
         ConfigReader $configReader
     ): Response {
+        $resource = $taskRepository->findOneBy(['id' => $id]);
+        if (!$resource) {
+            throw $this->createNotFoundException();
+        }
+
         $this->checkConfiguration();
 
         $manager = $gridFactory->create($logGrid);
@@ -124,10 +131,16 @@ class TaskController extends AbstractController
     #[Route(path: '/rerun/{id}', name: 'spipu_process_admin_task_rerun', methods: 'GET')]
     #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_RERUN')]
     public function rerun(
-        Task $resource,
+        TaskRepository $taskRepository,
+        int $id,
         ProcessManager $processManager,
         AsynchronousCommand $asynchronousCommand
     ): Response {
+        $resource = $taskRepository->findOneBy(['id' => $id]);
+        if (!$resource) {
+            throw $this->createNotFoundException();
+        }
+
         $this->checkConfiguration();
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -164,9 +177,15 @@ class TaskController extends AbstractController
     #[Route(path: '/kill/{id}', name: 'spipu_process_admin_task_kill', methods: 'GET')]
     #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_KILL')]
     public function kill(
-        Task $resource,
+        TaskRepository $taskRepository,
+        int $id,
         TaskManager $taskManager
     ): Response {
+        $resource = $taskRepository->findOneBy(['id' => $id]);
+        if (!$resource) {
+            throw $this->createNotFoundException();
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         try {
@@ -188,8 +207,14 @@ class TaskController extends AbstractController
     #[IsGranted('ROLE_ADMIN_MANAGE_PROCESS_DELETE')]
     public function delete(
         Request $request,
-        Task $resource
+        TaskRepository $taskRepository,
+        int $id
     ): Response {
+        $resource = $taskRepository->findOneBy(['id' => $id]);
+        if (!$resource) {
+            throw $this->createNotFoundException();
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if (!$this->isCsrfTokenValid('delete_process_task_' . $resource->getId(), $request->request->get('_token'))) {
