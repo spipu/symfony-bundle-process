@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Report;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Report::class)]
 class ReportTest extends TestCase
 {
     public function testOk(): void

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ConfigurationBundle\Tests\SpipuConfigurationMock;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
@@ -11,6 +13,8 @@ use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\MainParameters;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(MainParameters::class)]
 class MainParametersTest extends TestCase
 {
     public static function getMainParameters(TestCase $testCase): MainParameters

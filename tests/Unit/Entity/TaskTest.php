@@ -6,10 +6,15 @@ namespace Spipu\ProcessBundle\Tests\Unit\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\Collection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Task::class)]
 class TaskTest extends TestCase
 {
     public function testEntity(): void

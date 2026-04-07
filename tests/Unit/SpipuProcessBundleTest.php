@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ConfigurationBundle\SpipuConfigurationBundle;
 use Spipu\CoreBundle\RolesHierarchyBundleInterface;
@@ -18,6 +20,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Extension\ConfigurableExtensionInterface;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(SpipuProcessBundle::class)]
 class SpipuProcessBundleTest extends TestCase
 {
     public function testBase(): void

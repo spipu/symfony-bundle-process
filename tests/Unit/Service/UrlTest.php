@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ConfigurationBundle\Tests\SpipuConfigurationMock;
 use Spipu\CoreBundle\Tests\SymfonyMock;
 use Spipu\ProcessBundle\Service\Url;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Url::class)]
 class UrlTest extends TestCase
 {
     public static function getService(TestCase $testCase): Url

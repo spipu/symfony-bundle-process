@@ -13,14 +13,18 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Command\ProcessCronManagerCommand;
 use Spipu\ProcessBundle\Exception\ProcessException;
-use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
 use Symfony\Component\Console\Command\Command;
 use Throwable;
 
-class ProcessCronManagerTest extends AbstractFunctionalTest
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ProcessCronManagerCommand::class)]
+class ProcessCronManagerTest extends AbstractFunctionalTestCase
 {
     public function testExecuteMissingAction(): void
     {

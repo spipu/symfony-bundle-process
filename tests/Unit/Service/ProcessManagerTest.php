@@ -7,6 +7,8 @@ namespace Spipu\ProcessBundle\Tests\Unit\Service;
 use DateTime;
 use Doctrine\DBAL\Exception\NoKeyValue AS DbalException;
 use Doctrine\DBAL\Result as DbalResult;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Service\AsynchronousCommand;
 use Spipu\CoreBundle\Tests\SymfonyMock;
@@ -24,6 +26,8 @@ use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 use Spipu\ProcessBundle\Tests\Unit\Entity\Process\ProcessTest;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ProcessManager::class)]
 class ProcessManagerTest extends TestCase
 {
     public static function getService(TestCase $testCase, bool $toExecuteAsynchronously = false): ProcessManager

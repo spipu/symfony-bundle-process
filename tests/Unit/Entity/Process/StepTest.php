@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Step;
 use Spipu\ProcessBundle\Step\StepInterface;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Step::class)]
 class StepTest extends TestCase
 {
     public static function getStep(TestCase $testCase, string $code, StepInterface $class, array $parameters = [], bool $ignoreInProgress = false): Step

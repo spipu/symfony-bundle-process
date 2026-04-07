@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Spipu\ProcessBundle\Command\ProcessCheckCommand;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ProcessManager;
-use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
 
-class ProcessCheckTest extends AbstractFunctionalTest
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ProcessCheckCommand::class)]
+class ProcessCheckTest extends AbstractFunctionalTestCase
 {
     public function testExecuteWithoutStatus(): void
     {

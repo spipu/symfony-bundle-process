@@ -13,14 +13,18 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Command\ProcessRunCommand;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
-use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
 use Throwable;
 
-class ProcessRunTest extends AbstractFunctionalTest
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ProcessRunCommand::class)]
+class ProcessRunTest extends AbstractFunctionalTestCase
 {
     public function testExecuteMissingProcess(): void
     {

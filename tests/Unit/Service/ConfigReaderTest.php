@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Tests\SymfonyMock;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ConfigReader;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ConfigReader::class)]
 class ConfigReaderTest extends TestCase
 {
     /**

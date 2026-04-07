@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
 use Doctrine\DBAL\Exception\NoKeyValue AS DbalException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Spipu\CoreBundle\Tests\SymfonyMock;
@@ -17,6 +19,8 @@ use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 use Throwable;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Logger::class)]
 class LoggerTest extends TestCase
 {
     public static function getService(TestCase $testCase, ?MailManager $mailManager = null): Logger

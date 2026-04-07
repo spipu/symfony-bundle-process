@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Entity;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Spipu\ProcessBundle\Entity\Log;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Log::class)]
 class LogTest extends TestCase
 {
     public function testEntity(): void

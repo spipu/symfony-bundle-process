@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ConfigurationBundle\Tests\SpipuConfigurationMock;
 use Spipu\ProcessBundle\Service\ModuleConfiguration;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ModuleConfiguration::class)]
 class ModuleConfigurationTest extends TestCase
 {
     public static function getService(TestCase $testCase, array $values = [], string $mailSenderConfig = 'app.email.sender'): ModuleConfiguration

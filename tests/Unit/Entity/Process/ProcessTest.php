@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Tests\SpipuProcessMock;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Process::class)]
 class ProcessTest extends TestCase
 {
     public static function getProcess(TestCase $testCase): Process

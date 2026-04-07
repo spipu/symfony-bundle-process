@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Functional\Controller;
 
-use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Spipu\ProcessBundle\Controller\TaskController;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
 use Spipu\UiBundle\Tests\UiWebTestCaseTrait;
 
-class InterfaceTasksTest extends AbstractFunctionalTest
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(TaskController::class)]
+class InterfaceTasksTest extends AbstractFunctionalTestCase
 {
     use UiWebTestCaseTrait;
 

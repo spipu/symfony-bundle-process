@@ -14,14 +14,18 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Tests\Functional\Command;
 
 use DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Command\ProcessReRunCommand;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\ProcessManager;
-use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTest;
+use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
 use Throwable;
 
-class ProcessReRunTest extends AbstractFunctionalTest
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(ProcessReRunCommand::class)]
+class ProcessReRunTest extends AbstractFunctionalTestCase
 {
     public function testExecuteMissingTaskId(): void
     {

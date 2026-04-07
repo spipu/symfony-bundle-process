@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Entity\Process;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\ProcessBundle\Entity\Process\Inputs;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Tests\Unit\Service\InputsFactoryTest;
 use Spipu\UiBundle\Tests\OptionIntegerMock;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(Inputs::class)]
 class InputsTest extends TestCase
 {
     public static function getInputs(TestCase $testCase, array $description = []): Inputs

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Entity\Role\Item;
 use Spipu\CoreBundle\Tests\Unit\Service\RoleDefinitionUiTest;
 use Spipu\ProcessBundle\Service\RoleDefinition;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(RoleDefinition::class)]
 class RoleDefinitionTest extends TestCase
 {
 

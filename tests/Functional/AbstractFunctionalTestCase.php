@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Spipu\CoreBundle\Tests\EntityManagerTestCaseTrait;
 use Spipu\CoreBundle\Tests\WebTestCase;
 
-abstract class AbstractFunctionalTest extends WebTestCase
+#[CoversNothing]
+abstract class AbstractFunctionalTestCase extends WebTestCase
 {
     use EntityManagerTestCaseTrait;
 

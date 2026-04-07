@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Spipu\CoreBundle\Tests\SymfonyMock;
 use Spipu\ProcessBundle\Entity\Task;
@@ -11,6 +13,8 @@ use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Service\TaskManager;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(TaskManager::class)]
 class TaskManagerTest extends TestCase
 {
     /**
