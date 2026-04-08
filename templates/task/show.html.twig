@@ -25,9 +25,9 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-xs-12 col-lg-6 col-xl-4">
+        <div class="col-12 col-lg-6 col-xl-4">
             <div class="card mb-3">
-                <div class="card-header font-weight-bold">{{ 'spipu.process.fieldset.task'|trans }}</div>
+                <div class="card-header fw-bold">{{ 'spipu.process.fieldset.task'|trans }}</div>
                 <table class="table table-striped table-hover table-sm mb-0">
                     <tr>
                         <th class="w-25">{{ 'spipu.process.field.task.id'|trans   }}</th>
@@ -56,9 +56,9 @@
                 </table>
             </div>
         </div>
-        <div class="col-xs-12 col-lg-6 col-xl-4">
+        <div class="col-12 col-lg-6 col-xl-4">
             <div class="card mb-3">
-                <div class="card-header font-weight-bold">{{ 'spipu.process.fieldset.execution'|trans }}</div>
+                <div class="card-header fw-bold">{{ 'spipu.process.fieldset.execution'|trans }}</div>
                 <table class="table table-striped table-hover table-sm mb-0">
                     <tr>
                         <th>{{ 'spipu.process.field.task.scheduled_at'|trans }}</th>
@@ -95,9 +95,9 @@
                 </table>
             </div>
         </div>
-        <div class="col-xs-12 col-lg-12 col-xl-4">
+        <div class="col-12 col-lg-12 col-xl-4">
             <div class="card mb-3">
-                <div class="card-header font-weight-bold">{{ 'spipu.process.fieldset.inputs'|trans }}</div>
+                <div class="card-header fw-bold">{{ 'spipu.process.fieldset.inputs'|trans }}</div>
                 <table class="table table-sm mb-0">
                     {% for key, value in resource.inputsAsJson %}
                         <tr>
@@ -113,7 +113,7 @@
             </div>
             {% if processConfig.options.process_lock %}
             <div class="card mb-3">
-                <div class="card-header font-weight-bold">{{ 'spipu.process.field.process.locks'|trans }}</div>
+                <div class="card-header fw-bold">{{ 'spipu.process.field.process.locks'|trans }}</div>
                 <table class="table table-sm mb-0">
                     <tr class="alert-secondary"><td>
                         {{ 'spipu.process.field.process.lock_on_failed'|trans({'%value': (processConfig.options.process_lock_on_failed ? 'spipu.ui.options.value_yes' : 'spipu.ui.options.value_no')|trans }) }}
