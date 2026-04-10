@@ -21,26 +21,14 @@ use Spipu\ProcessBundle\Step\StepInterface;
 
 abstract class AbstractDatabase implements StepInterface
 {
-    /**
-     * @var ConnectionManagerInterface
-     */
     private ConnectionManagerInterface $connectionManager;
 
-    /**
-     * AbstractDatabase constructor.
-     * @param ConnectionManagerInterface $connectionManager
-     */
     public function __construct(
         ConnectionManagerInterface $connectionManager
     ) {
         $this->connectionManager = $connectionManager;
     }
 
-    /**
-     * @param ParametersInterface $parameters
-     * @param LoggerInterface $logger
-     * @return Connection
-     */
     protected function getConnection(ParametersInterface $parameters, LoggerInterface $logger): Connection
     {
         $parameters->setDefaultValue('connection', 'default');
