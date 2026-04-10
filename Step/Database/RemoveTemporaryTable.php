@@ -16,26 +16,9 @@ namespace Spipu\ProcessBundle\Step\Database;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
-use Spipu\ProcessBundle\Step\StepInterface;
-use Doctrine\DBAL\Connection;
 
-class RemoveTemporaryTable implements StepInterface
+class RemoveTemporaryTable extends AbstractDatabase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * CreateTemporaryTable constructor.
-     * @param Connection $connection
-     */
-    public function __construct(
-        Connection $connection
-    ) {
-        $this->connection = $connection;
-    }
-
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
@@ -44,6 +27,8 @@ class RemoveTemporaryTable implements StepInterface
      */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger)
     {
+        $connection = $this->getConnection($parameters, $logger);
+
         $parameters->setDefaultValue('if_exists', false);
         $ifExists = (bool) $parameters->get('if_exists');
 
@@ -52,7 +37,7 @@ class RemoveTemporaryTable implements StepInterface
         $logger->debug(sprintf('Table to delete: [%s]', $tablename));
 
         try {
-            $schema = $this->connection->createSchemaManager();
+            $schema = $connection->createSchemaManager();
             $schema->dropTable($tablename);
         } catch (Exception $e) {
             if (!$ifExists) {

@@ -16,27 +16,10 @@ namespace Spipu\ProcessBundle\Step\Database;
 use Doctrine\DBAL\Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
-use Spipu\ProcessBundle\Step\StepInterface;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Connection;
 
-class CreateTemporaryTable implements StepInterface
+class CreateTemporaryTable extends AbstractDatabase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * CreateTemporaryTable constructor.
-     * @param Connection $connection
-     */
-    public function __construct(
-        Connection $connection
-    ) {
-        $this->connection = $connection;
-    }
-
     /**
      * @param ParametersInterface $parameters
      * @param LoggerInterface $logger
@@ -45,6 +28,8 @@ class CreateTemporaryTable implements StepInterface
      */
     public function execute(ParametersInterface $parameters, LoggerInterface $logger)
     {
+        $connection = $this->getConnection($parameters, $logger);
+
         $tablename = $parameters->get('tablename');
         $fields = $parameters->get('fields');
 
@@ -64,7 +49,7 @@ class CreateTemporaryTable implements StepInterface
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(['row_id']);
 
-        $schema = $this->connection->createSchemaManager();
+        $schema = $connection->createSchemaManager();
         try {
             $schema->dropTable($tablename);
         } catch (Exception $e) {
