@@ -14,24 +14,17 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Step\Database;
 
 use Exception;
+use Doctrine\DBAL\Connection;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
-use Spipu\ProcessBundle\Step\StepInterface;
-use Doctrine\DBAL\Connection;
 
-class CleanDuplicatesData implements StepInterface
+class CleanDuplicatesData extends AbstractDatabase
 {
-    private Connection $connection;
-
-    public function __construct(
-        Connection $connection
-    ) {
-        $this->connection = $connection;
-    }
-
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
+        $connection = $this->getConnection($parameters, $logger);
+
         $tablename = $parameters->get('tablename');
         $fields = $parameters->get('fields');
 
@@ -46,7 +39,7 @@ class CleanDuplicatesData implements StepInterface
 
         $protectedFields = [];
         foreach ($fields as $field) {
-            $protectedFields[] = $this->connection->quoteIdentifier($field);
+            $protectedFields[] = $connection->quoteIdentifier($field);
         }
 
         $query = sprintf(
@@ -59,12 +52,12 @@ class CleanDuplicatesData implements StepInterface
                         HAVING count(*) > 1
                 ) as a
             ',
-            $this->connection->quoteIdentifier($tablename),
+            $connection->quoteIdentifier($tablename),
             implode(',', $protectedFields)
         );
 
         try {
-            $nbDuplicatedEntries = $this->connection->fetchNumeric($query)[0];
+            $nbDuplicatedEntries = $connection->fetchNumeric($query)[0];
         } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
@@ -93,12 +86,12 @@ class CleanDuplicatesData implements StepInterface
                 ON t2.id < t1.id
                 AND %2$s
             ',
-            $this->connection->quoteIdentifier($tablename),
-            $this->getCondition($fields, 't1', 't2')
+            $connection->quoteIdentifier($tablename),
+            $this->getCondition($connection, $fields, 't1', 't2')
         );
 
         try {
-            $nbPurgedLines = (int) $this->connection->executeStatement($query);
+            $nbPurgedLines = (int) $connection->executeStatement($query);
         } catch (Exception $e) {
             throw new StepException($e->getMessage());
         }
@@ -117,12 +110,13 @@ class CleanDuplicatesData implements StepInterface
     }
 
     /**
+     * @param Connection $connection
      * @param string[] $fields
      * @param string $alias1
      * @param string $alias2
      * @return string
      */
-    private function getCondition(array $fields, string $alias1, string $alias2): string
+    private function getCondition(Connection $connection, array $fields, string $alias1, string $alias2): string
     {
         $condition = [];
         foreach ($fields as $field) {
@@ -130,7 +124,7 @@ class CleanDuplicatesData implements StepInterface
                 '%1$s.%3$s = %2$s.%3$s',
                 $alias1,
                 $alias2,
-                $this->connection->quoteIdentifier($field)
+                $connection->quoteIdentifier($field)
             );
         }
         return implode(' AND ', $condition);
