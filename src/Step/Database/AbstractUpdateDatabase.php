@@ -15,23 +15,17 @@ namespace Spipu\ProcessBundle\Step\Database;
 
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
-use Spipu\ProcessBundle\Step\StepInterface;
 use Doctrine\DBAL\Connection;
 
-abstract class AbstractUpdateDatabase implements StepInterface
+abstract class AbstractUpdateDatabase extends AbstractDatabase
 {
     protected Connection $connection;
     protected array $report = [];
     protected LoggerInterface $logger;
 
-    public function __construct(
-        Connection $connection
-    ) {
-        $this->connection = $connection;
-    }
-
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
+        $this->connection = $this->getConnection($parameters, $logger);
         $this->logger = $logger;
 
         $this->report = [
