@@ -14,15 +14,16 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Step\File;
 
 use Exception;
+use Doctrine\DBAL\Connection;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
+use Spipu\ProcessBundle\Service\ConnectionManagerInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
+use Spipu\ProcessBundle\Step\Database\AbstractDatabase;
 use Spipu\ProcessBundle\Step\File\RowReader\RowReaderInterface;
-use Spipu\ProcessBundle\Step\StepInterface;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ImportFileToTable implements StepInterface
+class ImportFileToTable extends AbstractDatabase
 {
     private Connection $connection;
     private ContainerInterface $container;
@@ -30,12 +31,12 @@ class ImportFileToTable implements StepInterface
     private int $logEveryRows;
 
     public function __construct(
-        Connection $connection,
+        ConnectionManagerInterface $connectionManager,
         ContainerInterface $container,
         int $maxRowToInsert = 1000,
         int $logEveryRows = 1000000
     ) {
-        $this->connection = $connection;
+        parent::__construct($connectionManager);
         $this->container = $container;
         $this->maxRowToInsert = $maxRowToInsert;
         $this->logEveryRows = $logEveryRows;
@@ -43,6 +44,8 @@ class ImportFileToTable implements StepInterface
 
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
+        $this->connection = $this->getConnection($parameters, $logger);
+
         $filename  = $parameters->get('filename');
         $logger->debug(sprintf('File to import: [%s]', $filename));
 

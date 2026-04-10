@@ -16,21 +16,13 @@ namespace Spipu\ProcessBundle\Step\Database;
 use Exception;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
-use Spipu\ProcessBundle\Step\StepInterface;
-use Doctrine\DBAL\Connection;
 
-class AddIndexToTable implements StepInterface
+class AddIndexToTable extends AbstractDatabase
 {
-    private Connection $connection;
-
-    public function __construct(
-        Connection $connection
-    ) {
-        $this->connection = $connection;
-    }
-
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
+        $connection = $this->getConnection($parameters, $logger);
+
         $tablename = $parameters->get('tablename');
         $logger->debug(sprintf('Table: [%s]', $tablename));
 
@@ -41,7 +33,7 @@ class AddIndexToTable implements StepInterface
         $indexName = md5($tablename . '_' . implode('_', $fields));
 
         // Look at if the index already exists.
-        $schema = $this->connection->createSchemaManager();
+        $schema = $connection->createSchemaManager();
         $list = $schema->listTableIndexes($tablename);
         if (array_key_exists($indexName, $list)) {
             $logger->warning(' => The index already exists');
@@ -50,18 +42,18 @@ class AddIndexToTable implements StepInterface
 
         // Protect fields.
         foreach ($fields as &$field) {
-            $field = $this->connection->quoteIdentifier($field);
+            $field = $connection->quoteIdentifier($field);
         }
 
         // Create Index.
         $query = sprintf(
             'CREATE INDEX %1$s ON %2$s (%3$s)',
-            $this->connection->quoteIdentifier($indexName),
-            $this->connection->quoteIdentifier($tablename),
+            $connection->quoteIdentifier($indexName),
+            $connection->quoteIdentifier($tablename),
             implode(', ', $fields)
         );
         try {
-            $this->connection->executeQuery($query);
+            $connection->executeQuery($query);
         } catch (Exception $e) {
             $logger->error(' => Error with the following query');
             $logger->error($query);
