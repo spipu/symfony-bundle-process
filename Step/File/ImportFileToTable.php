@@ -182,6 +182,12 @@ class ImportFileToTable extends AbstractDatabase
             throw new StepException(sprintf("Unable to open %s.", $filename));
         }
 
+        // If BOM present, skip 3 bytes. Ensures correct header parsing.
+        $bom = fread($fileHandle, 3);
+        if ($bom !== "\xEF\xBB\xBF") {
+            rewind($fileHandle);
+        }
+
         return $fileHandle;
     }
 
