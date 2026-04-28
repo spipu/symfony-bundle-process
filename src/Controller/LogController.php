@@ -144,14 +144,14 @@ class LogController extends AbstractController
     private function getCssFromStatus(string $status): string
     {
         $levelAlertsLink = [
-            'emergency' => 'alert-danger',
-            'alert'     => 'alert-danger',
-            'critical'  => 'alert-danger',
-            'error'     => 'alert-danger',
-            'warning'   => 'alert-warning',
-            'notice'    => 'alert-success',
-            'info'      => 'alert-primary',
-            'debug'     => 'alert-secondary',
+            'emergency' => 'table-danger',
+            'alert'     => 'table-danger',
+            'critical'  => 'table-danger',
+            'error'     => 'table-danger',
+            'warning'   => 'table-warning',
+            'notice'    => 'table-success',
+            'info'      => 'table-primary',
+            'debug'     => 'table-secondary',
         ];
 
         if (!array_key_exists($status, $levelAlertsLink)) {
