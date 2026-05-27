@@ -15,6 +15,8 @@ namespace Spipu\ProcessBundle\Step\File;
 
 use Exception;
 use Doctrine\DBAL\Connection;
+use Spipu\CoreBundle\Service\ConnectionQuoterFactoryInterface;
+use Spipu\CoreBundle\Service\ConnectionQuoterInterface;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\ConnectionManagerInterface;
@@ -26,17 +28,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ImportFileToTable extends AbstractDatabase
 {
     private Connection $connection;
+    private ConnectionQuoterInterface $quoter;
     private ContainerInterface $container;
     private int $maxRowToInsert;
     private int $logEveryRows;
 
     public function __construct(
         ConnectionManagerInterface $connectionManager,
+        ConnectionQuoterFactoryInterface $quoterFactory,
         ContainerInterface $container,
         int $maxRowToInsert = 1000,
         int $logEveryRows = 1000000
     ) {
-        parent::__construct($connectionManager);
+        parent::__construct($connectionManager, $quoterFactory);
         $this->container = $container;
         $this->maxRowToInsert = $maxRowToInsert;
         $this->logEveryRows = $logEveryRows;
@@ -45,6 +49,7 @@ class ImportFileToTable extends AbstractDatabase
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $this->connection = $this->getConnection($parameters, $logger);
+        $this->quoter = $this->getQuoter($this->connection);
 
         $filename  = $parameters->get('filename');
         $logger->debug(sprintf('File to import: [%s]', $filename));
@@ -199,7 +204,7 @@ class ImportFileToTable extends AbstractDatabase
     {
         $columns = array_keys($rows[0]);
         foreach ($columns as &$column) {
-            $column = $this->connection->quoteIdentifier($column);
+            $column = $this->quoter->quoteIdentifier($column);
         }
 
         foreach ($rows as &$row) {
@@ -231,7 +236,7 @@ class ImportFileToTable extends AbstractDatabase
 
         $query = sprintf(
             'INSERT INTO %s %s VALUES %s;',
-            $this->connection->quoteIdentifier($tablename),
+            $this->quoter->quoteIdentifier($tablename),
             '(' . implode(',', $columns) . ')',
             implode(', ', $rows)
         );

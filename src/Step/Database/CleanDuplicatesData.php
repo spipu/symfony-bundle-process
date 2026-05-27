@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Step\Database;
 
 use Exception;
-use Doctrine\DBAL\Connection;
+use Spipu\CoreBundle\Service\ConnectionQuoterInterface;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Exception\StepException;
 use Spipu\ProcessBundle\Service\LoggerInterface;
@@ -24,6 +24,7 @@ class CleanDuplicatesData extends AbstractDatabase
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): array
     {
         $connection = $this->getConnection($parameters, $logger);
+        $quoter = $this->getQuoter($connection);
 
         $tablename = $parameters->get('tablename');
         $fields = $parameters->get('fields');
@@ -39,7 +40,7 @@ class CleanDuplicatesData extends AbstractDatabase
 
         $protectedFields = [];
         foreach ($fields as $field) {
-            $protectedFields[] = $connection->quoteIdentifier($field);
+            $protectedFields[] = $quoter->quoteIdentifier($field);
         }
 
         $query = sprintf(
@@ -52,7 +53,7 @@ class CleanDuplicatesData extends AbstractDatabase
                         HAVING count(*) > 1
                 ) as a
             ',
-            $connection->quoteIdentifier($tablename),
+            $quoter->quoteIdentifier($tablename),
             implode(',', $protectedFields)
         );
 
@@ -86,8 +87,8 @@ class CleanDuplicatesData extends AbstractDatabase
                 ON t2.id < t1.id
                 AND %2$s
             ',
-            $connection->quoteIdentifier($tablename),
-            $this->getCondition($connection, $fields, 't1', 't2')
+            $quoter->quoteIdentifier($tablename),
+            $this->getCondition($quoter, $fields, 't1', 't2')
         );
 
         try {
@@ -109,22 +110,19 @@ class CleanDuplicatesData extends AbstractDatabase
         ];
     }
 
-    /**
-     * @param Connection $connection
-     * @param string[] $fields
-     * @param string $alias1
-     * @param string $alias2
-     * @return string
-     */
-    private function getCondition(Connection $connection, array $fields, string $alias1, string $alias2): string
-    {
+    private function getCondition(
+        ConnectionQuoterInterface $quoter,
+        array $fields,
+        string $alias1,
+        string $alias2
+    ): string {
         $condition = [];
         foreach ($fields as $field) {
             $condition[] = sprintf(
                 '%1$s.%3$s = %2$s.%3$s',
                 $alias1,
                 $alias2,
-                $connection->quoteIdentifier($field)
+                $quoter->quoteIdentifier($field)
             );
         }
         return implode(' AND ', $condition);

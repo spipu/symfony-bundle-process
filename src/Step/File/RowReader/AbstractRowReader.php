@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Step\File\RowReader;
 
 use Doctrine\DBAL\Connection;
+use Spipu\CoreBundle\Service\ConnectionQuoterFactoryInterface;
+use Spipu\CoreBundle\Service\ConnectionQuoterInterface;
 use Spipu\ProcessBundle\Exception\RowReaderException;
 
 abstract class AbstractRowReader implements RowReaderInterface
 {
     protected Connection $connection;
+    protected ConnectionQuoterInterface $quoter;
     protected ActionList $actionList;
     protected array $fields = [];
     protected int $currentReadLine = 0;
@@ -28,9 +31,11 @@ abstract class AbstractRowReader implements RowReaderInterface
 
     public function __construct(
         Connection $connection,
+        ConnectionQuoterFactoryInterface $quoterFactory,
         ActionList $actionList
     ) {
         $this->connection = $connection;
+        $this->quoter = $quoterFactory->create($connection);
         $this->actionList = $actionList;
     }
 
@@ -170,9 +175,9 @@ abstract class AbstractRowReader implements RowReaderInterface
 
         $query = sprintf(
             'SELECT %s AS `code`, %s AS `id` FROM %s',
-            $this->connection->quoteIdentifier($mapping['source']['link']),
-            $this->connection->quoteIdentifier($mapping['source']['field']),
-            $this->connection->quoteIdentifier($mapping['source']['table'])
+            $this->quoter->quoteIdentifier($mapping['source']['link']),
+            $this->quoter->quoteIdentifier($mapping['source']['field']),
+            $this->quoter->quoteIdentifier($mapping['source']['table'])
         );
         $list = $this->connection->executeQuery($query)->fetchAllAssociative();
         $mapping['values'] = [];

@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Spipu\ProcessBundle\Step\Database;
 
 use Doctrine\DBAL\Connection;
+use Spipu\CoreBundle\Service\ConnectionQuoterFactoryInterface;
+use Spipu\CoreBundle\Service\ConnectionQuoterInterface;
 use Spipu\ProcessBundle\Entity\Process\ParametersInterface;
 use Spipu\ProcessBundle\Service\ConnectionManagerInterface;
 use Spipu\ProcessBundle\Service\LoggerInterface;
@@ -22,11 +24,14 @@ use Spipu\ProcessBundle\Step\StepInterface;
 abstract class AbstractDatabase implements StepInterface
 {
     private ConnectionManagerInterface $connectionManager;
+    protected ConnectionQuoterFactoryInterface $quoterFactory;
 
     public function __construct(
-        ConnectionManagerInterface $connectionManager
+        ConnectionManagerInterface $connectionManager,
+        ConnectionQuoterFactoryInterface $quoterFactory
     ) {
         $this->connectionManager = $connectionManager;
+        $this->quoterFactory = $quoterFactory;
     }
 
     protected function getConnection(ParametersInterface $parameters, LoggerInterface $logger): Connection
@@ -36,5 +41,10 @@ abstract class AbstractDatabase implements StepInterface
         $logger->debug(sprintf('Connection: [%s]', $connectionCode));
 
         return $this->connectionManager->getConnection($connectionCode);
+    }
+
+    protected function getQuoter(Connection $connection): ConnectionQuoterInterface
+    {
+        return $this->quoterFactory->create($connection);
     }
 }
