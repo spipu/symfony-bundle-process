@@ -22,6 +22,7 @@ class AddIndexToTable extends AbstractDatabase
     public function execute(ParametersInterface $parameters, LoggerInterface $logger): bool
     {
         $connection = $this->getConnection($parameters, $logger);
+        $quoter = $this->getQuoter($connection);
 
         $tablename = $parameters->get('tablename');
         $logger->debug(sprintf('Table: [%s]', $tablename));
@@ -42,14 +43,14 @@ class AddIndexToTable extends AbstractDatabase
 
         // Protect fields.
         foreach ($fields as &$field) {
-            $field = $connection->quoteIdentifier($field);
+            $field = $quoter->quoteIdentifier($field);
         }
 
         // Create Index.
         $query = sprintf(
             'CREATE INDEX %1$s ON %2$s (%3$s)',
-            $connection->quoteIdentifier($indexName),
-            $connection->quoteIdentifier($tablename),
+            $quoter->quoteIdentifier($indexName),
+            $quoter->quoteIdentifier($tablename),
             implode(', ', $fields)
         );
         try {
