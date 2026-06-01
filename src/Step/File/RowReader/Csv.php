@@ -75,6 +75,17 @@ class Csv extends AbstractRowReader
 
             $this->currentReadLine++;
 
+            if (count($line) !== count($this->header)) {
+                throw new RowReaderException(
+                    sprintf(
+                        'The line [%d] has %d columns, but the header declares %d',
+                        $this->currentReadLine,
+                        count($line),
+                        count($this->header)
+                    )
+                );
+            }
+
             $line = array_combine($this->header, $line);
 
             $row = [];
