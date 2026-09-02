@@ -42,23 +42,52 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $commandTester->execute(['cron_action' => 'foo']);
     }
 
-    public function testExecuteDisable(): void
+    public function testExecuteDisableRerun(): void
     {
-        $configurationManager = self::getContainer()->get(ConfigurationManager::class);
-        $configurationManager->set('process.task.can_execute', 0);
-        $configurationManager->clearCache();
+        $this->setCanExecute(false);
 
         $this->expectException(ProcessException::class);
         $this->expectExceptionMessage('Execution is disabled in module configuration');
 
         try {
             $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
-            $commandTester->execute(['cron_action' => 'foo']);
+            $commandTester->execute(['cron_action' => 'rerun']);
         } finally {
-            $configurationManager = self::getContainer()->get(ConfigurationManager::class);
-            $configurationManager->set('process.task.can_execute', 1);
-            $configurationManager->clearCache();
+            $this->setCanExecute(true);
         }
+    }
+
+    public function testExecuteDisableCleanup(): void
+    {
+        $this->setCanExecute(false);
+
+        $this->expectException(ProcessException::class);
+        $this->expectExceptionMessage('Execution is disabled in module configuration');
+
+        try {
+            $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+            $commandTester->execute(['cron_action' => 'cleanup']);
+        } finally {
+            $this->setCanExecute(true);
+        }
+    }
+
+    public function testExecuteDisableCheckPid(): void
+    {
+        $this->setCanExecute(false);
+
+        try {
+            $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+            $result = $commandTester->execute(['cron_action' => 'check-pid']);
+        } finally {
+            $this->setCanExecute(true);
+        }
+
+        $this->assertSame(Command::SUCCESS, $result);
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Process Cron Manager - Check Running Tasks - Begin', $output);
+        $this->assertStringContainsString('Process Cron Manager - Check Running Tasks - End', $output);
     }
 
     public function testExecuteActionRerun(): void
@@ -106,5 +135,12 @@ class ProcessCronManagerTest extends AbstractFunctionalTest
         $this->assertStringContainsString('Search running tasks', $output);
         $this->assertStringContainsString('=> No task found', $output);
         $this->assertStringContainsString('Process Cron Manager - Check Running Tasks - End', $output);
+    }
+
+    private function setCanExecute(bool $canExecute): void
+    {
+        $configurationManager = self::getContainer()->get(ConfigurationManager::class);
+        $configurationManager->set('process.task.can_execute', $canExecute ? 1 : 0);
+        $configurationManager->clearCache();
     }
 }
