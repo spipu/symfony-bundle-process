@@ -64,10 +64,6 @@ class ProcessCronManagerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->processConfiguration->hasTaskCanExecute()) {
-            throw new ProcessException('Execution is disabled in module configuration');
-        }
-
         $action = $input->getArgument(static::ARGUMENT_ACTION);
         if (!array_key_exists($action, $this->availableActions)) {
             throw new InvalidArgumentException('The asked action is not allowed');
@@ -78,25 +74,32 @@ class ProcessCronManagerCommand extends Command
         return self::SUCCESS;
     }
 
+    private function checkCanExecute(): void
+    {
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+    }
+
     /**
-     * @param OutputInterface $output
-     * @return void
      * @SuppressWarnings(PMD.UnusedPrivateMethod)
      */
     private function actionRerun(OutputInterface $output): void
     {
+        $this->checkCanExecute();
+
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Rerun - Begin');
         $this->cronManager->rerunWaitingTasks($output);
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Rerun - End');
     }
 
     /**
-     * @param OutputInterface $output
-     * @return void
      * @SuppressWarnings(PMD.UnusedPrivateMethod)
      */
     private function actionCleanUp(OutputInterface $output): void
     {
+        $this->checkCanExecute();
+
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - CleanUp - Begin');
         $this->cronManager->cleanFinishedTasks($output);
         $this->cronManager->cleanFinishedLogs($output);
@@ -104,8 +107,6 @@ class ProcessCronManagerCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @return void
      * @SuppressWarnings(PMD.UnusedPrivateMethod)
      */
     private function actionCheckRunningTasks(OutputInterface $output): void

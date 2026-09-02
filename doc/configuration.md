@@ -16,7 +16,7 @@ All ProcessBundle runtime settings are stored via the **ConfigurationBundle** an
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `process.task.can_execute` | boolean | `1` | Master switch: enable/disable all process execution |
+| `process.task.can_execute` | boolean | `1` | Master switch: enable/disable all process execution, including the `rerun` and `cleanup` cron actions. Only the `check-pid` cron action keeps running when disabled |
 | `process.task.can_kill` | boolean | `0` | Allow killing running processes from the admin UI |
 | `process.task.force_schedule_for_async` | boolean | `0` | Force async processes into the queue even when triggered from the UI |
 
