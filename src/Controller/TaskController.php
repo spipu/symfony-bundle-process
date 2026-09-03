@@ -235,7 +235,10 @@ class TaskController extends AbstractController
             ];
         }
 
-        ksort($processes);
+        uasort(
+            $processes,
+            fn(array $first, array $second): int => strnatcasecmp($first['name'], $second['name'])
+        );
 
         return $this->render(
             '@SpipuProcess/task/execute-choice.html.twig',
