@@ -28,6 +28,10 @@ class Process extends AbstractOptions
 
     protected function buildOptions(): array
     {
-        return $this->configReader->getProcessList();
+        $options = $this->configReader->getProcessList();
+
+        uasort($options, fn(string $first, string $second): int => strnatcasecmp($first, $second));
+
+        return $options;
     }
 }
