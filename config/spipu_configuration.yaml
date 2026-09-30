@@ -64,6 +64,13 @@ spipu_configuration:
         default:  "5"
         unit:     "minute(s)"
 
+    process.task.waiting_alert_after:
+        type:     integer
+        required: true
+        default:  "60"
+        unit:     "minute(s)"
+        help:     "delay after which a created task not yet executed triggers a waiting tasks event"
+
     process.task.force_schedule_for_async:
         type:     select
         options:  Spipu\UiBundle\Form\Options\ActiveStatus

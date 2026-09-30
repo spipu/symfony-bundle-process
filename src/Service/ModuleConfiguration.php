@@ -70,6 +70,17 @@ class ModuleConfiguration
         return $value;
     }
 
+    public function getTaskWaitingAlertAfter(): int
+    {
+        $value = (int) $this->getConfigurationValue('process.task.waiting_alert_after');
+
+        if ($value < 1) {
+            $value = 1;
+        }
+
+        return $value;
+    }
+
     public function hasFailedSendEmail(): bool
     {
         return ($this->getConfigurationValue('process.failed.send_email') == 1);

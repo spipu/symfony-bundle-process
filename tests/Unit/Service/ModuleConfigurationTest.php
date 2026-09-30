@@ -17,6 +17,7 @@ class ModuleConfigurationTest extends TestCase
             'process.task.can_kill'                 => 1,
             'process.task.limit_per_rerun'          => 1000,
             'process.task.force_schedule_for_async' => 0,
+            'process.task.waiting_alert_after'      => 60,
             'process.failed.send_email'             => 1,
             'process.failed.email'                  => 'to@mock.fr',
             $mailSenderConfig                       => 'from@mock.fr',
@@ -230,5 +231,14 @@ class ModuleConfigurationTest extends TestCase
 
         $moduleConfiguration = self::getService($this, ['process.task.limit_per_rerun' => -10]);
         $this->assertSame(1, $moduleConfiguration->getTaskLimitPerRerun());
+
+        $moduleConfiguration = self::getService($this);
+        $this->assertSame(60, $moduleConfiguration->getTaskWaitingAlertAfter());
+
+        $moduleConfiguration = self::getService($this, ['process.task.waiting_alert_after' => 30]);
+        $this->assertSame(30, $moduleConfiguration->getTaskWaitingAlertAfter());
+
+        $moduleConfiguration = self::getService($this, ['process.task.waiting_alert_after' => 0]);
+        $this->assertSame(1, $moduleConfiguration->getTaskWaitingAlertAfter());
     }
 }
