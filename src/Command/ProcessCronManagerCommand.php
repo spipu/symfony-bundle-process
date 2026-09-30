@@ -113,6 +113,7 @@ class ProcessCronManagerCommand extends Command
     {
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Check Running Tasks - Begin');
         $this->cronManager->checkRunningTasksPid($output);
+        $this->cronManager->checkWaitingTasks($output);
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Check Running Tasks - End');
     }
 }

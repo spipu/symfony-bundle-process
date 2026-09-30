@@ -91,6 +91,34 @@ class TaskRepository extends ServiceEntityRepository
         return $list;
     }
 
+    public function countWaitingUnscheduledTasks(DateTimeInterface $limitDate): int
+    {
+        return (int) $this
+            ->createQueryBuilder('t')
+            ->select('count(t.id)')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.scheduledAt is null')
+            ->andWhere('t.createdAt <= :limitDate')
+            ->setParameter('status', $this->status->getCreatedStatus())
+            ->setParameter('limitDate', $limitDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countWaitingScheduledTasks(DateTimeInterface $limitDate): int
+    {
+        return (int) $this
+            ->createQueryBuilder('t')
+            ->select('count(t.id)')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.scheduledAt is not null')
+            ->andWhere('t.scheduledAt <= :limitDate')
+            ->setParameter('status', $this->status->getCreatedStatus())
+            ->setParameter('limitDate', $limitDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function deleteFinishedTasks(DateTimeInterface $limitDate): int
     {
         $query = $this

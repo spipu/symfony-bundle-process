@@ -109,7 +109,7 @@ Intended to be scheduled as a regular cron job. Accepts one required argument:
 |--------|-------------|
 | `rerun` | Re-run waiting/failed tasks eligible for automatic retry |
 | `cleanup` | Remove old finished task records and logs |
-| `check-pid` | Verify running tasks still have a live PID; mark orphans as failed |
+| `check-pid` | Verify running tasks still have a live PID; mark orphans as failed. Also dispatch `WaitingTasksEvent` if tasks are still waiting in `created` status (see `process.task.waiting_alert_after`) |
 
 When `process.task.can_execute` is disabled, `rerun` and `cleanup` throw an exception and do nothing. `check-pid` is a monitoring action and keeps running, so that tasks orphaned while execution was disabled are still detected.
 
@@ -117,7 +117,7 @@ When `process.task.can_execute` is disabled, `rerun` and `cleanup` throw an exce
 # Typical crontab entries
 */5 * * * * php bin/console spipu:process:cron-manager rerun
 0 2 * * * php bin/console spipu:process:cron-manager cleanup
-* * * * *  php bin/console spipu:process:cron-manager check-pid
+*/10 * * * * php bin/console spipu:process:cron-manager check-pid
 ```
 
 ### `spipu:process:check`

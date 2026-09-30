@@ -27,6 +27,7 @@ All ProcessBundle runtime settings are stored via the **ConfigurationBundle** an
 | `process.task.automatic_rerun` | boolean | `1` | Enable the automatic retry mechanism |
 | `process.task.limit_per_rerun` | integer | `1000` | Max tasks to re-run per `cron-manager rerun` invocation |
 | `process.task.rerun_every` | integer | `5` | Minimum minutes between re-run attempts |
+| `process.task.waiting_alert_after` | integer | `60` | Minutes after which a task still in `created` status (created and not scheduled, or scheduled date exceeded) is reported by the `check-pid` cron action through the `WaitingTasksEvent` event |
 
 ### Failure Notifications
 
@@ -62,11 +63,12 @@ The sender address for failure emails is read from the `app.email.sender` Config
 
 ## Events
 
-The bundle dispatches the following Symfony event:
+The bundle dispatches the following Symfony events:
 
 | Event class | Event code | When |
 |-------------|------------|------|
 | `Spipu\ProcessBundle\Event\LogFailedEvent` | `spipu.process.log.failed` | When a process log is marked as failed |
+| `Spipu\ProcessBundle\Event\WaitingTasksEvent` | `spipu.process.task.waiting` | When the `check-pid` cron action finds tasks still in `created` status after `process.task.waiting_alert_after` minutes |
 
 Subscribe to this event to implement custom failure handling (e.g. custom notifications):
 
@@ -87,6 +89,28 @@ class MyProcessFailureListener
 }
 ```
 
+Subscribe to `WaitingTasksEvent` to be alerted when the task queue is not processed (e.g. the `rerun` cron action is not running, or execution is disabled).
+It is dispatched at each `check-pid` execution while waiting tasks remain, and only when at least one task is found:
+
+```php
+use Spipu\ProcessBundle\Event\WaitingTasksEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+#[AsEventListener]
+class MyWaitingTasksListener
+{
+    public function __invoke(WaitingTasksEvent $event): void
+    {
+        $nbTasks = $event->getNbTasks();                         // total
+        $nbUnscheduled = $event->getNbUnscheduledTasks();        // created before the delay, without schedule date
+        $nbScheduled = $event->getNbScheduledTasks();            // schedule date exceeded by the delay
+        $delay = $event->getWaitingDelay();                      // in minutes
+        $canExecute = $event->hasTaskCanExecute();               // false if execution is disabled
+        // ...
+    }
+}
+```
+
 ## CLI Usage
 
 ```bash
@@ -102,7 +126,7 @@ php bin/console spipu:process:cron-manager rerun
 # Clean up finished tasks and logs (cron action: cleanup)
 php bin/console spipu:process:cron-manager cleanup
 
-# Check running task PIDs and mark dead tasks as failed (cron action: check-pid)
+# Check running task PIDs, mark dead tasks as failed, and report waiting tasks (cron action: check-pid)
 php bin/console spipu:process:cron-manager check-pid
 
 # Count all tasks

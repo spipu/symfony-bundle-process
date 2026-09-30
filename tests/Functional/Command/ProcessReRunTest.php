@@ -78,7 +78,7 @@ class ProcessReRunTest extends AbstractFunctionalTestCase
         $taskId = $process->getTask()->getId();
 
         $this->expectException(ProcessException::class);
-        $this->expectExceptionMessage('The asked task [2] with the status [finished] can not be rerun');
+        $this->expectExceptionMessage('The asked task [' . $taskId . '] with the status [finished] can not be rerun');
 
         $commandTester = self::loadCommand(ProcessReRunCommand::class, 'spipu:process:rerun');
         $commandTester->execute(['task-id' => $taskId]);

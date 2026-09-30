@@ -19,9 +19,11 @@ use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Spipu\ProcessBundle\Entity\Task;
+use Spipu\ProcessBundle\Event\WaitingTasksEvent;
 use Spipu\ProcessBundle\Repository\LogRepository;
 use Spipu\ProcessBundle\Repository\TaskRepository;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PMD.CouplingBetweenObjects)
@@ -36,6 +38,7 @@ class CronManager
     private EntityManagerInterface $entityManager;
     private Logger $logger;
     private TaskManager $taskManager;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         TaskRepository $processTaskRepository,
@@ -45,7 +48,8 @@ class CronManager
         ModuleConfiguration $processConfiguration,
         EntityManagerInterface $entityManager,
         Logger $logger,
-        TaskManager $taskManager
+        TaskManager $taskManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->processTaskRepository = $processTaskRepository;
         $this->processLogRepository = $processLogRepository;
@@ -55,6 +59,7 @@ class CronManager
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->taskManager = $taskManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function rerunWaitingTasks(OutputInterface $output): bool
@@ -261,6 +266,42 @@ class CronManager
         $output->writeln('     => <info>Process found</info>');
         $task->setPidLastSeen(new DateTime());
         $this->entityManager->flush();
+    }
+
+    public function checkWaitingTasks(OutputInterface $output): bool
+    {
+        $output->writeln('Search waiting tasks');
+
+        $waitingDelay = $this->processConfiguration->getTaskWaitingAlertAfter();
+
+        $limitDate = new DateTime();
+        $limitDate->sub(new DateInterval('PT' . $waitingDelay . 'M'));
+
+        $nbUnscheduledTasks = $this->processTaskRepository->countWaitingUnscheduledTasks($limitDate);
+        $nbScheduledTasks = $this->processTaskRepository->countWaitingScheduledTasks($limitDate);
+
+        if ($nbUnscheduledTasks + $nbScheduledTasks === 0) {
+            $output->writeln('  => No task found');
+            return false;
+        }
+
+        $output->writeln(sprintf(
+            '  => <comment>%d task(s) waiting for more than %d minute(s): %d unscheduled, %d scheduled</comment>',
+            $nbUnscheduledTasks + $nbScheduledTasks,
+            $waitingDelay,
+            $nbUnscheduledTasks,
+            $nbScheduledTasks
+        ));
+
+        $event = new WaitingTasksEvent(
+            $nbUnscheduledTasks,
+            $nbScheduledTasks,
+            $waitingDelay,
+            $this->processConfiguration->hasTaskCanExecute()
+        );
+        $this->eventDispatcher->dispatch($event, $event->getEventCode());
+
+        return true;
     }
 
     private function isScheduledTask(Task $task): bool
