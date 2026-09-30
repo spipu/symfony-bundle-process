@@ -31,7 +31,7 @@ The **ProcessBundle** is a background job / workflow execution engine. Processes
 - `spipu/core-bundle`
 - `spipu/ui-bundle`
 - `spipu/configuration-bundle`
-- Doctrine ORM
+- Doctrine ORM 3.7+ and DBAL 4.5+
 
 ## Quick Start
 
