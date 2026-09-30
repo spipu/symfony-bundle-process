@@ -322,7 +322,7 @@ class ProcessForm implements EntityDefinitionInterface
 
         $allowedMimeTypes = $input->getAllowedMimeTypes();
         if (count($allowedMimeTypes) > 0) {
-            $field->addOption('constraints', [new File(['mimeTypes' => $allowedMimeTypes])]);
+            $field->addOption('constraints', [new File(mimeTypes: $allowedMimeTypes)]);
             $field->addOption('help', implode(',', $allowedMimeTypes));
         }
 
