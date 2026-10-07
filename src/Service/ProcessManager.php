@@ -42,6 +42,7 @@ class ProcessManager
     private ModuleConfiguration $moduleConfiguration;
     private FileManagerInterface $fileManager;
     private ProcessBuilder $processBuilder;
+    private TaskManager $taskManager;
     private ?LoggerOutputInterface $loggerOutput = null;
 
     public function __construct(
@@ -52,7 +53,8 @@ class ProcessManager
         ReportManager $reportManager,
         ModuleConfiguration $moduleConfiguration,
         FileManagerInterface $fileManager,
-        ProcessBuilder $processBuilder
+        ProcessBuilder $processBuilder,
+        TaskManager $taskManager
     ) {
         $this->configReader = $configReader;
         $this->logger = $logger;
@@ -62,6 +64,7 @@ class ProcessManager
         $this->moduleConfiguration = $moduleConfiguration;
         $this->fileManager = $fileManager;
         $this->processBuilder = $processBuilder;
+        $this->taskManager = $taskManager;
     }
 
     public function getConfigReader(): ConfigReader
@@ -114,8 +117,7 @@ class ProcessManager
 
         if ($process->getTask()) {
             $process->getTask()->setExecutedAt(new DateTime());
-            $process->getTask()->setPidValue(getmypid());
-            $process->getTask()->setPidLastSeen(new DateTime());
+            $this->updateTaskPid($process->getTask());
         }
 
         $this->executeUpdateTask($process, Status::RUNNING);
@@ -147,6 +149,24 @@ class ProcessManager
 
             throw $e;
         }
+    }
+
+    /**
+     * The PID is only saved in CLI context: in web context, it is the PID of a web worker, that can not be checked
+     */
+    private function updateTaskPid(Task $task): void
+    {
+        $isCli = $this->isCliContext();
+
+        $task
+            ->setPidValue($isCli ? getmypid() : null)
+            ->setPidHost($isCli ? $this->taskManager->getCurrentHost() : null)
+            ->setPidLastSeen($isCli ? new DateTime() : null);
+    }
+
+    protected function isCliContext(): bool
+    {
+        return PHP_SAPI === 'cli';
     }
 
     private function countMatterSteps(Process\Process $process): int

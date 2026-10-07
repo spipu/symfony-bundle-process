@@ -111,6 +111,8 @@ Intended to be scheduled as a regular cron job. Accepts one required argument:
 | `cleanup` | Remove old finished task records and logs |
 | `check-pid` | Verify running tasks still have a live PID; mark orphans as failed. Also dispatch `WaitingTasksEvent` if tasks are still waiting in `created` status (see `process.task.waiting_alert_after`) |
 
+The PID of a task is saved with the host executing it, and only in CLI context (a task executed directly from a web request has no PID). `check-pid` only checks the tasks running on its own host, and a task can only be killed from the host running it: the cron actions and the back-office must therefore run on the server executing the asynchronous and scheduled tasks.
+
 When `process.task.can_execute` is disabled, `rerun` and `cleanup` throw an exception and do nothing. `check-pid` is a monitoring action and keeps running, so that tasks orphaned while execution was disabled are still detected.
 
 ```bash

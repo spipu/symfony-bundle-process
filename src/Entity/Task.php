@@ -70,6 +70,9 @@ class Task implements EntityInterface, TimestampableInterface
     #[ORM\Column(nullable: true)]
     private ?int $pidValue = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $pidHost = null;
+
     #[ORM\Column(type: "datetime", nullable: true)]
     private ?DateTimeInterface $pidLastSeen = null;
 
@@ -276,6 +279,18 @@ class Task implements EntityInterface, TimestampableInterface
     public function setPidValue(?int $pidValue): self
     {
         $this->pidValue = $pidValue;
+
+        return $this;
+    }
+
+    public function getPidHost(): ?string
+    {
+        return $this->pidHost;
+    }
+
+    public function setPidHost(?string $pidHost): self
+    {
+        $this->pidHost = $pidHost;
 
         return $this;
     }

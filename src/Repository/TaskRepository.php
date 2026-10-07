@@ -135,9 +135,10 @@ class TaskRepository extends ServiceEntityRepository
 
     /**
      * @param int $nbMinutes
+     * @param string|null $currentHost
      * @return int[]
      */
-    public function getRunningIdsToCheck(int $nbMinutes): array
+    public function getRunningIdsToCheck(int $nbMinutes, ?string $currentHost): array
     {
         if ($nbMinutes < 1) {
             $nbMinutes = 5;
@@ -154,8 +155,10 @@ class TaskRepository extends ServiceEntityRepository
             ->andWhere('t.pidValue > 0')
             ->andWhere('t.pidLastSeen is not null')
             ->andWhere('t.pidLastSeen <= :currentDate')
+            ->andWhere('(t.pidHost is null OR t.pidHost = :currentHost)')
             ->setParameter('status', $this->status->getRunningStatus())
             ->setParameter('currentDate', $date)
+            ->setParameter('currentHost', $currentHost)
             ->getQuery();
 
         $rows = $query->getArrayResult();
