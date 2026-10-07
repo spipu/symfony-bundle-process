@@ -30,8 +30,11 @@ use Spipu\ProcessBundle\Tests\Unit\Entity\Process\ProcessTest;
 #[CoversClass(ProcessManager::class)]
 class ProcessManagerTest extends TestCase
 {
-    public static function getService(TestCase $testCase, bool $toExecuteAsynchronously = false): ProcessManager
-    {
+    public static function getService(
+        TestCase $testCase,
+        bool $toExecuteAsynchronously = false,
+        ?bool $isCliContext = null
+    ): ProcessManager {
         $configReader = ConfigReaderTest::getService($testCase);
         $mainParameters = MainParametersTest::getMainParameters($testCase);
 
@@ -71,7 +74,7 @@ class ProcessManagerTest extends TestCase
             InputsFactoryTest::getService($testCase),
         );
 
-        return new ProcessManager(
+        $arguments = [
             $configReader,
             LoggerTest::getService($testCase),
             $entityManager,
@@ -79,8 +82,22 @@ class ProcessManagerTest extends TestCase
             $reportManager,
             $moduleConfiguration,
             $fileManager,
-            $processBuilder
-        );
+            $processBuilder,
+            TaskManagerTest::getService($testCase)
+        ];
+
+        if ($isCliContext === null) {
+            return new ProcessManager(...$arguments);
+        }
+
+        $manager = $testCase->getMockBuilder(ProcessManager::class)
+            ->setConstructorArgs($arguments)
+            ->onlyMethods(['isCliContext'])
+            ->getMock();
+
+        $manager->method('isCliContext')->willReturn($isCliContext);
+
+        return $manager;
     }
 
     public function testConfigReader(): void
@@ -158,6 +175,42 @@ class ProcessManagerTest extends TestCase
 
         $this->assertSame(1, $process->getParameters()->get('result.first'));
         $this->assertSame(3, $process->getParameters()->get('result.second'));
+    }
+
+    public function testExecutePidInCliContext(): void
+    {
+        $process = ProcessTest::getProcess($this);
+        $process->getInputs()->set('name', 'Bar');
+        $process->setTask(SpipuProcessMock::getTaskEntity(1));
+
+        $manager = static::getService($this, false, true);
+        $manager->execute($process);
+
+        $this->assertSame(getmypid(), $process->getTask()->getPidValue());
+        $this->assertSame(TaskManagerTest::getService($this)->getCurrentHost(), $process->getTask()->getPidHost());
+        $this->assertNotNull($process->getTask()->getPidLastSeen());
+        $this->assertSame(Status::FINISHED, $process->getTask()->getStatus());
+    }
+
+    public function testExecutePidInWebContext(): void
+    {
+        $task = SpipuProcessMock::getTaskEntity(1);
+        $task->setPidValue(42);
+        $task->setPidHost('old-host');
+        $task->setPidLastSeen(new DateTime());
+
+        $process = ProcessTest::getProcess($this);
+        $process->getInputs()->set('name', 'Bar');
+        $process->setTask($task);
+
+        $manager = static::getService($this, false, false);
+        $manager->execute($process);
+
+        $this->assertNull($task->getPidValue());
+        $this->assertNull($task->getPidHost());
+        $this->assertNull($task->getPidLastSeen());
+        $this->assertNotNull($task->getExecutedAt());
+        $this->assertSame(Status::FINISHED, $task->getStatus());
     }
 
     public function testExecuteWithGenericException(): void

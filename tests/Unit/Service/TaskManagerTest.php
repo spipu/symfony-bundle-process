@@ -48,6 +48,68 @@ class TaskManagerTest extends TestCase
         $task = new Task();
         $task->setPidValue(getmypid());
         $this->assertTrue($service->isPidRunning($task));
+
+        $task = new Task();
+        $task->setPidValue(getmypid());
+        $task->setPidHost(self::getService($this)->getCurrentHost());
+        $this->assertTrue($service->isPidRunning($task));
+
+        $task = new Task();
+        $task->setPidValue(getmypid());
+        $task->setPidHost('other-host-' . self::getService($this)->getCurrentHost());
+        $this->assertFalse($service->isPidRunning($task));
+    }
+
+    public function testCurrentHost(): void
+    {
+        $service = self::getService($this);
+
+        $host = $service->getCurrentHost();
+        $this->assertNotNull($host);
+        $this->assertLessThanOrEqual(TaskManager::HOST_MAX_LENGTH, strlen($host));
+        $this->assertMatchesRegularExpression('/^[\x21-\x7E]+$/', $host);
+    }
+
+    public function testPidOnCurrentHost(): void
+    {
+        $service = self::getService($this);
+
+        $task = new Task();
+        $this->assertTrue($service->isPidOnCurrentHost($task));
+
+        $task->setPidHost(self::getService($this)->getCurrentHost());
+        $this->assertTrue($service->isPidOnCurrentHost($task));
+
+        $task->setPidHost('other-host-' . self::getService($this)->getCurrentHost());
+        $this->assertFalse($service->isPidOnCurrentHost($task));
+    }
+
+    public function testKillingKoOtherHost(): void
+    {
+        $command = 'sleep 5 > /dev/null 2>&1 & echo $!';
+        exec($command, $output);
+        $pid = (int) $output[0];
+
+        $task = new Task();
+        $task->setStatus(Status::RUNNING);
+        $task->setPidValue($pid);
+        $task->setPidHost('other-host-' . self::getService($this)->getCurrentHost());
+        $task->setTryNumber(0);
+
+        $service = self::getService($this);
+        try {
+            $service->kill($task, 'Foo Bar');
+            $this->fail('An exception must be thrown');
+        } catch (ProcessException $e) {
+            $this->assertSame('spipu.process.error.kill_host', $e->getMessage());
+        } finally {
+            $isAlive = (posix_getsid($pid) !== false);
+            posix_kill($pid, 9);
+        }
+
+        $this->assertTrue($isAlive);
+        $this->assertSame(Status::RUNNING, $task->getStatus());
+        $this->assertSame(0, $task->getTryNumber());
     }
 
     public function testKillingKo(): void
@@ -88,6 +150,7 @@ class TaskManagerTest extends TestCase
         $task = new Task();
         $task->setStatus(Status::RUNNING);
         $task->setPidValue((int) $output[0]);
+        $task->setPidHost(self::getService($this)->getCurrentHost());
         $task->setTryNumber(0);
 
         $service = self::getService($this);

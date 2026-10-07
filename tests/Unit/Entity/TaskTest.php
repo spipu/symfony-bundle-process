@@ -26,6 +26,7 @@ class TaskTest extends TestCase
         $this->assertSame(false, $entity->getCanBeRerunAutomatically());
         $this->assertSame(null, $entity->getTryLastAt());
         $this->assertSame(null, $entity->getPidValue());
+        $this->assertSame(null, $entity->getPidHost());
         $this->assertSame(null, $entity->getPidLastSeen());
         $this->assertSame(null, $entity->getExecutedAt());
         $this->assertSame(null, $entity->getScheduledAt());
@@ -37,6 +38,7 @@ class TaskTest extends TestCase
         $entity->setTryNumber(42);
         $entity->setProgress(43);
         $entity->setPidValue(44);
+        $entity->setPidHost('host');
 
         $this->assertSame('code', $entity->getCode());
         $this->assertSame('message', $entity->getTryLastMessage());
@@ -45,6 +47,7 @@ class TaskTest extends TestCase
         $this->assertSame(42, $entity->getTryNumber());
         $this->assertSame(43, $entity->getProgress());
         $this->assertSame(44, $entity->getPidValue());
+        $this->assertSame('host', $entity->getPidHost());
 
         $dateA = new DateTime();
         $dateB = new DateTime();

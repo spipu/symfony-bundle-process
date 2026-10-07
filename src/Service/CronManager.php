@@ -213,7 +213,7 @@ class CronManager
     {
         $output->writeln('Search running tasks');
 
-        $taskIds = $this->processTaskRepository->getRunningIdsToCheck(5);
+        $taskIds = $this->processTaskRepository->getRunningIdsToCheck(5, $this->taskManager->getCurrentHost());
         if (count($taskIds) == 0) {
             $output->writeln('  => No task found');
             return false;
@@ -242,6 +242,11 @@ class CronManager
 
         if ($task->getPidValue() === null || $task->getPidValue() < 1) {
             $output->writeln('     => <comment>No PID</comment>');
+            return;
+        }
+
+        if (!$this->taskManager->isPidOnCurrentHost($task)) {
+            $output->writeln('     => <comment>Other Host</comment>');
             return;
         }
 

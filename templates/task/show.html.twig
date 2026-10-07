@@ -89,6 +89,10 @@
                         <td>{{ resource.pidValue ? resource.pidValue : '-' }}</td>
                     </tr>
                     <tr>
+                        <th>{{ 'spipu.process.field.task.pid_host'|trans }}</th>
+                        <td>{{ resource.pidHost ? resource.pidHost : '-' }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ 'spipu.process.field.task.pid_last_seen'|trans }}</th>
                         <td>{{ resource.pidLastSeen ? resource.pidLastSeen|date('Y-m-d H:i:s') : '-' }}</td>
                     </tr>
