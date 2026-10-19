@@ -110,7 +110,7 @@ spipu:
             execute:  "Execution is disabled in module configuration"
             rerun:    "This task can not be rerun in this status"
             kill:     "This task can not be killed in this status"
-            kill_host: "This task is running on another host, it can not be killed from this one"
+            kill_host: "This task is running on another host: it can only be killed from this host, or from any host once its PID has not been seen for the delay configured in process.task.pid_not_seen_fail_after"
             disable:  "This action has been disabled in the app configuration"
             required: "This field is required"
             generic:  "There is an error on this form"

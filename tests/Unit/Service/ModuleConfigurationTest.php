@@ -18,6 +18,7 @@ class ModuleConfigurationTest extends TestCase
             'process.task.limit_per_rerun'          => 1000,
             'process.task.force_schedule_for_async' => 0,
             'process.task.waiting_alert_after'      => 60,
+            'process.task.pid_not_seen_fail_after'  => 30,
             'process.failed.send_email'             => 1,
             'process.failed.email'                  => 'to@mock.fr',
             $mailSenderConfig                       => 'from@mock.fr',
@@ -240,5 +241,20 @@ class ModuleConfigurationTest extends TestCase
 
         $moduleConfiguration = self::getService($this, ['process.task.waiting_alert_after' => 0]);
         $this->assertSame(1, $moduleConfiguration->getTaskWaitingAlertAfter());
+
+        $moduleConfiguration = self::getService($this);
+        $this->assertSame(30, $moduleConfiguration->getTaskPidNotSeenFailAfter());
+
+        $moduleConfiguration = self::getService($this, ['process.task.pid_not_seen_fail_after' => 30]);
+        $this->assertSame(30, $moduleConfiguration->getTaskPidNotSeenFailAfter());
+
+        $moduleConfiguration = self::getService($this, ['process.task.pid_not_seen_fail_after' => 10]);
+        $this->assertSame(10, $moduleConfiguration->getTaskPidNotSeenFailAfter());
+
+        $moduleConfiguration = self::getService($this, ['process.task.pid_not_seen_fail_after' => 5]);
+        $this->assertSame(10, $moduleConfiguration->getTaskPidNotSeenFailAfter());
+
+        $moduleConfiguration = self::getService($this, ['process.task.pid_not_seen_fail_after' => 0]);
+        $this->assertSame(10, $moduleConfiguration->getTaskPidNotSeenFailAfter());
     }
 }

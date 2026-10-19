@@ -172,6 +172,50 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
+     * Running tasks of the other hosts whose PID has not been seen for too long (the host may no longer exist)
+     *
+     * @param int $nbMinutes
+     * @param string|null $currentHost
+     * @return int[]
+     */
+    public function getRunningIdsNotSeenOnOtherHosts(int $nbMinutes, ?string $currentHost): array
+    {
+        if ($nbMinutes < 1) {
+            $nbMinutes = 1;
+        }
+
+        $date = new DateTime();
+        $date->sub(new DateInterval('PT' . $nbMinutes . 'M'));
+
+        $queryBuilder = $this
+            ->createQueryBuilder('t')
+            ->select('t.id')
+            ->andWhere('t.status = :status')
+            ->andWhere('t.pidValue is not null')
+            ->andWhere('t.pidValue > 0')
+            ->andWhere('t.pidLastSeen is not null')
+            ->andWhere('t.pidLastSeen <= :limitDate')
+            ->andWhere('t.pidHost is not null')
+            ->setParameter('status', $this->status->getRunningStatus())
+            ->setParameter('limitDate', $date);
+
+        if ($currentHost !== null) {
+            $queryBuilder
+                ->andWhere('t.pidHost <> :currentHost')
+                ->setParameter('currentHost', $currentHost);
+        }
+
+        $rows = $queryBuilder->getQuery()->getArrayResult();
+
+        $list = [];
+        foreach ($rows as $row) {
+            $list[] = (int) $row['id'];
+        }
+
+        return $list;
+    }
+
+    /**
      * @param DateTime $waitingDate
      * @return int[]
      */

@@ -19,6 +19,7 @@ All ProcessBundle runtime settings are stored via the **ConfigurationBundle** an
 | `process.task.can_execute` | boolean | `1` | Master switch: enable/disable all process execution, including the `rerun` and `cleanup` cron actions. Only the `check-pid` cron action keeps running when disabled |
 | `process.task.can_kill` | boolean | `0` | Allow killing running processes from the admin UI |
 | `process.task.force_schedule_for_async` | boolean | `0` | Force async processes into the queue even when triggered from the UI |
+| `process.task.waiting_alert_after` | integer | `30` | Minutes after which a running task of another host, whose PID is no longer seen, is marked as failed by the main `check-pid` cron action, and can be killed from the back-office of any host. Must be greater than the `check-pid` cron interval plus 5 minutes (minimum `10`) |
 
 ### Automatic Re-run
 
@@ -27,7 +28,7 @@ All ProcessBundle runtime settings are stored via the **ConfigurationBundle** an
 | `process.task.automatic_rerun` | boolean | `1` | Enable the automatic retry mechanism |
 | `process.task.limit_per_rerun` | integer | `1000` | Max tasks to re-run per `cron-manager rerun` invocation |
 | `process.task.rerun_every` | integer | `5` | Minimum minutes between re-run attempts |
-| `process.task.waiting_alert_after` | integer | `60` | Minutes after which a task still in `created` status (created and not scheduled, or scheduled date exceeded) is reported by the `check-pid` cron action through the `WaitingTasksEvent` event |
+| `process.task.waiting_alert_after` | integer | `30` | Minutes after which a task still in `created` status (created and not scheduled, or scheduled date exceeded) is reported by the main `check-pid` cron action (without `--is-child`) through the `WaitingTasksEvent` event |
 
 ### Failure Notifications
 
@@ -68,7 +69,7 @@ The bundle dispatches the following Symfony events:
 | Event class | Event code | When |
 |-------------|------------|------|
 | `Spipu\ProcessBundle\Event\LogFailedEvent` | `spipu.process.log.failed` | When a process log is marked as failed |
-| `Spipu\ProcessBundle\Event\WaitingTasksEvent` | `spipu.process.task.waiting` | When the `check-pid` cron action finds tasks still in `created` status after `process.task.waiting_alert_after` minutes |
+| `Spipu\ProcessBundle\Event\WaitingTasksEvent` | `spipu.process.task.waiting` | When the main `check-pid` cron action finds tasks still in `created` status after `process.task.waiting_alert_after` minutes |
 
 Subscribe to this event to implement custom failure handling (e.g. custom notifications):
 

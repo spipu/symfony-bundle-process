@@ -109,9 +109,18 @@ Intended to be scheduled as a regular cron job. Accepts one required argument:
 |--------|-------------|
 | `rerun` | Re-run waiting/failed tasks eligible for automatic retry |
 | `cleanup` | Remove old finished task records and logs |
-| `check-pid` | Verify running tasks still have a live PID; mark orphans as failed. Also dispatch `WaitingTasksEvent` if tasks are still waiting in `created` status (see `process.task.waiting_alert_after`) |
+| `check-pid` | Verify running tasks still have a live PID; mark orphans as failed. Also dispatch `WaitingTasksEvent` if tasks are still waiting in `created` status (see `process.task.waiting_alert_after`). Accepts the `--is-child` option, see below |
 
-The PID of a task is saved with the host executing it, and only in CLI context (a task executed directly from a web request has no PID). `check-pid` only checks the tasks running on its own host, and a task can only be killed from the host running it: the cron actions and the back-office must therefore run on the server executing the asynchronous and scheduled tasks.
+The PID of a task is saved with the host executing it, and only in CLI context (a task executed directly from a web request has no PID).
+
+`check-pid` checks the PID of the running tasks of its own host: if the process is alive, its "last seen" date is updated, otherwise the task is marked as failed. By default, the host is considered as the **main** one, and it also marks as failed the running tasks of the **other hosts** whose PID has not been seen for more than `process.task.pid_not_seen_fail_after` minutes: their host may no longer exist (AWS spot instance, new container with a new hostname, ...) and can not check them anymore. These tasks are not re-run automatically.
+
+With several servers executing tasks:
+
+- every server executing tasks **must** run `check-pid`, otherwise its running tasks are no longer seen and the main server marks them as failed while they are still running;
+- only one server runs `check-pid` without option (the main one), the others run `check-pid --is-child`: they only check their own tasks and do not dispatch `WaitingTasksEvent`. Running several main servers is not an issue, but `WaitingTasksEvent` is dispatched by each of them.
+
+A task can only be killed from the back-office of the host running it, unless its PID has not been seen for more than `process.task.pid_not_seen_fail_after` minutes: it is then only marked as failed.
 
 When `process.task.can_execute` is disabled, `rerun` and `cleanup` throw an exception and do nothing. `check-pid` is a monitoring action and keeps running, so that tasks orphaned while execution was disabled are still detected.
 
@@ -120,6 +129,9 @@ When `process.task.can_execute` is disabled, `rerun` and `cleanup` throw an exce
 */5 * * * * php bin/console spipu:process:cron-manager rerun
 0 2 * * * php bin/console spipu:process:cron-manager cleanup
 */10 * * * * php bin/console spipu:process:cron-manager check-pid
+
+# On the other servers executing tasks, if any
+*/10 * * * * php bin/console spipu:process:cron-manager check-pid --is-child
 ```
 
 ### `spipu:process:check`

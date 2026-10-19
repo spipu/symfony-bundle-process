@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Service;
 
+use DateInterval;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Exception\ProcessException;
@@ -23,13 +25,16 @@ class TaskManager
 
     private Status $status;
     private EntityManagerInterface $entityManager;
+    private ModuleConfiguration $moduleConfiguration;
 
     public function __construct(
         Status $status,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ModuleConfiguration $moduleConfiguration
     ) {
         $this->status = $status;
         $this->entityManager = $entityManager;
+        $this->moduleConfiguration = $moduleConfiguration;
     }
 
     /**
@@ -79,6 +84,21 @@ class TaskManager
         return $task->getPidHost() === null || $task->getPidHost() === $this->getCurrentHost();
     }
 
+    /**
+     * A PID of another host not seen for too long is considered lost: its host may no longer exist
+     */
+    public function isPidLost(Task $task): bool
+    {
+        if (!$this->hasPid($task) || $this->isPidOnCurrentHost($task) || $task->getPidLastSeen() === null) {
+            return false;
+        }
+
+        $limitDate = new DateTime();
+        $limitDate->sub(new DateInterval('PT' . $this->moduleConfiguration->getTaskPidNotSeenFailAfter() . 'M'));
+
+        return $task->getPidLastSeen() <= $limitDate;
+    }
+
     private function hasPid(Task $task): bool
     {
         return $task->getPidValue() !== null && $task->getPidValue() > 0;
@@ -90,7 +110,7 @@ class TaskManager
             throw new ProcessException('spipu.process.error.kill');
         }
 
-        if ($this->hasPid($task) && !$this->isPidOnCurrentHost($task)) {
+        if ($this->hasPid($task) && !$this->isPidOnCurrentHost($task) && !$this->isPidLost($task)) {
             throw new ProcessException('spipu.process.error.kill_host');
         }
 

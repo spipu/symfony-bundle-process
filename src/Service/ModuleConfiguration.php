@@ -17,6 +17,8 @@ use Spipu\ConfigurationBundle\Service\ConfigurationManager as Manager;
 
 class ModuleConfiguration
 {
+    public const TASK_PID_NOT_SEEN_FAIL_AFTER_MIN = 10;
+
     private Manager $manager;
     private string $mailSenderConfig;
 
@@ -76,6 +78,19 @@ class ModuleConfiguration
 
         if ($value < 1) {
             $value = 1;
+        }
+
+        return $value;
+    }
+
+    public function getTaskPidNotSeenFailAfter(): int
+    {
+        $value = (int) $this->getConfigurationValue('process.task.pid_not_seen_fail_after');
+
+        // A living task is only refreshed by the check-pid cron if not seen for 5 minutes,
+        // so its last seen date can be older than the cron interval.
+        if ($value < self::TASK_PID_NOT_SEEN_FAIL_AFTER_MIN) {
+            $value = self::TASK_PID_NOT_SEEN_FAIL_AFTER_MIN;
         }
 
         return $value;

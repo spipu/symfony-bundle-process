@@ -71,6 +71,13 @@ spipu_configuration:
         unit:     "minute(s)"
         help:     "delay after which a created task not yet executed triggers a waiting tasks event"
 
+    process.task.pid_not_seen_fail_after:
+        type:     integer
+        required: true
+        default:  "30"
+        unit:     "minute(s)"
+        help:     "delay after which a running task of another host, whose PID is no longer seen, is set as failed by the main check-pid cron (minimum 10)"
+
     process.task.force_schedule_for_async:
         type:     select
         options:  Spipu\UiBundle\Form\Options\ActiveStatus

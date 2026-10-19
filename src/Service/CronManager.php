@@ -209,6 +209,9 @@ class CronManager
         return $date;
     }
 
+    /**
+     * Check the PID of the running tasks of the current host
+     */
     public function checkRunningTasksPid(OutputInterface $output): bool
     {
         $output->writeln('Search running tasks');
@@ -251,25 +254,80 @@ class CronManager
         }
 
         if (!$this->taskManager->isPidRunning($task)) {
-            $errorMessage = 'Process not found';
-            $output->writeln("     => <error>$errorMessage</error>");
-
-            $log = $task->getLogs()->last();
-            if ($log) {
-                $logger = clone $this->logger;
-                $logger->initFromExistingLog($log);
-                $logger->critical($errorMessage);
-                $logger->finish(Status::FAILED);
-            }
-            $task->incrementTry($errorMessage, false);
-            $task->setStatus(Status::FAILED);
-            $this->entityManager->flush();
-
+            $this->failRunningTask($output, $task, 'Process not found');
             return;
         }
 
         $output->writeln('     => <info>Process found</info>');
         $task->setPidLastSeen(new DateTime());
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Fail the running tasks of the other hosts whose PID has not been seen for too long:
+     * a host that no longer exists (ex: AWS spot instance, new container) can not check its own tasks anymore
+     */
+    public function checkLostTasksPid(OutputInterface $output): bool
+    {
+        $output->writeln('Search running tasks not seen on other hosts');
+
+        $nbMinutes = $this->processConfiguration->getTaskPidNotSeenFailAfter();
+
+        $taskIds = $this->processTaskRepository->getRunningIdsNotSeenOnOtherHosts(
+            $nbMinutes,
+            $this->taskManager->getCurrentHost()
+        );
+        if (count($taskIds) == 0) {
+            $output->writeln('  => No task found');
+            return false;
+        }
+
+        $output->writeln(sprintf('  => %d task(s) found', count($taskIds)));
+
+        // We are using ids because we must reload it just before the check, to be sure of its status.
+        foreach ($taskIds as $taskId) {
+            $this->checkOtherHostRunningTask($output, $taskId, $nbMinutes);
+        }
+
+        return true;
+    }
+
+    private function checkOtherHostRunningTask(OutputInterface $output, int $taskId, int $nbMinutes): void
+    {
+        $task = $this->processTaskRepository->find($taskId);
+
+        $output->writeln('   - Task #' . $task->getId());
+
+        if ($task->getStatus() !== $this->processStatus->getRunningStatus()) {
+            $output->writeln('     => <comment>Wrong Status</comment>');
+            return;
+        }
+
+        if (!$this->taskManager->isPidLost($task)) {
+            $output->writeln('     => <comment>Not lost</comment>');
+            return;
+        }
+
+        $this->failRunningTask(
+            $output,
+            $task,
+            sprintf('Process not seen for more than %d minute(s) on host [%s]', $nbMinutes, $task->getPidHost())
+        );
+    }
+
+    private function failRunningTask(OutputInterface $output, Task $task, string $errorMessage): void
+    {
+        $output->writeln("     => <error>{$errorMessage}</error>");
+
+        $log = $task->getLogs()->last();
+        if ($log) {
+            $logger = clone $this->logger;
+            $logger->initFromExistingLog($log);
+            $logger->critical($errorMessage);
+            $logger->finish(Status::FAILED);
+        }
+        $task->incrementTry($errorMessage, false);
+        $task->setStatus(Status::FAILED);
         $this->entityManager->flush();
     }
 
