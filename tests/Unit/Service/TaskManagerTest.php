@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Tests\Unit\Service;
 
+use DateTime;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +26,8 @@ class TaskManagerTest extends TestCase
     {
         return new TaskManager(
             StatusTest::getService($testCase),
-            SymfonyMock::getEntityManager($testCase)
+            SymfonyMock::getEntityManager($testCase),
+            ModuleConfigurationTest::getService($testCase)
         );
     }
 
@@ -110,6 +112,58 @@ class TaskManagerTest extends TestCase
         $this->assertTrue($isAlive);
         $this->assertSame(Status::RUNNING, $task->getStatus());
         $this->assertSame(0, $task->getTryNumber());
+    }
+
+    public function testPidLost(): void
+    {
+        $service = self::getService($this);
+        $otherHost = 'other-host-' . $service->getCurrentHost();
+
+        // No PID or current host: never lost
+        $task = new Task();
+        $task->setPidHost($otherHost)->setPidLastSeen(new DateTime('-2 hours'));
+        $this->assertFalse($service->isPidLost($task));
+
+        $task = new Task();
+        $task
+            ->setPidValue(12356789)
+            ->setPidHost($service->getCurrentHost())
+            ->setPidLastSeen(new DateTime('-2 hours'));
+        $this->assertFalse($service->isPidLost($task));
+
+        $task = new Task();
+        $task->setPidValue(12356789)->setPidHost(null)->setPidLastSeen(new DateTime('-2 hours'));
+        $this->assertFalse($service->isPidLost($task));
+
+        // Other host: lost only if not seen for more than the configured delay
+        $task = new Task();
+        $task->setPidValue(12356789)->setPidHost($otherHost)->setPidLastSeen(null);
+        $this->assertFalse($service->isPidLost($task));
+
+        $task = new Task();
+        $task->setPidValue(12356789)->setPidHost($otherHost)->setPidLastSeen(new DateTime('-20 minutes'));
+        $this->assertFalse($service->isPidLost($task));
+
+        $task = new Task();
+        $task->setPidValue(12356789)->setPidHost($otherHost)->setPidLastSeen(new DateTime('-2 hours'));
+        $this->assertTrue($service->isPidLost($task));
+    }
+
+    public function testKillingOkOtherHostLost(): void
+    {
+        $task = new Task();
+        $task->setStatus(Status::RUNNING);
+        $task->setPidValue(12356789);
+        $task->setPidHost('other-host-' . self::getService($this)->getCurrentHost());
+        $task->setPidLastSeen(new DateTime('-2 hours'));
+        $task->setTryNumber(0);
+
+        $service = self::getService($this);
+        $service->kill($task, 'Foo Bar');
+
+        $this->assertSame(Status::FAILED, $task->getStatus());
+        $this->assertSame(1, $task->getTryNumber());
+        $this->assertSame('Foo Bar', $task->getTryLastMessage());
     }
 
     public function testKillingKo(): void

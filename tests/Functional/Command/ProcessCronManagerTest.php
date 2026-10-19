@@ -23,6 +23,7 @@ use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Event\WaitingTasksEvent;
 use Spipu\ProcessBundle\Exception\ProcessException;
 use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
+use Spipu\ProcessBundle\Service\TaskManager;
 use Symfony\Component\Console\Command\Command;
 use Throwable;
 
@@ -189,6 +190,83 @@ class ProcessCronManagerTest extends AbstractFunctionalTestCase
         $this->assertSame(3, $events[0]->getNbTasks());
         $this->assertSame(60, $events[0]->getWaitingDelay());
         $this->assertSame(true, $events[0]->hasTaskCanExecute());
+    }
+
+    public function testExecuteActionCheckPidHosts(): void
+    {
+        $commandTester = self::loadCommand(ProcessCronManagerCommand::class, 'spipu:process:cron-manager');
+
+        $currentHost = self::getContainer()->get(TaskManager::class)->getCurrentHost();
+
+        $otherHostOld = $this->createRunningTask(99999999, 'other-host', '-PT2H');
+        $otherHostRecent = $this->createRunningTask(99999999, 'other-host', '-PT20M');
+        $currentHostAlive = $this->createRunningTask(getmypid(), $currentHost, '-PT10M');
+        $currentHostDead = $this->createRunningTask(99999999, $currentHost, '-PT10M');
+
+        // Child: only the tasks of the current host are checked
+        $result = $commandTester->execute(['cron_action' => 'check-pid', '--is-child' => true]);
+        $this->assertSame(Command::SUCCESS, $result);
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Search running tasks', $output);
+        $this->assertStringNotContainsString('Search running tasks not seen on other hosts', $output);
+        $this->assertStringNotContainsString('Search waiting tasks', $output);
+
+        $this->assertTaskStatus($otherHostOld, 'running');
+        $this->assertTaskStatus($otherHostRecent, 'running');
+        $this->assertTaskStatus($currentHostAlive, 'running');
+        $this->assertTaskStatus($currentHostDead, 'failed', 'Process not found');
+
+        $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
+        $task = $entityManager->getRepository(Task::class)->find($currentHostAlive);
+        $this->assertGreaterThan($this->getRelativeDate('-PT1M'), $task->getPidLastSeen());
+
+        // Main (default): the tasks of the other hosts not seen for too long are also failed
+        $result = $commandTester->execute(['cron_action' => 'check-pid']);
+        $this->assertSame(Command::SUCCESS, $result);
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Search running tasks not seen on other hosts', $output);
+
+        $this->assertTaskStatus(
+            $otherHostOld,
+            'failed',
+            'Process not seen for more than 30 minute(s) on host [other-host]'
+        );
+        $this->assertTaskStatus($otherHostRecent, 'running');
+        $this->assertTaskStatus($currentHostAlive, 'running');
+    }
+
+    private function createRunningTask(int $pidValue, ?string $pidHost, string $pidLastSeen): int
+    {
+        $task = new Task();
+        $task
+            ->setCode('test')
+            ->setInputs('[]')
+            ->setStatus('running')
+            ->setCanBeRerunAutomatically(true)
+            ->setPidValue($pidValue)
+            ->setPidHost($pidHost)
+            ->setPidLastSeen($this->getRelativeDate($pidLastSeen));
+
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($task);
+        $entityManager->flush();
+
+        return $task->getId();
+    }
+
+    private function assertTaskStatus(int $taskId, string $status, ?string $tryLastMessage = null): void
+    {
+        // The command uses the entity manager of the last booted kernel
+        $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
+        $entityManager->clear();
+
+        $task = $entityManager->getRepository(Task::class)->find($taskId);
+        $this->assertSame($status, $task->getStatus());
+        if ($tryLastMessage !== null) {
+            $this->assertSame($tryLastMessage, $task->getTryLastMessage());
+        }
     }
 
     private function createTask(string $createdAt, ?string $scheduledAt, string $status = 'created'): void

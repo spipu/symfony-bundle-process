@@ -21,6 +21,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
@@ -30,6 +31,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessCronManagerCommand extends Command
 {
     public const ARGUMENT_ACTION = 'cron_action';
+    public const OPTION_IS_CHILD = 'is-child';
 
     private CronManager $cronManager;
     private ModuleConfiguration $processConfiguration;
@@ -59,6 +61,12 @@ class ProcessCronManagerCommand extends Command
                 InputArgument::REQUIRED,
                 'The code of the cron action to execute : [' . implode('|', array_keys($this->availableActions)) . ']'
             )
+            ->addOption(
+                static::OPTION_IS_CHILD,
+                null,
+                InputOption::VALUE_NONE,
+                'check-pid only: this host is not the main one, it only checks its own tasks'
+            )
         ;
     }
 
@@ -69,7 +77,7 @@ class ProcessCronManagerCommand extends Command
             throw new InvalidArgumentException('The asked action is not allowed');
         }
 
-        $this->{$this->availableActions[$action]}($output);
+        $this->{$this->availableActions[$action]}($input, $output);
 
         return self::SUCCESS;
     }
@@ -83,8 +91,9 @@ class ProcessCronManagerCommand extends Command
 
     /**
      * @SuppressWarnings(PMD.UnusedPrivateMethod)
+     * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    private function actionRerun(OutputInterface $output): void
+    private function actionRerun(InputInterface $input, OutputInterface $output): void
     {
         $this->checkCanExecute();
 
@@ -95,8 +104,9 @@ class ProcessCronManagerCommand extends Command
 
     /**
      * @SuppressWarnings(PMD.UnusedPrivateMethod)
+     * @SuppressWarnings(PMD.UnusedFormalParameter)
      */
-    private function actionCleanUp(OutputInterface $output): void
+    private function actionCleanUp(InputInterface $input, OutputInterface $output): void
     {
         $this->checkCanExecute();
 
@@ -109,11 +119,14 @@ class ProcessCronManagerCommand extends Command
     /**
      * @SuppressWarnings(PMD.UnusedPrivateMethod)
      */
-    private function actionCheckRunningTasks(OutputInterface $output): void
+    private function actionCheckRunningTasks(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Check Running Tasks - Begin');
         $this->cronManager->checkRunningTasksPid($output);
-        $this->cronManager->checkWaitingTasks($output);
+        if (!$input->getOption(static::OPTION_IS_CHILD)) {
+            $this->cronManager->checkLostTasksPid($output);
+            $this->cronManager->checkWaitingTasks($output);
+        }
         $output->writeln(Date('Y-m-d H:i:s') . ' - Process Cron Manager - Check Running Tasks - End');
     }
 }
