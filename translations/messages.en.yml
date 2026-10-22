@@ -69,7 +69,7 @@ spipu:
 
             message:
                 date:                     "Date"
-                level:                    "Date"
+                level:                    "Level"
                 memory:                   "Mem"
                 memory_peak:              "Peak"
                 memory_real:              "Real"
