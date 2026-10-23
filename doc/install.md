@@ -124,6 +124,8 @@ A task can only be killed from the back-office of the host running it, unless it
 
 When `process.task.can_execute` is disabled, `rerun` and `cleanup` throw an exception and do nothing. `check-pid` is a monitoring action and keeps running, so that tasks orphaned while execution was disabled are still detected.
 
+`spipu:process:run` does not fail when `process.task.can_execute` is disabled: the process is put in queue (task in `created` status, scheduled now) and its task id is displayed. These tasks accumulate while execution is disabled, and are executed by `rerun` once it is enabled again. A process that can not be put in queue (`can_be_put_in_queue: false`) still throws an exception.
+
 ```bash
 # Typical crontab entries
 */5 * * * * php bin/console spipu:process:cron-manager rerun
