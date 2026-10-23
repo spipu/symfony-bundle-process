@@ -16,7 +16,7 @@ All ProcessBundle runtime settings are stored via the **ConfigurationBundle** an
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `process.task.can_execute` | boolean | `1` | Master switch: enable/disable all process execution, including the `rerun` and `cleanup` cron actions. Only the `check-pid` cron action keeps running when disabled |
+| `process.task.can_execute` | boolean | `1` | Master switch: enable/disable all process execution, including the `rerun` and `cleanup` cron actions. Only the `check-pid` cron action keeps running when disabled. When disabled, `spipu:process:run` puts the process in queue instead of executing it (see [Installation](install.md)) |
 | `process.task.can_kill` | boolean | `0` | Allow killing running processes from the admin UI |
 | `process.task.force_schedule_for_async` | boolean | `0` | Force async processes into the queue even when triggered from the UI |
 | `process.task.waiting_alert_after` | integer | `30` | Minutes after which a running task of another host, whose PID is no longer seen, is marked as failed by the main `check-pid` cron action, and can be killed from the back-office of any host. Must be greater than the `check-pid` cron interval plus 5 minutes (minimum `10`) |

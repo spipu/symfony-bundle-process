@@ -17,8 +17,10 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Spipu\ConfigurationBundle\Service\ConfigurationManager;
 use Spipu\ProcessBundle\Command\ProcessRunCommand;
+use Spipu\ProcessBundle\Entity\Task;
 use Spipu\ProcessBundle\Exception\InputException;
 use Spipu\ProcessBundle\Exception\ProcessException;
+use Spipu\ProcessBundle\Service\Status;
 use Spipu\ProcessBundle\Tests\Functional\AbstractFunctionalTestCase;
 use Throwable;
 
@@ -74,12 +76,50 @@ class ProcessRunTest extends AbstractFunctionalTestCase
 
         try {
             $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
-            $commandTester->execute(['process' => 'foo']);
+            $commandTester->execute(['process' => 'test_hello']);
         } finally {
             $configurationManager = self::getContainer()->get(ConfigurationManager::class);
             $configurationManager->set('process.task.can_execute', 1);
             $configurationManager->clearCache();
         }
+    }
+
+    public function testExecuteDisablePutInQueue(): void
+    {
+        $configurationManager = self::getContainer()->get(ConfigurationManager::class);
+        $configurationManager->set('process.task.can_execute', 0);
+        $configurationManager->clearCache();
+
+        try {
+            $commandTester = self::loadCommand(ProcessRunCommand::class, 'spipu:process:run');
+            $commandTester->execute(
+                [
+                    'process' => 'test_simple',
+                    '--inputs' => [
+                        'automatic_report_email:foo@bar.fr',
+                        'name_from:Foo',
+                        'name_to:Bar'
+                    ]
+                ]
+            );
+        } finally {
+            $configurationManager = self::getContainer()->get(ConfigurationManager::class);
+            $configurationManager->set('process.task.can_execute', 1);
+            $configurationManager->clearCache();
+        }
+
+        $output = trim($commandTester->getDisplay());
+        $this->assertStringContainsString('Execute process: test_simple', $output);
+        $this->assertStringContainsString('the process is put in queue', $output);
+        $this->assertStringNotContainsString('Hello World Bar from Foo', $output);
+        $this->assertSame(1, preg_match('/=> TaskId: (\d+)/', $output, $matches));
+
+        $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
+        $task = $entityManager->getRepository(Task::class)->find((int) $matches[1]);
+        $this->assertNotNull($task);
+        $this->assertSame('test_simple', $task->getCode());
+        $this->assertSame(Status::CREATED, $task->getStatus());
+        $this->assertNotNull($task->getScheduledAt());
     }
 
     public function testExecuteWithoutDebug(): void

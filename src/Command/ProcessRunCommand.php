@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Spipu\ProcessBundle\Command;
 
+use DateTime;
 use Spipu\ProcessBundle\Entity\Process\Input;
 use Spipu\ProcessBundle\Entity\Process\Process;
 use Spipu\ProcessBundle\Exception\InputException;
@@ -102,10 +103,6 @@ class ProcessRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->processConfiguration->hasTaskCanExecute()) {
-            throw new ProcessException('Execution is disabled in module configuration');
-        }
-
         // Init the new process.
         $processCode = $input->getArgument(static::ARGUMENT_PROCESS);
         $output->writeln(Date('Y-m-d H:i:s') . ' - Execute process: ' . $processCode);
@@ -114,6 +111,11 @@ class ProcessRunCommand extends Command
         // Init the inputs.
         $inputs = $input->getOption(static::OPTION_INPUT);
         $this->askInputs($process, $inputs, $input, $output);
+
+        // Execution disabled: put the process in queue.
+        if (!$this->processConfiguration->hasTaskCanExecute()) {
+            return $this->scheduleProcess($process, $output);
+        }
 
         // Debug mode or not.
         $loggerOutput = null;
@@ -129,6 +131,19 @@ class ProcessRunCommand extends Command
         // Display the result.
         $output->writeln(' => Result:');
         $output->writeln((string) $result);
+
+        return self::SUCCESS;
+    }
+
+    private function scheduleProcess(Process $process, OutputInterface $output): int
+    {
+        if (!$process->getOptions()->canBePutInQueue()) {
+            throw new ProcessException('Execution is disabled in module configuration');
+        }
+
+        $taskId = $this->processManager->scheduleExecution($process, new DateTime());
+        $output->writeln('Execution is disabled in module configuration, the process is put in queue');
+        $output->writeln(sprintf(' => TaskId: %d', $taskId));
 
         return self::SUCCESS;
     }
