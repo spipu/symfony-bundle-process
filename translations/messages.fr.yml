@@ -1,0 +1,130 @@
+spipu:
+    process:
+        confirm:
+            kill: "Voulez-vous vraiment arrêter cette tâche ?"
+
+        label:
+            task:
+                single: "Tâche"
+                plurial: "Tâches"
+            log:
+                single: "Journal"
+                plurial: "Journaux"
+
+        page:
+            admin:
+                task:
+                    list: "Tâches"
+                    show: "Tâche n°%id"
+                    choice: "Sélectionner une tâche à exécuter"
+                    execute: "Exécuter la tâche « %code »"
+                log:
+                    list: "Journaux"
+                    show: "Journal n°%id"
+                    memory_graph: "Consommation mémoire"
+
+        fieldset:
+            task: "Tâche"
+            execution: "Exécution"
+            inputs: "Données d'entrée"
+            logs: "Journaux"
+
+        field:
+            process:
+                code: "Code"
+                name: "Nom"
+                need_inputs: "Données requises"
+                parameters: "Paramètres"
+                inputs: "Données d'entrée"
+                options: "Options"
+                steps: "Étapes"
+                lock_on_failed: "Verrou en cas d'échec : %value"
+                locked_by: "Verrouillé par <span class=\"text-danger\">%nb tâche(s)</span>"
+                locks: "Verrous"
+            task:
+                id: "Id"
+                code: "Code"
+                status: "Statut"
+                progress: "Avancement"
+                try_last_at: "Dernier essai"
+                try_number: "Nb essais"
+                try_last_message: "Dernier message"
+                can_be_run_automatically: "Relance auto"
+                scheduled_at: "Planifiée"
+                scheduled_at_date: "Date"
+                scheduled_at_time: "Heure"
+                executed_at: "Exécutée"
+                pid_value: "PID"
+                pid_host: "Hôte du PID"
+                pid_last_seen: "PID vu le"
+                created_at: "Créée le"
+                updated_at: "Modifiée le"
+            log:
+                id: "Id"
+                code: "Traitement"
+                task: "Tâche"
+                status: "Statut"
+                progress: "Avancement"
+                created_at: "Créé le"
+                updated_at: "Modifié le"
+            message:
+                date: "Date"
+                level: "Niveau"
+                memory: "Mém"
+                memory_peak: "Pic"
+                memory_real: "Réel"
+                duration: "Durée"
+                message: "Message"
+            option:
+                can_be_put_in_queue: "Peut être mise en file d'attente"
+                can_be_rerun_automatically: "Peut être relancée automatiquement"
+            parameter:
+                empty: "Aucun paramètre"
+            input:
+                type: "Type « %type »"
+                empty: "Aucune donnée d'entrée"
+
+        status:
+            created: "Créée"
+            running: "En cours"
+            finished: "Terminée"
+            failed: "En échec"
+
+        action:
+            show_task: "Afficher la tâche"
+            rerun: "Relancer la tâche"
+            execute-choice: "Exécuter une nouvelle tâche"
+            execute: "Exécuter"
+            kill: "Arrêter la tâche"
+
+        refresh:
+            title: "Rafraîchir"
+            content: "Actualisé il y a "
+            stop: "Arrêter le rafraîchissement"
+            start: "Démarrer le rafraîchissement"
+
+        error:
+            execute: "L'exécution est désactivée dans la configuration du module"
+            rerun: "Cette tâche ne peut pas être relancée dans son état actuel"
+            kill: "Cette tâche ne peut pas être arrêtée dans son état actuel"
+            kill_host: "Cette tâche tourne sur un autre hôte : elle ne peut être arrêtée que depuis cet hôte, ou depuis n'importe quel hôte une fois son PID non vu pendant le délai configuré dans process.task.pid_not_seen_fail_after"
+            disable: "Cette action a été désactivée dans la configuration de l'application"
+            required: "Ce champ est obligatoire"
+            generic: "Le formulaire contient une erreur"
+            locked: "Ce traitement ne peut pas être exécuté : il est verrouillé par un autre — tâche %taskId"
+            needed_role: "Ce traitement ne peut pas être exécuté : vous n'avez pas le rôle nécessaire"
+
+        help:
+            json: "Doit être un format Json valide"
+
+        success:
+            rerun: "La tâche a été relancée"
+            kill: "La tâche a été arrêtée"
+
+        role:
+            admin: "Gérer les Traitements"
+            admin_show: "Gérer les Traitements - Afficher"
+            admin_delete: "Gérer les Traitements - Supprimer"
+            admin_rerun: "Gérer les Traitements - Relancer une tâche"
+            admin_execute: "Gérer les Traitements - Exécuter une tâche"
+            admin_kill: "Gérer les Traitements - Arrêter une tâche"

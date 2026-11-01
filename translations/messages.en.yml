@@ -1,5 +1,8 @@
 spipu:
     process:
+        confirm:
+            kill: "Do you really want to kill this task?"
+
         label:
             task:
                 single:  "Task"

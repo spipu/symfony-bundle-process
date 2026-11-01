@@ -13,7 +13,7 @@
 {% block main_actions %}
     {{ buttons.back(path('spipu_process_admin_task_list')) }}
     {% if is_granted('ROLE_ADMIN_MANAGE_PROCESS_KILL') and canKill%}
-        {{ buttons.defaultLink(path('spipu_process_admin_task_kill', {'id': resource.id}), 'spipu.process.action.kill', 'warning confirm-action', 'skull', null, 'kill') }}
+        {{ buttons.defaultLink(path('spipu_process_admin_task_kill', {'id': resource.id}), 'spipu.process.action.kill', 'warning confirm-action', 'skull', null, 'kill', 'spipu.process.confirm.kill') }}
     {% endif %}
     {% if is_granted('ROLE_ADMIN_MANAGE_PROCESS_RERUN') and canRerun %}
         {{ buttons.defaultLink(path('spipu_process_admin_task_rerun', {'id': resource.id}), 'spipu.process.action.rerun', 'primary', 'play-circle') }}
