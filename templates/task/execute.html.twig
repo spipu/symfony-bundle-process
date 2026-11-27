@@ -33,7 +33,7 @@
                     <tr><th>{{ 'spipu.process.field.option.can_be_put_in_queue'|trans }}</th></tr>
                     <tr><td>{% if (process.options.can_be_put_in_queue) %}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td></tr>
                     <tr><th>{{ 'spipu.process.field.option.can_be_rerun_automatically'|trans }}</th></tr>
-                    <tr><td>{% if (process.options.can_be_put_in_queue) %}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td></tr>
+                    <tr><td>{% if (process.options.can_be_rerun_automatically) %}{{ 'spipu.ui.options.value_yes'|trans }}{% else %}{{ 'spipu.ui.options.value_no'|trans }}{% endif %}</td></tr>
                 </table>
             </div>
         </div>
